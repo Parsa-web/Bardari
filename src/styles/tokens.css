@@ -52,7 +52,6 @@
 	--border: #e3e9f2;
 	--border-strong: #cfd9e6;
 	--text: #16263d;
-	--text-soft: #405madd;
 	--text-soft: #41546e;
 	--muted: #6d7f96;
 
@@ -119,7 +118,7 @@
 	color-scheme: dark;
 }
 
-/* در نمایشگرهای کوچک، مقیاس تیپوگرافی کمی جمع‌تر می‌شود */
+/* در نمایشگرهای کوچک، مقیاس تیپوگرافی کمی جمع‌تر می‌شود. */
 @media (max-width: 760px) {
 	:root {
 		--fs-page-title: 23px;

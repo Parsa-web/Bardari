@@ -1,0 +1,195 @@
+/* =========================================================================
+   لایه مقاوم‌سازی: نتیجه بازبینی سناریوهای حاد (متن بلند فارسی،
+   داده زیاد، نمایشگر ۳۲۰ پیکسل، دسترسی‌پذیری و RTL).
+   این فایل فقط از توکن‌ها استفاده می‌کند و مقدار دلخواه ندارد.
+   ========================================================================= */
+
+/* --- متن بلند و بدون فاصله نباید از کارت بیرون بزند --- */
+.card,
+.list__item,
+.stat,
+.notif__item,
+.thread__item,
+.timeline__item,
+.bubble,
+.alert,
+.state {
+	overflow-wrap: anywhere;
+}
+
+.stat__value,
+.card__title,
+.page-head__title,
+.section-head__title,
+.timeline__title,
+.notif__title,
+.drawer__title {
+	overflow-wrap: anywhere;
+}
+
+/* عناوین درون فهرست‌ها باید محدوده خود را نگه دارند */
+.list__item > div,
+.list__item > .list__main,
+.notif__item > div,
+.split__main > *,
+.shell__main,
+.content > * {
+	min-width: 0;
+}
+
+/* مقدار بلند آمار باید با اندازه کوچک‌تر و سه خط حداکرر نمایش داده شود */
+.stat__value {
+	font-size: clamp(16px, 2.1vw, 22px);
+	line-height: 1.6;
+}
+
+/* --- دسترسی‌پذیری: هدف لمس و حالت فوکوس --- */
+.btn:focus-visible,
+.chip:focus-visible,
+.icon-btn:focus-visible,
+.nav__item:focus-visible,
+.list__button:focus-visible,
+.modal__close:focus-visible,
+.input-group__action:focus-visible {
+	outline: 2px solid transparent;
+	box-shadow: var(--focus-ring);
+}
+
+.input:focus-visible {
+	box-shadow: var(--focus-ring);
+}
+
+.chip,
+.icon-btn,
+.modal__close,
+.input-group__action {
+	min-height: 38px;
+}
+
+@media (pointer: coarse) {
+	.chip,
+	.modal__close,
+	.input-group__action,
+	.btn--sm {
+		min-height: 44px;
+	}
+	.modal__close,
+	.input-group__action {
+		min-width: 44px;
+	}
+}
+
+/* در iOS ورودی کوچک‌تر از ۱۶ پیکسل باعث زوم ناگهانی می‌شود */
+@media (max-width: 760px) {
+	.input,
+	.input--area {
+		font-size: 16px;
+	}
+}
+
+/* --- جلوگیری از اسکرول افقی ناخواسته --- */
+.shell,
+.shell__main,
+.content,
+.card,
+.split,
+.grid {
+	max-width: 100%;
+}
+
+.card > .table,
+.card > table {
+	display: block;
+	overflow-x: auto;
+}
+
+/* در نمایشگرهای بسیار کوچک (۳۲۰ پیکسل) فشاردگی کم می‌شود */
+@media (max-width: 380px) {
+	.content {
+		padding: var(--space-3);
+	}
+	.card {
+		padding: var(--space-4);
+	}
+	.btn {
+		padding-inline: var(--space-4);
+	}
+	.page-head__actions,
+	.card__actions,
+	.toolbar {
+		width: 100%;
+	}
+	.page-head__actions .btn,
+	.toolbar .btn {
+		flex: 1 1 auto;
+	}
+	.field {
+		flex: 1 1 100%;
+	}
+	.input--inline {
+		width: 100%;
+		min-width: 0;
+	}
+	.pairs {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/* --- فهرست‌های بلند (اعلان زیاد، خط زمانی طولانی) --- */
+.drawer__body .notif__list {
+	gap: var(--space-2);
+}
+
+.list--selectable {
+	max-height: 460px;
+	overflow-y: auto;
+}
+
+/* --- RTL: جهت صحیح اعداد و تاریخ در ورودی‌های انگلیسی --- */
+input[type="date"].input,
+input[type="time"].input,
+input[type="tel"].input,
+input[type="number"].input {
+	direction: ltr;
+	text-align: end;
+}
+
+.badge,
+.stat__label,
+.field__label {
+	text-align: start;
+}
+
+/* --- جداول در موبایل: اسکرول افقی کنترل‌شده با سربرگ ثابت --- */
+.table-wrap {
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	background: var(--surface);
+}
+
+/* --- دستیار: پیام طولانی نباید کش بیاید --- */
+.chat {
+	min-height: 180px;
+}
+
+.bubble {
+	line-height: var(--lh-body);
+}
+
+/* --- دکمه غیرفعال نباید حالت شناور داشته باشد --- */
+.btn:disabled:hover {
+	background: inherit;
+}
+
+/* --- چاپ: حذف عناصر تعاملی --- */
+@media print {
+	.shell__side,
+	.topbar,
+	.drawer,
+	.modal {
+		display: none !important;
+	}
+	.content {
+		padding: 0;
+	}
+}

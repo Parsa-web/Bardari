@@ -5,6 +5,7 @@ import { App } from "./app/App"
 import "./styles/tokens.css"
 import "./styles/app.css"
 import "./styles/components.css"
+import "./styles/robustness.css"
 
 const container = document.getElementById("root")
 if (!container) throw new Error("عنصر ریشه پیدا نشد.")
