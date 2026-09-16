@@ -1,7 +1,13 @@
 import type { AppDatabase } from "../../shared/types/domain"
 import { addDays, todayIso } from "../../shared/utils/date"
+import { hashSecret } from "../auth/authService"
 
-export const SCHEMA_VERSION = 1
+export const SCHEMA_VERSION = 2
+
+/** رمز همه حساب‌های نمایشی؛ فقط برای دمو و بدون هیچ ارزش امنیتی. */
+export const DEMO_PASSWORD = "123456"
+
+const DEMO_HASH = hashSecret(DEMO_PASSWORD)
 
 const d = (offset: number) => addDays(todayIso(), offset)
 const ts = (offset: number, time = "10:00") => `${d(offset)}T${time}:00.000Z`
@@ -16,11 +22,21 @@ export function createSeedDatabase(): AppDatabase {
 			{ id: "sp_2", role: "specialist", name: "دکتر امید صالحی", specialty: "نوزادان و کودکان", center: "درمانگاه کودکان" },
 		],
 		mothers: [
-			{ id: "mo_1", firstName: "زهرا", lastName: "موسوی", phone: "09120000001", birthDate: "1996-04-12", bloodType: "O+", city: "تهران", careTeam: { midwifeId: "mw_1", specialistIds: ["sp_1"] }, note: "بارداری دوم؛ یک فرزند از بارداری قبلی." },
-			{ id: "mo_2", firstName: "نرگس", lastName: "کریمی", phone: "09120000002", birthDate: "2000-09-03", bloodType: "A+", city: "کرج", careTeam: { midwifeId: "mw_1", specialistIds: [] }, note: "مرحله پیش از بارداری؛ تاریخ‌ها ثبت نشده." },
-			{ id: "mo_3", firstName: "فاطمه", lastName: "حیدری", phone: "09120000003", birthDate: "1992-01-20", bloodType: "B-", city: "اصفهان", careTeam: { midwifeId: "mw_1", specialistIds: ["sp_1"] }, note: "نیازمند پیگیری در سه‌ماهه سوم." },
-			{ id: "mo_4", firstName: "سمیرا", lastName: "عباسی", phone: "09120000004", birthDate: "1990-11-08", city: "شیراز", careTeam: { midwifeId: "mw_1", specialistIds: ["sp_2"] }, note: "دو فرزند؛ بدون بارداری فعال." },
-			{ id: "mo_5", firstName: "الهام", lastName: "نوری", phone: "09120000005", birthDate: null, city: "تبریز", careTeam: { midwifeId: "mw_1", specialistIds: [] }, note: "پرونده خالی برای بررسی حالت بدون داده." },
+			{ id: "mo_1", firstName: "زهرا", lastName: "موسوی", phone: "09120000001", birthDate: "1996-04-12", bloodType: "O+", city: "تهران", careTeam: { midwifeId: "mw_1", specialistIds: ["sp_1"] }, note: "بارداری دوم؛ یک فرزند از بارداری قبلی.", currentStatus: "pregnant", createdAt: ts(-300) },
+			{ id: "mo_2", firstName: "نرگس", lastName: "کریمی", phone: "09120000002", birthDate: "2000-09-03", bloodType: "A+", city: "کرج", careTeam: { midwifeId: "mw_1", specialistIds: [] }, note: "مرحله پیش از بارداری؛ تاریخ‌ها ثبت نشده.", currentStatus: "planning", createdAt: ts(-120) },
+			{ id: "mo_3", firstName: "فاطمه", lastName: "حیدری", phone: "09120000003", birthDate: "1992-01-20", bloodType: "B-", city: "اصفهان", careTeam: { midwifeId: "mw_1", specialistIds: ["sp_1"] }, note: "نیازمند پیگیری در سه‌ماهه سوم.", currentStatus: "pregnant", createdAt: ts(-260) },
+			{ id: "mo_4", firstName: "سمیرا", lastName: "عباسی", phone: "09120000004", birthDate: "1990-11-08", city: "شیراز", careTeam: { midwifeId: "mw_1", specialistIds: ["sp_2"] }, note: "دو فرزند؛ بدون بارداری فعال.", currentStatus: "postpartum", createdAt: ts(-400) },
+			{ id: "mo_5", firstName: "الهام", lastName: "نوری", phone: "09120000005", birthDate: null, city: "تبریز", careTeam: { midwifeId: "mw_1", specialistIds: [] }, note: "پرونده خالی برای بررسی حالت بدون داده.", currentStatus: "not_pregnant", createdAt: ts(-20) },
+		],
+		accounts: [
+			{ id: "au_1", role: "mother", phone: "09120000001", passwordHash: DEMO_HASH, displayName: "زهرا موسوی", motherId: "mo_1", providerId: null, createdAt: ts(-300) },
+			{ id: "au_2", role: "mother", phone: "09120000002", passwordHash: DEMO_HASH, displayName: "نرگس کریمی", motherId: "mo_2", providerId: null, createdAt: ts(-120) },
+			{ id: "au_3", role: "mother", phone: "09120000003", passwordHash: DEMO_HASH, displayName: "فاطمه حیدری", motherId: "mo_3", providerId: null, createdAt: ts(-260) },
+			{ id: "au_4", role: "mother", phone: "09120000004", passwordHash: DEMO_HASH, displayName: "سمیرا عباسی", motherId: "mo_4", providerId: null, createdAt: ts(-400) },
+			{ id: "au_5", role: "mother", phone: "09120000005", passwordHash: DEMO_HASH, displayName: "الهام نوری", motherId: "mo_5", providerId: null, createdAt: ts(-20) },
+			{ id: "au_6", role: "midwife", phone: "09130000001", passwordHash: DEMO_HASH, displayName: "مریم رضایی", motherId: null, providerId: "mw_1", createdAt: ts(-400) },
+			{ id: "au_7", role: "specialist", phone: "09130000002", passwordHash: DEMO_HASH, displayName: "دکتر نسرین کاویانی", motherId: null, providerId: "sp_1", createdAt: ts(-400) },
+			{ id: "au_8", role: "specialist", phone: "09130000003", passwordHash: DEMO_HASH, displayName: "دکتر امید صالحی", motherId: null, providerId: "sp_2", createdAt: ts(-400) },
 		],
 		pregnancies: [
 			{ id: "pg_1", motherId: "mo_1", label: "بارداری اول", status: "birthed", lmpDate: d(-1185), eddDate: d(-905), createdAt: ts(-1185), providerNote: "زایمان طبیعی بدون عارضه ثبت شد.", birth: { date: d(-905), time: "04:20", kind: "natural", place: "بیمارستان مرکزی" } },
