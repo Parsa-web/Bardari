@@ -1,23 +1,131 @@
+/* ================= توکن‌های طراحی — منبع واحد تمام تصمیمات بصری ================= */
 :root {
-	--bg: #f6f7fb;
+	/* --- فاصله‌گذاری --- */
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 20px;
+	--space-6: 24px;
+	--space-8: 32px;
+	--space-10: 40px;
+	--space-12: 48px;
+	--space-16: 64px;
+
+	/* --- شعاع --- */
+	--radius-sm: 10px;
+	--radius-md: 12px;
+	--radius-lg: 16px;
+	--radius-pill: 999px;
+
+	/* --- تیپوگرافی --- */
+	--font-sans: "Vazirmatn", "IRANSansX", "Segoe UI", Tahoma, sans-serif;
+	--fs-page-title: 28px;
+	--fs-section-title: 20px;
+	--fs-card-title: 17px;
+	--fs-body: 15px;
+	--fs-secondary: 13.5px;
+	--fs-meta: 12.5px;
+	--fs-button: 14.5px;
+	--fs-input: 15px;
+	--fs-label: 13.5px;
+	--lh-tight: 1.5;
+	--lh-body: 1.8;
+
+	/* --- ارتفاع اجزا --- */
+	--control-h: 46px;
+	--control-h-sm: 38px;
+	--topbar-h: 68px;
+	--sidebar-w: 264px;
+
+	/* --- لایه‌ها --- */
+	--z-sticky: 20;
+	--z-drawer: 40;
+	--z-modal: 60;
+
+	/* --- رنگ — تم روشن --- */
+	--bg: #f4f7fb;
+	--bg-soft: #eef3f9;
 	--surface: #ffffff;
-	--surface-2: #f2f4f8;
-	--border: #e2e6ef;
-	--text: #1f2430;
-	--muted: #6b7384;
-	--primary: #4b6ef5;
-	--primary-weak: #eaefff;
-	--success: #1f8a5f;
-	--success-weak: #e6f6ef;
-	--warn: #9a6400;
-	--warn-weak: #fdf2dd;
-	--danger: #b3261e;
-	--danger-weak: #fdeceb;
-	--info: #1d6fa5;
-	--info-weak: #e7f2fa;
-	--radius: 14px;
-	--radius-sm: 9px;
-	--shadow: 0 1px 2px rgba(20, 25, 40, 0.05), 0 8px 24px rgba(20, 25, 40, 0.05);
-	--gap: 16px;
-	--font: "Vazirmatn", "Segoe UI", Tahoma, sans-serif;
+	--surface-2: #f5f8fc;
+	--surface-3: #eaf0f7;
+	--border: #e3e9f2;
+	--border-strong: #cfd9e6;
+	--text: #16263d;
+	--text-soft: #405madd;
+	--text-soft: #41546e;
+	--muted: #6d7f96;
+
+	--primary: #2f6fd0;
+	--primary-hover: #2760b8;
+	--primary-soft: #e8f0fc;
+	--primary-border: #c9dcf7;
+	--on-primary: #ffffff;
+
+	--success: #1d7a56;
+	--success-soft: #e6f5ee;
+	--warn: #8a5a05;
+	--warn-soft: #fdf3e2;
+	--danger: #a52f2a;
+	--danger-soft: #fceceb;
+	--info: #1f628f;
+	--info-soft: #e8f2f9;
+	--neutral-soft: #eef2f7;
+
+	--focus-ring: 0 0 0 3px rgba(47, 111, 208, 0.22);
+	--shadow-xs: 0 1px 2px rgba(19, 38, 63, 0.05);
+	--shadow-sm: 0 1px 2px rgba(19, 38, 63, 0.05), 0 4px 12px rgba(19, 38, 63, 0.04);
+	--shadow-md: 0 8px 28px rgba(19, 38, 63, 0.1);
+	--overlay: rgba(16, 27, 43, 0.42);
+
+	color-scheme: light;
+}
+
+/* --- رنگ — تم تاریک (طراحی مستقل، نه معکوس‌سازی) --- */
+[data-theme="dark"] {
+	--bg: #10182a;
+	--bg-soft: #0d1422;
+	--surface: #182238;
+	--surface-2: #1e2942;
+	--surface-3: #24314d;
+	--border: #2a3855;
+	--border-strong: #3a4a6b;
+	--text: #e8eef8;
+	--text-soft: #c2cee0;
+	--muted: #93a3bb;
+
+	--primary: #74a8f0;
+	--primary-hover: #8cb8f5;
+	--primary-soft: #1d2c47;
+	--primary-border: #2f4771;
+	--on-primary: #0d1728;
+
+	--success: #79d0a8;
+	--success-soft: #17301f;
+	--warn: #e2b872;
+	--warn-soft: #33270f;
+	--danger: #ef9b95;
+	--danger-soft: #361c1c;
+	--info: #8cc2e8;
+	--info-soft: #152a3a;
+	--neutral-soft: #202c45;
+
+	--focus-ring: 0 0 0 3px rgba(116, 168, 240, 0.28);
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28), 0 4px 14px rgba(0, 0, 0, 0.24);
+	--shadow-md: 0 10px 30px rgba(0, 0, 0, 0.38);
+	--overlay: rgba(6, 11, 20, 0.6);
+
+	color-scheme: dark;
+}
+
+/* در نمایشگرهای کوچک، مقیاس تیپوگرافی کمی جمع‌تر می‌شود */
+@media (max-width: 760px) {
+	:root {
+		--fs-page-title: 23px;
+		--fs-section-title: 18px;
+		--fs-card-title: 16px;
+		--fs-body: 14.5px;
+		--topbar-h: 60px;
+	}
 }
