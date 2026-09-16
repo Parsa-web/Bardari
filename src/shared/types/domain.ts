@@ -18,6 +18,9 @@ export type CareProvider = {
 	center?: string
 }
 
+/** وضعیت جاری اعلام‌شده توسط خود مادر در زمان ثبت‌نام */
+export type MotherCurrentStatus = "planning" | "pregnant" | "postpartum" | "not_pregnant"
+
 export type Mother = {
 	id: string
 	firstName: string
@@ -28,6 +31,9 @@ export type Mother = {
 	city?: string
 	careTeam: { midwifeId?: string; specialistIds: string[] }
 	note?: string
+	/** وضعیت اعلامی مادر؛ جایگزین موجودیت بارداری نیست */
+	currentStatus?: MotherCurrentStatus
+	createdAt?: string
 }
 
 export type PregnancyStatus = "planning" | "active" | "birthed" | "ended"
@@ -67,6 +73,22 @@ export type Child = {
 	birthTime?: string
 	sex: "female" | "male" | "unknown"
 	note?: string
+}
+
+/**
+ * حساب ورود نمایشی.
+ * رمز به‌صورت متن ساده نگهداری نمی‌شود؛ فقط یک اثر تک‌طرفه ساده برای دمو ذخیره می‌شود
+ * و این جایگزین احراز هویت واقعی سمت سرور نیست.
+ */
+export type AuthAccount = {
+	id: string
+	role: Role
+	phone: string
+	passwordHash: string
+	displayName: string
+	motherId?: string | null
+	providerId?: string | null
+	createdAt: string
 }
 
 export type ActivityCategory =
@@ -242,6 +264,7 @@ export type AppDatabase = {
 	version: number
 	providers: CareProvider[]
 	mothers: Mother[]
+	accounts: AuthAccount[]
 	pregnancies: Pregnancy[]
 	children: Child[]
 	activities: Activity[]
