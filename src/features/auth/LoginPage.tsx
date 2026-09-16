@@ -26,6 +26,7 @@ import { Icon } from "../../shared/components/icons"
 import { MOTHER_STATUS_LABELS, NOT_RECORDED } from "../../shared/constants/labels"
 import type { MotherCurrentStatus, Role } from "../../shared/types/domain"
 import { diffInDays, formatDate, toFa, todayIso } from "../../shared/utils/date"
+import { REGISTER_SUCCESS_DESC, REGISTER_SUCCESS_TITLE } from "./successText"
 import "../../styles/auth.css"
 
 type Mode = "login" | "register" | "registered"
@@ -667,10 +668,8 @@ export default function LoginPage() {
 					<Icon name="check" size={24} />
 				</span>
 				<div className="authx__head">
-					<h1 className="authx__title">حساب شما با موفقیت ایجاد شد</h1>
-					<p className="authx__desc">
-						aکنون می‌توانید وارد فضای مراقبت شخصی خود شوید.
-					</p>
+					<h1 className="authx__title">{REGISTER_SUCCESS_TITLE}</h1>
+					<p className="authx__desc">{REGISTER_SUCCESS_DESC}</p>
 				</div>
 				<Button variant="primary" block onClick={() => void enterAfterRegister()}>
 					ورود به حساب
@@ -691,8 +690,8 @@ export default function LoginPage() {
 					<div>
 						<h2 className="authx__headline">پیگیری آرام و منظم سلامت مادر و کودک</h2>
 						<p className="authx__lede">
-							هر چیزی که ثبت می‌کنید در جای خودش باقی می‌ماند: بارداری، کودک و پرونده خود
-							مادر جداگانه نگهداری می‌شوند.
+							هر چیزی که ثبت می‌کنید در جای خودش باقی می‌ماند: بارداری، کودک و پرونده خود مادر
+							جداگانه نگهداری می‌شوند.
 						</p>
 						<div className="authx__points">
 							{POINTS.map((point) => (
