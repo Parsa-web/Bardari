@@ -10,6 +10,9 @@ import {
 	FormRow,
 	Modal,
 	PageHeader,
+	Select,
+	TextArea,
+	TextInput,
 } from "../../shared/components/ui"
 import { useMotherContext } from "./useMotherContext"
 import { getPregnancies } from "../../services/selectors"
@@ -86,16 +89,17 @@ export function PregnanciesPage() {
 
 	return (
 		<>
-			<PageHeader
-				title="بارداری‌ها"
-				subtitle="چرخه پیش از بارداری ← بارداری ← زایمان ← پرونده کودک"
-			/>
+			<PageHeader title="بارداری‌ها" subtitle="چرخه پیش از بارداری ← بارداری ← زایمان ← پرونده کودک" />
 
 			{error && <Alert tone="danger">{error}</Alert>}
 
 			<Card title="پرونده‌های بارداری">
 				{pregnancies.length === 0 ? (
-					<EmptyState title="پرونده بارداری ثبت نشده است." hint="می‌توانید از فرم پایین پرونده جدید بسازید." />
+					<EmptyState
+						icon="pregnancy"
+						title="پرونده بارداری ثبت نشده است"
+						hint="از فرم پایین می‌توانید پرونده جدید بسازید. در هر زمان فقط یک بارداری می‌تواند فعال باشد."
+					/>
 				) : (
 					<ul className="list">
 						{pregnancies.map((pregnancy) => {
@@ -146,6 +150,8 @@ export function PregnanciesPage() {
 									<div className="row-actions">
 										{pregnancy.status === "planning" && (
 											<Button
+												variant="outline"
+												size="sm"
 												onClick={() => {
 													setError(null)
 													void mutate((current) =>
@@ -159,7 +165,7 @@ export function PregnanciesPage() {
 											</Button>
 										)}
 										{pregnancy.status === "active" && (
-											<Button variant="primary" onClick={() => setBirthFor(pregnancy.id)}>
+											<Button variant="primary" size="sm" onClick={() => setBirthFor(pregnancy.id)}>
 												ثبت زایمان
 											</Button>
 										)}
@@ -171,109 +177,116 @@ export function PregnanciesPage() {
 				)}
 			</Card>
 
-			<Card title="ثبت پرونده بارداری جدید" subtitle="اگر تاریخی وارد نکنید، پرونده در مرحله پیش از بارداری ثبت می‌شود.">
+			<Card
+				title="ثبت پرونده بارداری جدید"
+				subtitle="اگر تاریخی وارد نکنید، پرونده در مرحله پیش از بارداری ثبت می‌شود."
+			>
 				<Field label="عنوان">
-					<input
-						className="input"
+					<TextInput
 						value={newForm.label}
 						placeholder="مانند: بارداری سوم"
-						onChange={(event) => setNewForm({ ...newForm, label: event.target.value })}
+						onChange={(value) => setNewForm({ ...newForm, label: value })}
 					/>
 				</Field>
 				<FormRow>
 					<Field label="اولین روز آخرین قاعدگی" hint="اختیاری">
-						<input
-							className="input"
+						<TextInput
 							type="date"
 							value={newForm.lmpDate}
-							onChange={(event) => setNewForm({ ...newForm, lmpDate: event.target.value })}
+							onChange={(value) => setNewForm({ ...newForm, lmpDate: value })}
 						/>
 					</Field>
 					<Field label="تاریخ تخمینی زایمان" hint="اختیاری">
-						<input
-							className="input"
+						<TextInput
 							type="date"
 							value={newForm.eddDate}
-							onChange={(event) => setNewForm({ ...newForm, eddDate: event.target.value })}
+							onChange={(value) => setNewForm({ ...newForm, eddDate: value })}
 						/>
 					</Field>
 				</FormRow>
 				<Field label="یادداشت" hint="اختیاری">
-					<textarea
-						className="input input--area"
+					<TextArea
 						value={newForm.note}
-						onChange={(event) => setNewForm({ ...newForm, note: event.target.value })}
+						rows={3}
+						onChange={(value) => setNewForm({ ...newForm, note: value })}
 					/>
 				</Field>
-				<Button variant="primary" onClick={submitNew}>
+				<Button variant="primary" icon="plus" onClick={submitNew}>
 					ثبت پرونده
 				</Button>
 			</Card>
 
-			<Modal open={birthFor !== null} title="ثبت زایمان و پرونده کودک" onClose={() => setBirthFor(null)}>
+			<Modal
+				open={birthFor !== null}
+				title="ثبت زایمان و پرونده کودک"
+				onClose={() => setBirthFor(null)}
+				footer={
+					<>
+						<Button variant="outline" onClick={() => setBirthFor(null)}>
+							انصراف
+						</Button>
+						<Button variant="primary" onClick={submitBirth}>
+							ثبت و ساخت پرونده کودک
+						</Button>
+					</>
+				}
+			>
 				<FormRow>
 					<Field label="تاریخ زایمان">
-						<input
-							className="input"
+						<TextInput
 							type="date"
 							value={birthForm.date}
-							onChange={(event) => setBirthForm({ ...birthForm, date: event.target.value })}
+							onChange={(value) => setBirthForm({ ...birthForm, date: value })}
 						/>
 					</Field>
 					<Field label="ساعت" hint="اختیاری">
-						<input
-							className="input"
+						<TextInput
 							type="time"
 							value={birthForm.time}
-							onChange={(event) => setBirthForm({ ...birthForm, time: event.target.value })}
+							onChange={(value) => setBirthForm({ ...birthForm, time: value })}
 						/>
 					</Field>
 				</FormRow>
 				<FormRow>
 					<Field label="نوع زایمان">
-						<select
-							className="input"
+						<Select
 							value={birthForm.kind}
-							onChange={(event) =>
-								setBirthForm({ ...birthForm, kind: event.target.value as NonNullable<Birth["kind"]> })
+							onChange={(value) =>
+								setBirthForm({ ...birthForm, kind: value as NonNullable<Birth["kind"]> })
 							}
-						>
-							<option value="natural">{BIRTH_KIND_LABELS.natural}</option>
-							<option value="cesarean">{BIRTH_KIND_LABELS.cesarean}</option>
-							<option value="unknown">{BIRTH_KIND_LABELS.unknown}</option>
-						</select>
+							options={[
+								{ value: "natural", label: BIRTH_KIND_LABELS.natural },
+								{ value: "cesarean", label: BIRTH_KIND_LABELS.cesarean },
+								{ value: "unknown", label: BIRTH_KIND_LABELS.unknown },
+							]}
+						/>
 					</Field>
 					<Field label="محل زایمان" hint="اختیاری">
-						<input
-							className="input"
+						<TextInput
 							value={birthForm.place}
-							onChange={(event) => setBirthForm({ ...birthForm, place: event.target.value })}
+							onChange={(value) => setBirthForm({ ...birthForm, place: value })}
 						/>
 					</Field>
 				</FormRow>
 				<FormRow>
 					<Field label="نام کودک">
-						<input
-							className="input"
+						<TextInput
 							value={birthForm.childName}
-							onChange={(event) => setBirthForm({ ...birthForm, childName: event.target.value })}
+							onChange={(value) => setBirthForm({ ...birthForm, childName: value })}
 						/>
 					</Field>
 					<Field label="جنسیت">
-						<select
-							className="input"
+						<Select
 							value={birthForm.sex}
-							onChange={(event) => setBirthForm({ ...birthForm, sex: event.target.value as Child["sex"] })}
-						>
-							<option value="female">دختر</option>
-							<option value="male">پسر</option>
-							<option value="unknown">ثبت نشده</option>
-						</select>
+							onChange={(value) => setBirthForm({ ...birthForm, sex: value as Child["sex"] })}
+							options={[
+								{ value: "female", label: "دختر" },
+								{ value: "male", label: "پسر" },
+								{ value: "unknown", label: "ثبت نشده" },
+							]}
+						/>
 					</Field>
 				</FormRow>
-				<Button variant="primary" onClick={submitBirth}>
-					ثبت و ساخت پرونده کودک
-				</Button>
 			</Modal>
 		</>
 	)
