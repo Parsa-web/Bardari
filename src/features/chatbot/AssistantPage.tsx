@@ -21,12 +21,15 @@ export function AssistantPage() {
 		const userTurn: Turn = { id: Date.now(), role: "user", text }
 		setTurns((current) => [...current, userTurn])
 		setInput("")
-		const reply = await chatbotService.ask(text)
-		setTurns((current) => [
-			...current,
-			{ id: Date.now() + 1, role: "bot", text: reply.text, kind: reply.kind },
-		])
-		setBusy(false)
+		try {
+			const reply = await chatbotService.ask(text)
+			setTurns((current) => [
+				...current,
+				{ id: Date.now() + 1, role: "bot", text: reply.text, kind: reply.kind },
+			])
+		} finally {
+			setBusy(false)
+		}
 	}
 
 	return (
@@ -46,13 +49,13 @@ export function AssistantPage() {
 			<Alert tone="info">{CHATBOT_DISCLAIMER}</Alert>
 
 			<Card title="گفتگو" subtitle="پیام‌های شما فقط در همین مرورگر و در همین گفتگو نگه داشته می‌شوند.">
-				<div className="chat">
+				<div className="chat" role="log" aria-live="polite">
 					{turns.length === 0 ? (
-						<div className="chat__hint">
-							<span className="chat__hint-icon" aria-hidden="true">
+						<div className="state empty">
+							<span className="state__icon">
 								<Icon name="assistant" size={22} />
 							</span>
-							<p className="muted">می‌توانید از این نمونه‌ها شروع کنید:</p>
+							<p className="state__title">می‌توانید از این نمونه‌ها شروع کنید</p>
 							<div className="chat__chips">
 								{CHATBOT_SUGGESTIONS.map((suggestion) => (
 									<button
@@ -75,17 +78,17 @@ export function AssistantPage() {
 								key={turn.id}
 								className={`bubble bubble--${turn.role}${turn.kind === "safety" ? " bubble--safety" : ""}`}
 							>
-								<span className="bubble__author">{turn.role === "user" ? "شما" : "دستیار مراقبت"}</span>
-								{turn.text}
+								<p className="meta">{turn.role === "user" ? "شما" : "دستیار مراقبت"}</p>
+								<p>{turn.text}</p>
 							</div>
 						))
 					)}
 				</div>
 
-				<Field label="پرسش شما" hint="در موارد فوری و علائم هشدار، مستقیم با مراقب سلامت خود تماس بگیرید.">
+				<Field label="پرسش شما" hint="در موارد فوری و علامت هشدار، مستقیم با مراقب سلامت خود تماس بگیرید.">
 					<TextArea
 						value={input}
-						rows={3}
+						disabled={busy}
 						placeholder="مانند: در دوران بارداری چه ورزشی مناسب است؟"
 						onChange={(value) => setInput(value)}
 					/>
