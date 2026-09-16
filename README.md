@@ -1,78 +1,57 @@
-# React + TypeScript + Vite
+# سامانه مراقبت مادر و کودک (Mother & Child Care Platform)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+پنل فرانت‌اند فارسی و RTL برای مراقبت مادر، بارداری و کودک با سه نقش **مادر / ماما / متخصص**.
 
-Currently, two official plugins are available:
+> این نسخه فقط فرانت‌اند است. بک‌اند، احراز هویت واقعی، پیامک، پرداخت و هوش مصنوعی واقعی پیاده‌سازی **نشده** است. داده‌ها با Mock ساخته می‌شوند و در LocalStorage مرورگر ذخیره می‌شوند.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## اجرا
 
-## React Compiler
-
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
-
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
+npm run dev     # اجرای محلی
+npm run build   # بررسی تایپ + بیلد تولیدی
+npm run lint    # بررسی ESLint
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+نسخه منتشرشده: <https://parsa-web.github.io/Bardari/> (مسیردهی Hash برای میزبانی ایستا)
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## معماری
 
 ```
+src/
+  app/        providers (Data, Session)، router (routes, RoleGuard)، layouts (AppLayout)
+  features/   auth, mother, midwife, specialist, timeline, chatbot
+  shared/     types/domain.ts، constants/labels.ts، utils (date, id)، components/ui.tsx
+  services/   repositories (databaseRepository)، mock (seed)، storage، selectors، mutations
+  styles/     tokens.css، app.css، components.css
+```
+
+رابط کاربری هرگز مستقیم با LocalStorage کار نمی‌کند؛ همه خواندن/نوشتن از `services` عبور می‌کند. برای اتصال به API واقعی فقط `services/repositories` جایگزین می‌شود.
+
+## مدل دامنه
+
+`Mother ≠ Pregnancy ≠ Child`؛ هر مادر می‌تواند چند بارداری و چند کودک داشته باشد، اما **فقط یک بارداری فعال یا هیچ**. رویدادها با مفهوم عمومی `TimelineEvent` روی خط زمانی نمایش داده می‌شوند.
+
+چرخه‌های وضعیت:
+
+- چکاپ: در انتظار / نزدیک موعد / عقب‌افتاده / انجام شد / انجام نشد / لغو شد
+- سؤال: باز / در حال بررسی / پاسخ داده شد / نیازمند پیگیری / ارجاع به متخصص / بسته شد
+- ارجاع: ایجاد شد / ارسال شد / مشاهده شد / در حال بررسی / اقدام ثبت شد / بسته شد
+
+## قابلیت‌ها
+
+- **مادر:** خانه، پروفایل، بارداری‌ها (شروع بارداری، ثبت زایمان و ساخت پرونده کودک)، فعالیت روزانه با CRUD کامل، کودکان (واکسن، رشد، تکامل، سوابق سلامت)، چکاپ‌ها، سؤال از ماما، خط زمانی، دستیار مراقبت
+- **ماما:** میز کار، مادران تحت مراقبت با پرونده کامل، پاسخ به سؤال‌ها و تغییر وضعیت، ایجاد ارجاع به متخصص، مدیریت چکاپ‌ها، پیگیری ارجاع‌ها
+- **متخصص:** صف ارجاع با تمرکز بر اولویت و فوریت، ثبت مشاهده/بررسی/اقدام تخصصی و بستن ارجاع
+- **اعلان‌ها:** مرکز اعلان درون‌برنامه‌ای با وضعیت خوانده‌شده (بدون Push واقعی)
+- **دستیار:** فقط در حوزه بارداری و مراقبت پاسخ می‌دهد؛ خارج از حوزه رد می‌کند و در موارد خطر، پیام ارجاع فوری به مراقب سلامت می‌دهد
+
+## ورود دمو
+
+صفحه `/login` بدون رمز عبور است؛ نقش و پرونده انتخاب می‌شود و با «تعویض نقش» می‌توان نقش را عوض کرد. دکمه «بازنشانی داده دمو» داده‌ها را به حالت اولیه برمی‌گرداند.
+
+## محدودیت‌های صریح
+
+- هفته بارداری و سن کودک فقط از تاریخ‌های معتبر محاسبه می‌شود؛ در غیر این صورت «اطلاعات ثبت نشده» نمایش داده می‌شود.
+- پاسخ‌های دستیار از قواعد Mock می‌آید و جای مشاوره پزشکی را نمی‌گیرد.
+- داده‌ها محلی و مخصوص همان مرورگر است و بین کاربران همگام نمی‌شود.
