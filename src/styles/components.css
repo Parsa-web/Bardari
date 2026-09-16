@@ -1,0 +1,96 @@
+/* تکمیل استیل برای مارکآپ دقیق کامپوننت‌های مشترک */
+.card__title {
+	font-size: 16px;
+	font-weight: 700;
+}
+
+.card__subtitle,
+.page-head__subtitle {
+	margin: 0;
+	color: var(--muted);
+	font-size: 13px;
+}
+
+.card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+}
+
+.card__actions,
+.page-head__actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.card__footer {
+	border-top: 1px solid var(--border);
+	padding-top: 8px;
+}
+
+.page-head__title {
+	font-size: 20px;
+	font-weight: 700;
+}
+
+.stat__hint {
+	color: var(--muted);
+	font-size: 12px;
+}
+
+.field__error {
+	color: var(--danger);
+	font-size: 12px;
+}
+
+.empty__title {
+	margin: 0;
+	font-size: 14px;
+}
+
+.empty__hint {
+	margin: 4px 0 0;
+	font-size: 12px;
+}
+
+/* مودال */
+.modal__backdrop {
+	position: absolute;
+	inset: 0;
+}
+
+.modal__panel {
+	position: relative;
+	background: var(--surface);
+	border-radius: var(--radius);
+	padding: 18px;
+	width: min(620px, 100%);
+	max-height: 90vh;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	box-shadow: var(--shadow);
+}
+
+.modal__body {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.modal__close {
+	border: none;
+	background: transparent;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+	color: var(--muted);
+}
+
+.modal__head h2 {
+	font-size: 16px;
+}
