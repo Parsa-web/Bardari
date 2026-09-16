@@ -1,17 +1,21 @@
 {
   "name": "bardari",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Mother & Child Care Platform - frontend MVP (mock data, no backend)",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "build:fast": "vite build",
+    "typecheck": "tsc -b",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "react": "^19.2.8",
-    "react-dom": "^19.2.8"
+    "react-dom": "^19.2.8",
+    "react-router-dom": "^7.9.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.7",
