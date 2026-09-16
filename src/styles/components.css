@@ -273,11 +273,22 @@
 }
 
 /* ---------------- فرم ---------------- */
+/*
+ * مهم: هیچ‌وقت به .field به‌صورت سراسری «flex-basis» عددی ندهید.
+ * در هر ظرف ستونی (مانند .card__body ، .modal__body یا فرم ورود)
+ * آن عدد روی «ارتفاع» اعمال می‌شود و فیلدها را کشیده می‌کند.
+ * کشسانی افقی فقط در ردیف‌های فرم (.form-row / .toolbar) فعال است.
+ */
 .field {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-2);
 	min-width: 0;
+	flex: 0 1 auto;
+}
+
+.form-row > .field,
+.toolbar > .field {
 	flex: 1 1 220px;
 }
 
@@ -361,6 +372,10 @@
 	min-width: 170px;
 }
 
+/*
+ * فلش لیست کشویی در چیدمان راست‌به‌چپ سمت چپ (پایان خط) رسم می‌شود؛
+ * پس فاصله داخلی باید همان سمت باشد، وگرنه متن روی فلش می‌افتد.
+ */
 select.input {
 	appearance: none;
 	background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%),
@@ -368,7 +383,7 @@ select.input {
 	background-position: calc(var(--space-4)) center, calc(var(--space-4) + 5px) center;
 	background-size: 5px 5px, 5px 5px;
 	background-repeat: no-repeat;
-	padding-inline-start: var(--space-8);
+	padding-inline-end: var(--space-8);
 }
 
 .input-group {
@@ -759,7 +774,7 @@ select.input {
 	overflow-wrap: anywhere;
 }
 
-/* ---------------- گفتگوی سؤال‌ها ---------------- */
+/* ---------------- گفتگوی سوال‌ها ---------------- */
 .thread {
 	list-style: none;
 	padding: 0;
@@ -981,6 +996,7 @@ select.input {
 	border-radius: var(--radius-sm);
 	color: var(--muted);
 	cursor: pointer;
+	flex: 0 0 auto;
 }
 
 .modal__close:hover {
