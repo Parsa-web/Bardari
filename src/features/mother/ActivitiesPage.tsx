@@ -5,10 +5,14 @@ import {
 	Badge,
 	Button,
 	Card,
+	ConfirmDialog,
 	EmptyState,
 	Field,
 	FormRow,
 	PageHeader,
+	Select,
+	TextArea,
+	TextInput,
 	Toolbar,
 } from "../../shared/components/ui"
 import { decodeSubject, useMotherContext } from "./useMotherContext"
@@ -53,6 +57,7 @@ export function ActivitiesPage() {
 	const [editingId, setEditingId] = useState<string | null>(null)
 	const [filter, setFilter] = useState<string>("all")
 	const [error, setError] = useState<string | null>(null)
+	const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
 	const activities = useMemo(() => {
 		const subject = filter === "all" ? null : decodeSubject(filter)
@@ -119,101 +124,77 @@ export function ActivitiesPage() {
 				{error && <Alert tone="danger">{error}</Alert>}
 				<FormRow>
 					<Field label="موضوع">
-						<select
-							className="input"
+						<Select
 							value={form.subjectValue}
-							onChange={(event) => update({ subjectValue: event.target.value })}
-						>
-							{subjectOptions.map((option) => (
-								<option key={option.value} value={option.value}>
-									{option.label}
-								</option>
-							))}
-						</select>
+							onChange={(value) => update({ subjectValue: value })}
+							options={subjectOptions.map((option) => ({ value: option.value, label: option.label }))}
+						/>
 					</Field>
 					<Field label="دسته">
-						<select
-							className="input"
+						<Select
 							value={form.category}
-							onChange={(event) => update({ category: event.target.value as ActivityCategory })}
-						>
-							{CATEGORIES.map((category) => (
-								<option key={category} value={category}>
-									{ACTIVITY_CATEGORY_LABELS[category]}
-								</option>
-							))}
-						</select>
+							onChange={(value) => update({ category: value as ActivityCategory })}
+							options={CATEGORIES.map((category) => ({
+								value: category,
+								label: ACTIVITY_CATEGORY_LABELS[category],
+							}))}
+						/>
 					</Field>
 				</FormRow>
 
 				<FormRow>
 					<Field label="تاریخ">
-						<input
-							className="input"
-							type="date"
-							value={form.date}
-							onChange={(event) => update({ date: event.target.value })}
-						/>
+						<TextInput type="date" value={form.date} onChange={(value) => update({ date: value })} />
 					</Field>
 					<Field label="ساعت">
-						<input
-							className="input"
-							type="time"
-							value={form.time}
-							onChange={(event) => update({ time: event.target.value })}
-						/>
+						<TextInput type="time" value={form.time} onChange={(value) => update({ time: value })} />
 					</Field>
 				</FormRow>
 
 				<Field label="عنوان">
-					<input
-						className="input"
+					<TextInput
 						value={form.title}
 						placeholder="مانند: پیاده‌روی عصر"
-						onChange={(event) => update({ title: event.target.value })}
+						onChange={(value) => update({ title: value })}
 					/>
 				</Field>
 
 				<FormRow>
 					<Field label="مدت (دقیقه)" hint="اختیاری">
-						<input
-							className="input"
+						<TextInput
 							type="number"
 							min={0}
 							value={form.duration}
-							onChange={(event) => update({ duration: event.target.value })}
+							onChange={(value) => update({ duration: value })}
 						/>
 					</Field>
 					{form.category === "symptom" && (
 						<Field label="شدت علامت (۱ تا ۵)">
-							<input
-								className="input"
+							<TextInput
 								type="number"
 								min={1}
 								max={5}
 								value={form.severity}
-								onChange={(event) => update({ severity: event.target.value })}
+								onChange={(value) => update({ severity: value })}
 							/>
 						</Field>
 					)}
 				</FormRow>
 
 				<Field label="توضیحات" hint="اختیاری">
-					<textarea
-						className="input input--area"
-						value={form.description}
-						onChange={(event) => update({ description: event.target.value })}
-					/>
+					<TextArea value={form.description} onChange={(value) => update({ description: value })} rows={3} />
 				</Field>
 
 				<Toolbar>
-					<Button variant="primary" onClick={submit}>
+					<Button variant="primary" icon={editingId ? "check" : "plus"} onClick={submit}>
 						{editingId ? "ذخیره تغییرات" : "ثبت فعالیت"}
 					</Button>
 					{editingId && (
 						<Button
+							variant="outline"
 							onClick={() => {
 								setEditingId(null)
+								setError(null)
 								setForm(emptyForm(form.subjectValue))
 							}}
 						>
@@ -226,18 +207,24 @@ export function ActivitiesPage() {
 			<Card
 				title="فعالیت‌های ثبت‌شده"
 				actions={
-					<select className="input input--inline" value={filter} onChange={(event) => setFilter(event.target.value)}>
-						<option value="all">همه موضوع‌ها</option>
-						{subjectOptions.map((option) => (
-							<option key={option.value} value={option.value}>
-								{option.label}
-							</option>
-						))}
-					</select>
+					<Select
+						inline
+						value={filter}
+						onChange={(value) => setFilter(value)}
+						aria-label="فیلتر موضوع"
+						options={[
+							{ value: "all", label: "همه موضوع‌ها" },
+							...subjectOptions.map((option) => ({ value: option.value, label: option.label })),
+						]}
+					/>
 				}
 			>
 				{grouped.length === 0 ? (
-					<EmptyState title="فعالیتی ثبت نشده است." />
+					<EmptyState
+						icon="activity"
+						title="فعالیتی برای این فیلتر ثبت نشده است"
+						hint="از فرم بالا می‌توانید غذا، حرکت، دارو، خواب یا علامت را ثبت کنید."
+					/>
 				) : (
 					grouped.map(([date, items]) => (
 						<div key={date} className="day-group">
@@ -247,7 +234,7 @@ export function ActivitiesPage() {
 									<li key={activity.id} className="list__item">
 										<div>
 											<strong>{activity.title}</strong>
-											<p className="muted">
+											<p className="meta">
 												ساعت {formatTime(activity.time)} · {ACTIVITY_CATEGORY_LABELS[activity.category]} ·{" "}
 												{subjectLabel(db, activity.subject)}
 												{activity.durationMinutes ? ` · ${toFa(activity.durationMinutes)} دقیقه` : ""}
@@ -261,8 +248,10 @@ export function ActivitiesPage() {
 											</Badge>
 											<Button
 												variant="ghost"
+												size="sm"
 												onClick={() => {
 													setEditingId(activity.id)
+													setError(null)
 													setForm({
 														subjectValue: `${activity.subject.kind}:${activity.subject.id}`,
 														date: activity.date,
@@ -277,13 +266,7 @@ export function ActivitiesPage() {
 											>
 												ویرایش
 											</Button>
-											<Button
-												variant="danger"
-												onClick={() => {
-													if (!window.confirm("این فعالیت حذف شود؟")) return
-													void mutate((current) => deleteActivity(current, activity.id))
-												}}
-											>
+											<Button variant="ghost" size="sm" onClick={() => setPendingDeleteId(activity.id)}>
 												حذف
 											</Button>
 										</div>
@@ -294,6 +277,26 @@ export function ActivitiesPage() {
 					))
 				)}
 			</Card>
+
+			<ConfirmDialog
+				open={pendingDeleteId !== null}
+				title="حذف فعالیت"
+				description="این فعالیت از پرونده و خط زمانی حذف می‌شود. این اقدام قابل بازگرداندن نیست."
+				confirmLabel="حذف فعالیت"
+				cancelLabel="انصراف"
+				tone="danger"
+				onCancel={() => setPendingDeleteId(null)}
+				onConfirm={() => {
+					const id = pendingDeleteId
+					setPendingDeleteId(null)
+					if (!id) return
+					if (editingId === id) {
+						setEditingId(null)
+						setForm(emptyForm(form.subjectValue))
+					}
+					void mutate((current) => deleteActivity(current, id))
+				}}
+			/>
 		</>
 	)
 }
