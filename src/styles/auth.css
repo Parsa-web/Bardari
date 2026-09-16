@@ -1,0 +1,372 @@
+/* استایل ناحیه احراز هویت (ورود و ثبت‌نام). فقط در صفحه احراز هویت بارگذاری می‌شود. */
+
+.authx {
+	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-8) var(--space-4);
+	background: var(--bg);
+}
+
+.authx__card {
+	width: min(1040px, 100%);
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-md);
+	overflow: hidden;
+}
+
+.authx__brand {
+	position: relative;
+	isolation: isolate;
+	padding: 40px 36px;
+	background: var(--primary-soft);
+	border-inline-end: 1px solid var(--border);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: var(--space-8);
+	overflow: hidden;
+}
+
+.authx__brand::after {
+	content: "";
+	position: absolute;
+	z-index: -1;
+	inset-inline-start: -80px;
+	bottom: -100px;
+	width: 240px;
+	height: 240px;
+	border-radius: 50%;
+	background: rgba(47, 111, 208, 0.08);
+}
+
+.authx__lockup {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+}
+
+.authx__mark {
+	width: 42px;
+	height: 42px;
+	border-radius: var(--radius-md);
+	background: var(--primary);
+	color: var(--on-primary);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+}
+
+.authx__name {
+	font-size: 16px;
+	font-weight: 700;
+	color: var(--text);
+	line-height: 1.4;
+}
+
+.authx__tag {
+	font-size: var(--fs-meta);
+	color: var(--muted);
+}
+
+.authx__headline {
+	font-size: 23px;
+	font-weight: 700;
+	line-height: 1.65;
+	color: var(--text);
+	margin: 0 0 var(--space-3);
+}
+
+.authx__lede {
+	font-size: var(--fs-body);
+	line-height: 1.9;
+	color: var(--text-soft);
+	margin: 0;
+}
+
+.authx__points {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+	margin-top: var(--space-6);
+}
+
+.authx__point {
+	display: flex;
+	align-items: center;
+	gap: var(--space-3);
+	padding: 10px 12px;
+	border: 1px solid var(--primary-border);
+	border-radius: var(--radius-md);
+	background: var(--surface);
+	font-size: 13.5px;
+	color: var(--text-soft);
+}
+
+.authx__point-icon {
+	width: 30px;
+	height: 30px;
+	border-radius: var(--radius-sm);
+	background: var(--primary-soft);
+	color: var(--primary);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+}
+
+.authx__brand-foot {
+	font-size: var(--fs-meta);
+	color: var(--muted);
+	line-height: 1.9;
+}
+
+.authx__pane {
+	padding: 40px 36px;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+}
+
+.authx__form {
+	width: min(400px, 100%);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-5);
+}
+
+.authx__mobile-brand {
+	display: none;
+}
+
+.authx__title {
+	font-size: 24px;
+	font-weight: 700;
+	color: var(--text);
+	margin: 0 0 6px;
+	line-height: 1.5;
+}
+
+.authx__desc {
+	font-size: var(--fs-secondary);
+	color: var(--muted);
+	line-height: 1.9;
+	margin: 0;
+}
+
+.authx__fields {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+.authx__actions {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.authx__switch {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+	font-size: 13.5px;
+	color: var(--muted);
+	text-align: center;
+}
+
+.authx__steps {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.authx__step {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12.5px;
+	color: var(--muted);
+	line-height: 1.6;
+}
+
+.authx__step-num {
+	width: 22px;
+	height: 22px;
+	border-radius: var(--radius-pill);
+	border: 1px solid var(--border);
+	background: var(--surface-2);
+	color: var(--muted);
+	font-size: 11.5px;
+	font-weight: 700;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+}
+
+.authx__step--active {
+	color: var(--primary);
+	font-weight: 600;
+}
+
+.authx__step--active .authx__step-num {
+	background: var(--primary-soft);
+	border-color: var(--primary-border);
+	color: var(--primary);
+}
+
+.authx__step--done .authx__step-num {
+	background: var(--primary);
+	border-color: var(--primary);
+	color: var(--on-primary);
+}
+
+.authx__summary {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+.authx__summary-row {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--space-3);
+	padding: var(--space-3);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	background: var(--surface-2);
+}
+
+.authx__summary-body {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.authx__summary-title {
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--text);
+}
+
+.authx__summary-item {
+	font-size: 13.5px;
+	color: var(--text-soft);
+	overflow-wrap: anywhere;
+	line-height: 1.9;
+}
+
+.authx__demo {
+	border-top: 1px solid var(--border);
+	padding-top: var(--space-4);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.authx__demo-title {
+	font-size: var(--fs-meta);
+	color: var(--muted);
+	line-height: 1.9;
+}
+
+.authx__demo-row {
+	display: flex;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+}
+
+.authx__success {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: var(--space-4);
+}
+
+.authx__success-icon {
+	width: 48px;
+	height: 48px;
+	border-radius: var(--radius-pill);
+	background: var(--primary-soft);
+	color: var(--primary);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.authx__foot {
+	font-size: var(--fs-meta);
+	color: var(--muted);
+	line-height: 1.9;
+	text-align: center;
+}
+
+@media (max-width: 980px) {
+	.authx {
+		align-items: flex-start;
+		padding: var(--space-6) var(--space-4);
+	}
+
+	.authx__card {
+		grid-template-columns: 1fr;
+		width: min(520px, 100%);
+	}
+
+	.authx__brand {
+		display: none;
+	}
+
+	.authx__pane {
+		padding: var(--space-6) var(--space-5);
+	}
+
+	.authx__mobile-brand {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+		padding-bottom: var(--space-4);
+		border-bottom: 1px solid var(--border);
+	}
+}
+
+@media (max-width: 480px) {
+	.authx {
+		padding: 0;
+		background: var(--surface);
+	}
+
+	.authx__card {
+		border: 0;
+		box-shadow: none;
+		border-radius: 0;
+		min-height: 100vh;
+	}
+
+	.authx__pane {
+		padding: var(--space-6) 16px var(--space-8);
+	}
+
+	.authx__title {
+		font-size: 21px;
+	}
+
+	.authx__summary-row {
+		flex-direction: column;
+		align-items: stretch;
+	}
+}
