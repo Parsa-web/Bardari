@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom"
 import { AppLayout } from "../layouts/AppLayout"
 import { RoleGuard } from "./RoleGuard"
-import { LoginPage } from "../../features/auth/LoginPage"
+import LoginPage from "../../features/auth/LoginPage"
 import { MotherDashboard } from "../../features/mother/MotherDashboard"
 import { MotherProfilePage } from "../../features/mother/MotherProfilePage"
 import { PregnanciesPage } from "../../features/mother/PregnanciesPage"
