@@ -531,18 +531,32 @@ textarea {
 /* ---------------- صفحه ورود ---------------- */
 .auth {
 	min-height: 100vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-8) var(--space-6);
+	background: var(--bg);
+}
+
+.auth__card {
+	width: min(1040px, 100%);
 	display: grid;
-	grid-template-columns: 1.05fr 1fr;
+	grid-template-columns: 1.02fr 1fr;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-md);
+	overflow: hidden;
 }
 
 .auth__brand {
 	position: relative;
 	background: var(--primary-soft);
 	border-inline-end: 1px solid var(--primary-border);
-	padding: var(--space-16) var(--space-12);
+	padding: var(--space-8);
 	display: flex;
 	flex-direction: column;
-	justify-content: center;
+	justify-content: space-between;
 	gap: var(--space-8);
 	overflow: hidden;
 }
@@ -550,12 +564,13 @@ textarea {
 .auth__brand::after {
 	content: "";
 	position: absolute;
-	inset-inline-start: -120px;
-	bottom: -160px;
-	width: 420px;
-	height: 420px;
+	inset-inline-start: -140px;
+	bottom: -180px;
+	width: 360px;
+	height: 360px;
 	border-radius: 50%;
-	background: color-mix(in srgb, var(--primary) 12%, transparent);
+	background: color-mix(in srgb, var(--primary) 9%, transparent);
+	pointer-events: none;
 }
 
 .auth__brand-inner {
@@ -563,19 +578,19 @@ textarea {
 	z-index: 1;
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-6);
-	max-width: 46ch;
+	gap: var(--space-5);
+	max-width: 42ch;
 }
 
 .auth__headline {
-	font-size: 30px;
-	line-height: 1.6;
+	font-size: 23px;
+	line-height: 1.75;
 	font-weight: 700;
 	color: var(--text);
 }
 
 .auth__lede {
-	font-size: 15px;
+	font-size: 14.5px;
 	color: var(--text-soft);
 }
 
@@ -584,54 +599,71 @@ textarea {
 	padding: 0;
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-3);
+	gap: var(--space-2);
 }
 
 .auth__point {
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	gap: var(--space-3);
-	font-size: 14.5px;
+	font-size: 14px;
+	line-height: 1.7;
 	color: var(--text-soft);
+	background: color-mix(in srgb, var(--surface) 75%, transparent);
+	border: 1px solid var(--primary-border);
+	border-radius: var(--radius-sm);
+	padding: var(--space-3);
+	min-width: 0;
 }
 
 .auth__point-icon {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 32px;
-	height: 32px;
-	flex: 0 0 32px;
+	width: 30px;
+	height: 30px;
+	flex: 0 0 30px;
 	border-radius: var(--radius-sm);
 	background: var(--surface);
 	color: var(--primary);
 	border: 1px solid var(--primary-border);
 }
 
+.auth__brand-foot {
+	position: relative;
+	z-index: 1;
+	font-size: var(--fs-meta);
+	color: var(--muted);
+	line-height: 1.8;
+	max-width: 42ch;
+}
+
 .auth__form-side {
 	background: var(--surface);
-	padding: var(--space-12);
+	padding: var(--space-8);
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	min-width: 0;
 }
 
 .auth__form {
-	width: min(420px, 100%);
+	width: min(392px, 100%);
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-5);
 }
 
 .auth__title {
-	font-size: var(--fs-page-title);
+	font-size: 26px;
 	font-weight: 700;
 }
 
 .auth__desc {
 	margin-top: var(--space-2);
 	color: var(--muted);
-	font-size: 14.5px;
+	font-size: 14px;
+	line-height: 1.8;
 }
 
 .auth__fields {
@@ -644,10 +676,48 @@ textarea {
 	font-size: var(--fs-meta);
 	color: var(--muted);
 	text-align: center;
+	line-height: 1.8;
 }
 
 .auth__mobile-brand {
 	display: none;
+}
+
+@media (max-width: 980px) {
+	.auth {
+		padding: 0;
+		align-items: stretch;
+		background: var(--surface);
+	}
+	.auth__card {
+		width: 100%;
+		grid-template-columns: minmax(0, 1fr);
+		border: none;
+		border-radius: 0;
+		box-shadow: none;
+		min-height: 100vh;
+	}
+	.auth__brand {
+		display: none;
+	}
+	.auth__form-side {
+		padding: var(--space-8) var(--space-6);
+		align-items: flex-start;
+	}
+	.auth__mobile-brand {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-4);
+	}
+}
+
+@media (max-width: 480px) {
+	.auth__form-side {
+		padding: var(--space-6) var(--space-4);
+	}
+	.auth__title {
+		font-size: 22px;
+	}
 }
 
 /* ---------------- واکنشگرایی ---------------- */
@@ -675,21 +745,6 @@ textarea {
 	}
 	.split {
 		grid-template-columns: minmax(0, 1fr);
-	}
-	.auth {
-		grid-template-columns: minmax(0, 1fr);
-	}
-	.auth__brand {
-		display: none;
-	}
-	.auth__form-side {
-		padding: var(--space-8) var(--space-4);
-		align-items: flex-start;
-	}
-	.auth__mobile-brand {
-		display: flex;
-		justify-content: center;
-		margin-bottom: var(--space-2);
 	}
 }
 

@@ -17,11 +17,24 @@ import {
 import { motherFullName } from "../../services/selectors"
 
 const POINTS = [
-	{ icon: "pregnancy" as const, text: "پیگیری بارداری، چکاپ‌ها و علائم در یک پرونده یکجا" },
+	{ icon: "pregnancy" as const, text: "پیگیری بارداری، چکاپ‌ها و علائم در یک پرونده" },
 	{ icon: "child" as const, text: "مراقبت کودک: رشد، واکسیناسیون و روند تکامل" },
 	{ icon: "users" as const, text: "ارتباط روشن میان مادر، ماما و متخصص" },
-	{ icon: "shield" as const, text: "داده‌ها در این نسخه فقط در مرورگر خود شما ذخیره می‌شود" },
 ]
+
+function BrandLockup({ subtitle }: { subtitle: string }) {
+	return (
+		<div className="brand">
+			<span className="brand__mark">
+				<Icon name="heart" size={21} />
+			</span>
+			<span className="brand__text">
+				<span className="brand__title">مراقبت مادر و کودک</span>
+				<span className="brand__sub">{subtitle}</span>
+			</span>
+		</div>
+	)
+}
 
 /** ورود نمایشی: انتخاب نقش و پرونده؛ احراز هویت واقعی پیاده‌سازی نشده است. */
 export function LoginPage() {
@@ -53,10 +66,13 @@ export function LoginPage() {
 	if (loading || !db)
 		return (
 			<div className="auth">
-				<div className="auth__form-side">
-					<div className="auth__form">
-						<LoadingState rows={2} />
-					</div>
+				<div className="auth__card">
+					<section className="auth__form-side">
+						<div className="auth__form">
+							<BrandLockup subtitle="در حال آماده‌سازی…" />
+							<LoadingState rows={2} />
+						</div>
+					</section>
 				</div>
 			</div>
 		)
@@ -100,145 +116,131 @@ export function LoginPage() {
 		setErrors({})
 		void signIn({ role, providerId: provider.id, displayName: provider.name })
 			.then(() => navigate(`/${role}`, { replace: true }))
-			.catch(() => setErrors({ form: "ورود به پنل ممکن نشد. دوباره تلاش کنید." }))
+			.catch(() => setErrors({ form: "ورود به پنل ممکن نشد. دوباره تلاش کنید." })
+			)
 			.finally(() => setSubmitting(false))
 	}
 
 	return (
 		<div className="auth">
-			<section className="auth__brand" aria-hidden="true">
-				<div className="auth__brand-inner">
-					<div className="brand">
-						<span className="brand__mark">
-							<Icon name="heart" size={21} />
-						</span>
-						<span className="brand__text">
-							<span className="brand__title">مراقبت مادر و کودک</span>
-							<span className="brand__sub">همراه دوران بارداری تا سال‌های اول کودکی</span>
-						</span>
+			<div className="auth__card">
+				<section className="auth__brand">
+					<div className="auth__brand-inner">
+						<BrandLockup subtitle="همراه بارداری تا سال‌های اول کودکی" />
+						<h2 className="auth__headline">مراقبتی آرام، منطم و قابل پیگیری</h2>
+						<p className="auth__lede">
+							رویدادهای مراقبت در یک خط زمانی روشن ثبت می‌شود تا مادر و مراقب سلامت تصویر کاملی از وضعیت داشته باشند.
+						</p>
+						<ul className="auth__points">
+							{POINTS.map((point) => (
+								<li className="auth__point" key={point.text}>
+									<span className="auth__point-icon" aria-hidden="true">
+										<Icon name={point.icon} size={17} />
+									</span>
+									<span>{point.text}</span>
+								</li>
+							))}
+						</ul>
 					</div>
-					<h2 className="auth__headline">مراقبتی آرام، منظم و قابل پیگیری برای مادر و کودک</h2>
-					<p className="auth__lede">
-						همه رویدادهای مراقبت در یک خط زمانی روشن ثبت می‌شود تا تصمیم‌های مراقبتی بر پایه اطلاعات کامل گرفته شود.
+					<p className="auth__brand-foot">
+						داده‌های این نسخه نمایشی فقط در مرورگر خود شما ذخیره می‌شود و به هیچ سروری ارسال نمی‌شود.
 					</p>
-					<ul className="auth__points">
-						{POINTS.map((point) => (
-							<li className="auth__point" key={point.text}>
-								<span className="auth__point-icon">
-									<Icon name={point.icon} size={18} />
-								</span>
-								<span>{point.text}</span>
-							</li>
-						))}
-					</ul>
-				</div>
-			</section>
+				</section>
 
-			<section className="auth__form-side">
-				<form
-					className="auth__form"
-					onSubmit={(event) => {
-						event.preventDefault()
-						submit()
-					}}
-					noValidate
-				>
-					<div className="auth__mobile-brand">
-						<div className="brand">
-							<span className="brand__mark">
-								<Icon name="heart" size={20} />
-							</span>
-							<span className="brand__text">
-								<span className="brand__title">مراقبت مادر و کودک</span>
-								<span className="brand__sub">ورود به پنل مراقبت</span>
-							</span>
+				<section className="auth__form-side">
+					<form
+						className="auth__form"
+						onSubmit={(event) => {
+							event.preventDefault()
+							submit()
+						}}
+						noValidate
+					>
+						<div className="auth__mobile-brand">
+							<BrandLockup subtitle="ورود به پنل مراقبت" />
 						</div>
-					</div>
 
-					<div>
-						<h1 className="auth__title">خوش آمدید</h1>
-						<p className="auth__desc">برای ورود، نقش خود و پرونده مورد نظر را انتخاب کنید.</p>
-					</div>
+						<div>
+							<h1 className="auth__title">خوش آمدید</h1>
+							<p className="auth__desc">
+								شماره موبایل و رمز خود را وارد کنید، سپس نقش و پرونده مورد نظر را انتخاب کنید.
+							</p>
+						</div>
 
-					<Alert tone="info">
-						این یک نسخه نمایشی است. شماره موبایل و رمز فقط از نظر قالب بررسی می‌شوند و هیچ احراز هویت
-						واقعی، پیامک تأیید یا سروری در میان نیست.
-					</Alert>
-
-					<div className="auth__fields">
-						<Field label="شماره موبایل" hint="نمونه: ۰۹۱۲۳۴۵۶۷۸۹" error={errors.phone}>
-							<TextInput
-								value={phone}
-								onChange={(value) => setPhone(value)}
-								type="tel"
-								inputMode="tel"
-								placeholder="09xxxxxxxxx"
-								invalid={Boolean(errors.phone)}
-							/>
-						</Field>
-
-						<Field label="رمز عبور" error={errors.password}>
-							<PasswordInput
-								value={password}
-								onChange={(value) => setPassword(value)}
-								visible={passwordVisible}
-								onToggleVisible={() => setPasswordVisible((visible) => !visible)}
-								placeholder="دست‌کم ۶ کاراکتر"
-								invalid={Boolean(errors.password)}
-							/>
-						</Field>
-
-						<Field label="نقش کاربری">
-							<Select
-								value={role}
-								onChange={(value) => setRole(value as Role)}
-								options={[
-									{ value: "mother", label: ROLE_LABELS.mother },
-									{ value: "midwife", label: ROLE_LABELS.midwife },
-									{ value: "specialist", label: ROLE_LABELS.specialist },
-								]}
-							/>
-						</Field>
-
-						{role === "mother" ? (
-							<Field
-								label="پرونده مادر"
-								hint="داده نمایشی چند پرونده متفاوت دارد تا حالت‌های مختلف را ببینید."
-							>
-								<Select
-									value={motherId}
-									onChange={(value) => setMotherId(value)}
-									options={db.mothers.map((mother) => ({
-										value: mother.id,
-										label: motherFullName(mother),
-									}))}
+						<div className="auth__fields">
+							<Field label="شماره موبایل" hint="نمونه: ۰۹۱۲۳۴۵۶۷۸۹" error={errors.phone}>
+								<TextInput
+									value={phone}
+									onChange={(value) => setPhone(value)}
+									type="tel"
+									inputMode="tel"
+									placeholder="09xxxxxxxxx"
+									invalid={Boolean(errors.phone)}
 								/>
 							</Field>
-						) : (
-							<Field label="مراقب سلامت">
-								<Select
-									value={providerId}
-									onChange={(value) => setProviderId(value)}
-									options={providers.map((provider) => ({
-										value: provider.id,
-										label: provider.specialty
-											? `${provider.name} — ${provider.specialty}`
-											: provider.name,
-									}))}
+
+							<Field label="رمز عبور" error={errors.password}>
+								<PasswordInput
+									value={password}
+									onChange={(value) => setPassword(value)}
+									visible={passwordVisible}
+									onToggleVisible={() => setPasswordVisible((visible) => !visible)}
+									placeholder="دست‌کم ۶ کاراکتر"
+									invalid={Boolean(errors.password)}
 								/>
 							</Field>
-						)}
-					</div>
 
-					{errors.form && <Alert tone="danger">{errors.form}</Alert>}
+							<Field label="نقش کاربری">
+								<Select
+									value={role}
+									onChange={(value) => setRole(value as Role)}
+									options={[
+										{ value: "mother", label: ROLE_LABELS.mother },
+										{ value: "midwife", label: ROLE_LABELS.midwife },
+										{ value: "specialist", label: ROLE_LABELS.specialist },
+									]}
+								/>
+							</Field>
 
-					<Button type="submit" variant="primary" block loading={submitting}>
-						ورود به پنل
-					</Button>
+							{role === "mother" ? (
+								<Field label="پرونده مادر" hint="داده نمایشی چند پرونده متفاوت دارد.">
+									<Select
+										value={motherId}
+										onChange={(value) => setMotherId(value)}
+										options={db.mothers.map((mother) => ({
+											value: mother.id,
+											label: motherFullName(mother),
+										}))}
+									/>
+								</Field>
+							) : (
+								<Field label="مراقب سلامت">
+									<Select
+										value={providerId}
+										onChange={(value) => setProviderId(value)}
+										options={providers.map((provider) => ({
+											value: provider.id,
+											label: provider.specialty
+												? `${provider.name} — ${provider.specialty}`
+												: provider.name,
+										}))}
+									/>
+								</Field>
+							)}
+						</div>
 
-					<p className="auth__foot">این نسخه جایگزین مراقبت پزشکی نیست و فقط برای پیگیری اطلاعات کاربرد دارد.</p>
-				</form>
-			</section>
+						{errors.form && <Alert tone="danger">{errors.form}</Alert>}
+
+						<Button type="submit" variant="primary" block loading={submitting}>
+							ورود به پنل
+						</Button>
+
+						<p className="auth__foot">
+							این یک نسخه نمایشی است؛ شماره و رمز فقط از نظر قالب بررسی می‌شود و جایگزین مراقبت پزشکی نیست.
+						</p>
+					</form>
+				</section>
+			</div>
 		</div>
 	)
 }
