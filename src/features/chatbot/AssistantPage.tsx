@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Alert, Button, Card, Field, PageHeader } from "../../shared/components/ui"
+import { Alert, Button, Card, Field, Icon, PageHeader, TextArea } from "../../shared/components/ui"
 import {
 	CHATBOT_DISCLAIMER,
 	CHATBOT_SUGGESTIONS,
@@ -33,15 +33,25 @@ export function AssistantPage() {
 		<>
 			<PageHeader
 				title="دستیار مراقبت"
-				subtitle="پاسخ به پرسش‌های عمومی درباره بارداری و مراقبت مادر و کودک"
+				subtitle="محیط گفتگوی ویژه پرسش‌های مراقبت مادر و کودک"
+				actions={
+					turns.length > 0 ? (
+						<Button variant="outline" icon="refresh" onClick={() => setTurns([])}>
+							گفتگوی جدید
+						</Button>
+					) : undefined
+				}
 			/>
 
 			<Alert tone="info">{CHATBOT_DISCLAIMER}</Alert>
 
-			<Card title="گفتگو">
+			<Card title="گفتگو" subtitle="پیام‌های شما فقط در همین مرورگر و در همین گفتگو نگه داشته می‌شوند.">
 				<div className="chat">
-					{turns.length === 0 && (
+					{turns.length === 0 ? (
 						<div className="chat__hint">
+							<span className="chat__hint-icon" aria-hidden="true">
+								<Icon name="assistant" size={22} />
+							</span>
 							<p className="muted">می‌توانید از این نمونه‌ها شروع کنید:</p>
 							<div className="chat__chips">
 								{CHATBOT_SUGGESTIONS.map((suggestion) => (
@@ -49,6 +59,7 @@ export function AssistantPage() {
 										key={suggestion}
 										className="chip"
 										type="button"
+										disabled={busy}
 										onClick={() => {
 											void send(suggestion)
 										}}
@@ -58,35 +69,36 @@ export function AssistantPage() {
 								))}
 							</div>
 						</div>
+					) : (
+						turns.map((turn) => (
+							<div
+								key={turn.id}
+								className={`bubble bubble--${turn.role}${turn.kind === "safety" ? " bubble--safety" : ""}`}
+							>
+								<span className="bubble__author">{turn.role === "user" ? "شما" : "دستیار مراقبت"}</span>
+								{turn.text}
+							</div>
+						))
 					)}
-					{turns.map((turn) => (
-						<div
-							key={turn.id}
-							className={`bubble bubble--${turn.role}${
-								turn.kind === "safety" ? " bubble--safety" : ""
-							}`}
-						>
-							{turn.text}
-						</div>
-					))}
 				</div>
 
-				<Field label="پرسش شما">
-					<textarea
-						className="input input--area"
+				<Field label="پرسش شما" hint="در موارد فوری و علائم هشدار، مستقیم با مراقب سلامت خود تماس بگیرید.">
+					<TextArea
 						value={input}
+						rows={3}
 						placeholder="مانند: در دوران بارداری چه ورزشی مناسب است؟"
-						onChange={(event) => setInput(event.target.value)}
+						onChange={(value) => setInput(value)}
 					/>
 				</Field>
 				<Button
 					variant="primary"
-					disabled={busy || !input.trim()}
+					loading={busy}
+					disabled={!input.trim()}
 					onClick={() => {
 						void send(input)
 					}}
 				>
-					{busy ? "در حال پاسخ…" : "ارسال پرسش"}
+					ارسال پرسش
 				</Button>
 			</Card>
 		</>
