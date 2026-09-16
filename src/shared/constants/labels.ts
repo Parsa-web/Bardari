@@ -3,6 +3,7 @@ import type {
 	CheckupType,
 	CheckupViewStatus,
 	HealthRecordKind,
+	MotherCurrentStatus,
 	PregnancyStatus,
 	QuestionStatus,
 	ReferralStatus,
@@ -17,6 +18,20 @@ export const ROLE_LABELS: Record<Role, string> = {
 	mother: "مادر",
 	midwife: "ماما",
 	specialist: "متخصص",
+}
+
+export const MOTHER_STATUS_LABELS: Record<MotherCurrentStatus, string> = {
+	planning: "قصد بارداری دارم",
+	pregnant: "باردار هستم",
+	postpartum: "در حال پیگیری پس از زایمان",
+	not_pregnant: "فعلاً باردار نیستم",
+}
+
+export const MOTHER_STATUS_TONES: Record<MotherCurrentStatus, Tone> = {
+	planning: "info",
+	pregnant: "success",
+	postpartum: "info",
+	not_pregnant: "neutral",
 }
 
 export const SUBJECT_KIND_LABELS: Record<SubjectKind, string> = {
