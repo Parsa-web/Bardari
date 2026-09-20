@@ -1,6 +1,6 @@
-/* ================= توکن‌های طراحی — منبع واحد تمام تصمیمات بصری =================
-   هویت: بنفش (اعتماد، حس پریمیوم) + صورتی ملایم (گرما، مادرانه)
-   قاعده: هیچ رنگی در کامپوننت‌ها hardcode نمی‌شود؛ همه از این توکن‌ها می‌آیند. */
+/* ================= سیستم طراحی «پاستل نرم بارداری» =================
+   هویت: بنفش ملایم (اعتماد و آرامش) + صورتی نوزادی (گرما و حس مادرانه)
+   قاعده طلایی: هیچ رنگی در کامپوننت‌ها hardcode نمی‌شود؛ همه از این توکن‌ها می‌آید. */
 :root {
 	/* --- فاصله‌گذاری --- */
 	--space-1: 4px;
@@ -14,10 +14,11 @@
 	--space-12: 48px;
 	--space-16: 64px;
 
-	/* --- شعاع (کارت‌های نرم و مادرانه) --- */
-	--radius-sm: 12px;
-	--radius-md: 16px;
+	/* --- شعاع: کارت‌های نرم و دوستانه --- */
+	--radius-sm: 14px;
+	--radius-md: 18px;
 	--radius-lg: 22px;
+	--radius-xl: 26px;
 	--radius-pill: 999px;
 
 	/* --- تیپوگرافی --- */
@@ -34,7 +35,7 @@
 	--lh-tight: 1.5;
 	--lh-body: 1.8;
 
-	/* --- ارتفاع اجزا --- */
+	/* --- ابعاد اجزا --- */
 	--control-h: 46px;
 	--control-h-sm: 38px;
 	--topbar-h: 68px;
@@ -45,122 +46,269 @@
 	--z-drawer: 40;
 	--z-modal: 60;
 
-	/* --- حرکت و انیمیشن (سبک و کم‌هزینه) --- */
+	/* --- حرکت --- */
 	--motion-fast: 140ms;
-	--motion-base: 220ms;
-	--motion-slow: 420ms;
+	--motion-base: 240ms;
+	--motion-slow: 520ms;
 	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 	--ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
 
-	/* --- رنگ — تم روشن --- */
-	--bg: #faf7ff;
-	--bg-soft: #f4eefc;
+	/* ================= تم روشن ================= */
+	--bg: #fff8fc;
+	--bg-soft: #fdf2f9;
 	--surface: #ffffff;
-	--surface-2: #fff1f7;
-	--surface-3: #ede9fe;
-	--border: #e5e7eb;
-	--border-strong: #d8cdf3;
-	--text: #1f2937;
-	--text-soft: #6b7280;
+	--surface-2: #fce7f3;
+	--surface-3: #f3e8ff;
+	--border: #f1e4f5;
+	--border-strong: #e6d5ef;
+	--text: #352b3f;
+	--text-soft: #6b6475;
 	--muted: #9ca3af;
 
-	--primary: #7c3aed;
-	--primary-hover: #6d28d9;
-	--primary-soft: #ede9fe;
-	--primary-border: #ddd2fb;
+	--primary: #a78bfa;
+	--primary-strong: #7c5ce0;
+	--primary-hover: #8b6df4;
+	--primary-soft: #f3e8ff;
+	--primary-border: #e6d8fb;
 	--on-primary: #ffffff;
 
-	--accent: #db2777;
+	--secondary: #f9a8d4;
+	--accent: #f472b6;
+	--accent-strong: #d1447f;
 	--accent-soft: #fce7f3;
-	--accent-border: #f9cfe4;
-	--pink-soft: #f9a8d4;
+	--accent-border: #f8d4e7;
 
-	--success: #15803d;
-	--success-soft: #e7f8ed;
-	--warn: #b45309;
-	--warn-soft: #fdf3e0;
-	--danger: #b91c1c;
-	--danger-soft: #fdecec;
-	--info: #1d4ed8;
-	--info-soft: #e8efff;
-	--neutral-soft: #f1effa;
+	/* رنگ دسته فعالیت‌ها (پنل مادر) */
+	--cat-sleep: #8b78e8;
+	--cat-sleep-soft: #efe9ff;
+	--cat-nutrition: #3f9e74;
+	--cat-nutrition-soft: #e6f7ef;
+	--cat-exercise: #de6aa3;
+	--cat-exercise-soft: #fdeaf3;
+	--cat-other: #8e83b8;
+	--cat-other-soft: #f1eefb;
 
-	/* --- گرادیانت‌های ملایم مادرانه --- */
-	--gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
-	--gradient-soft: linear-gradient(135deg, #ede9fe 0%, #fce7f3 100%);
-	--gradient-surface: linear-gradient(160deg, #ffffff 0%, #fdf7ff 100%);
+	/* وضعیت‌ها — پاستلی ولی خوانا (AA) */
+	--success: #2f8f5b;
+	--success-soft: #e7f7ee;
+	--warn: #a96a12;
+	--warn-soft: #fdf2e0;
+	--danger: #c0435a;
+	--danger-soft: #fdeaee;
+	--info: #5a76d8;
+	--info-soft: #ecefff;
+	--neutral-soft: #f6f0fa;
 
-	--focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.26);
-	--shadow-xs: 0 1px 2px rgba(76, 29, 149, 0.06);
-	--shadow-sm: 0 1px 2px rgba(76, 29, 149, 0.05), 0 6px 16px rgba(139, 92, 246, 0.08);
-	--shadow-md: 0 10px 30px rgba(109, 40, 217, 0.12);
-	--shadow-lift: 0 14px 34px rgba(219, 39, 119, 0.14);
-	--overlay: rgba(46, 16, 71, 0.44);
+	/* --- گرادیان‌های ملایم --- */
+	--gradient-primary: linear-gradient(135deg, #c084fc 0%, #f9a8d4 100%);
+	--gradient-hero: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 100%);
+	--gradient-surface: linear-gradient(170deg, #ffffff 0%, #fffafd 100%);
+
+	--focus-ring: 0 0 0 3px rgba(167, 139, 250, 0.3);
+	--shadow-xs: 0 1px 2px rgba(120, 80, 150, 0.05);
+	--shadow-sm: 0 2px 6px rgba(150, 100, 175, 0.07), 0 10px 24px rgba(244, 114, 182, 0.07);
+	--shadow-md: 0 14px 34px rgba(150, 100, 175, 0.14);
+	--shadow-lift: 0 16px 38px rgba(244, 114, 182, 0.16);
+	--overlay: rgba(53, 43, 63, 0.4);
 
 	color-scheme: light;
 }
 
-/* --- رنگ — تم تاریک (طراحی مستقل، نه معکوس‌سازی) --- */
+/* ================= تم تاریک (گرم، نه سیاه مطلق) ================= */
 [data-theme="dark"] {
-	--bg: #150f23;
-	--bg-soft: #100b1b;
-	--surface: #1e1733;
-	--surface-2: #271d3f;
-	--surface-3: #2f2450;
-	--border: #362a56;
-	--border-strong: #4a3a72;
-	--text: #f1ecfb;
-	--text-soft: #c9c0e3;
-	--muted: #9d94ba;
+	--bg: #18121f;
+	--bg-soft: #140f1a;
+	--surface: #241a2e;
+	--surface-2: #30223d;
+	--surface-3: #3a2a49;
+	--border: #3b2d4a;
+	--border-strong: #4d3b60;
+	--text: #faf5ff;
+	--text-soft: #d8cfe3;
+	--muted: #a78bfa;
 
-	--primary: #b79bfa;
-	--primary-hover: #c9b4fc;
-	--primary-soft: #2b2149;
-	--primary-border: #453569;
-	--on-primary: #1b1030;
+	--primary: #c084fc;
+	--primary-strong: #d5aaff;
+	--primary-hover: #d0a1fd;
+	--primary-soft: #35244b;
+	--primary-border: #4c3a67;
+	--on-primary: #1d1229;
 
-	--accent: #f9a8d4;
-	--accent-soft: #3a1f33;
-	--accent-border: #5a3049;
-	--pink-soft: #f9a8d4;
+	--secondary: #f9a8d4;
+	--accent: #fb7185;
+	--accent-strong: #ff93a3;
+	--accent-soft: #3d2130;
+	--accent-border: #5a3243;
 
-	--success: #7bd6a2;
-	--success-soft: #16301f;
-	--warn: #eabf78;
-	--warn-soft: #33270f;
-	--danger: #f49b95;
-	--danger-soft: #3a1d1d;
-	--info: #93b4fb;
-	--info-soft: #1b2444;
-	--neutral-soft: #26203c;
+	--cat-sleep: #c4b0ff;
+	--cat-sleep-soft: #322449;
+	--cat-nutrition: #86dfb2;
+	--cat-nutrition-soft: #1d3329;
+	--cat-exercise: #f9a8d4;
+	--cat-exercise-soft: #3d2334;
+	--cat-other: #bfb3e8;
+	--cat-other-soft: #2e2743;
 
-	--gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #db2777 100%);
-	--gradient-soft: linear-gradient(135deg, #2b2149 0%, #3a1f33 100%);
-	--gradient-surface: linear-gradient(160deg, #1e1733 0%, #261a38 100%);
+	--success: #86dfb2;
+	--success-soft: #1d3329;
+	--warn: #f0c47c;
+	--warn-soft: #382b16;
+	--danger: #fb9ba8;
+	--danger-soft: #3d2029;
+	--info: #a5b8fb;
+	--info-soft: #232a4a;
+	--neutral-soft: #2c2138;
 
-	--focus-ring: 0 0 0 3px rgba(183, 155, 250, 0.3);
-	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.32);
-	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.26);
-	--shadow-md: 0 12px 32px rgba(0, 0, 0, 0.42);
-	--shadow-lift: 0 16px 36px rgba(0, 0, 0, 0.48);
-	--overlay: rgba(10, 6, 18, 0.64);
+	--gradient-primary: linear-gradient(135deg, #c084fc 0%, #f9a8d4 100%);
+	--gradient-hero: linear-gradient(135deg, #35244b 0%, #3d2334 100%);
+	--gradient-surface: linear-gradient(170deg, #241a2e 0%, #2a1e36 100%);
+
+	--focus-ring: 0 0 0 3px rgba(192, 132, 252, 0.34);
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+	--shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.28), 0 10px 26px rgba(0, 0, 0, 0.26);
+	--shadow-md: 0 16px 36px rgba(0, 0, 0, 0.44);
+	--shadow-lift: 0 18px 40px rgba(0, 0, 0, 0.5);
+	--overlay: rgba(12, 8, 17, 0.62);
 
 	color-scheme: dark;
 }
 
-/* ================= لایه حرکت — سبک، فقط opacity/transform =================
-   بدون کتابخانه خارجی، بدون blur سنگین، بدون re-render اضافی. */
-@keyframes mcc-fade-up {
-	from {
-		opacity: 0;
-		transform: translateY(8px);
-	}
-	to {
-		opacity: 1;
-		transform: translateY(0);
-	}
+/* ================= لایه هویت بصری =================
+   این لایه روی کامپوننت‌های مشترک اعمال می‌شود و همه‌جا یکدست است. */
+
+/* --- کارت‌ها: گوشه نرم، سایه پاستلی، تنفس بیشتر --- */
+body .card,
+body .stat {
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-sm);
+	transition:
+		box-shadow var(--motion-base) var(--ease-soft),
+		border-color var(--motion-base) var(--ease-soft),
+		transform var(--motion-fast) var(--ease-out);
 }
 
+body .card--quiet {
+	box-shadow: none;
+}
+
+/* --- دکمه‌ها: اصلی گرادیانی و قرصی، ثانویه پاستلی --- */
+body .btn {
+	border-radius: var(--radius-pill);
+	transition:
+		background-color var(--motion-fast) var(--ease-soft),
+		border-color var(--motion-fast) var(--ease-soft),
+		color var(--motion-fast) var(--ease-soft),
+		box-shadow var(--motion-base) var(--ease-soft),
+		transform var(--motion-fast) var(--ease-out);
+}
+
+body .btn:active:not(:disabled) {
+	transform: scale(0.97);
+}
+
+body .btn--primary {
+	background: var(--gradient-primary);
+	border-color: transparent;
+	color: #ffffff;
+	box-shadow: var(--shadow-xs);
+}
+
+body .btn--primary:hover:not(:disabled) {
+	background: var(--gradient-primary);
+	filter: brightness(1.04);
+	box-shadow: var(--shadow-sm);
+}
+
+body .btn--secondary {
+	background: var(--primary-soft);
+	border-color: var(--primary-border);
+	color: var(--primary-strong);
+}
+
+body .btn--secondary:hover:not(:disabled) {
+	background: var(--accent-soft);
+	border-color: var(--accent-border);
+	color: var(--accent-strong);
+}
+
+body .btn--ghost {
+	color: var(--primary-strong);
+}
+
+/* --- ورودی‌ها: گوشه نرم، مرز ملایم، فوکوس دوستانه --- */
+body .input {
+	border-radius: var(--radius-sm);
+	border-color: var(--border-strong);
+	background: var(--surface);
+	transition:
+		border-color var(--motion-fast) var(--ease-soft),
+		box-shadow var(--motion-base) var(--ease-soft),
+		background-color var(--motion-fast) var(--ease-soft);
+}
+
+body .input:hover:not(:disabled) {
+	border-color: var(--primary-border);
+}
+
+body .input:focus {
+	border-color: var(--primary);
+	box-shadow: var(--focus-ring);
+}
+
+body .chip {
+	border-radius: var(--radius-pill);
+}
+
+/* --- ناوبری و تب‌ها: نشانگر بنفش↔صورتی --- */
+body .nav__item {
+	border-radius: var(--radius-pill);
+	color: var(--text-soft);
+	transition:
+		background-color var(--motion-fast) var(--ease-soft),
+		color var(--motion-fast) var(--ease-soft);
+}
+
+body .nav__item--active {
+	background: var(--gradient-hero);
+	color: var(--primary-strong);
+}
+
+body .nav__item--active::before {
+	background: var(--gradient-primary);
+	width: 4px;
+}
+
+body .brand__mark,
+body .icon-btn__dot,
+body .notif__unread-dot {
+	background: var(--gradient-primary);
+	color: #ffffff;
+	border-color: transparent;
+}
+
+body .avatar {
+	background: var(--gradient-hero);
+	color: var(--primary-strong);
+}
+
+/* --- مودال و کشو --- */
+body .modal__panel,
+body .drawer__panel {
+	border-radius: var(--radius-lg);
+	box-shadow: var(--shadow-md);
+}
+
+body .drawer__panel {
+	border-radius: 0;
+}
+
+/* --- صفحه ورود: حس آرام و مادرانه --- */
+body .auth__brand {
+	background: var(--gradient-hero);
+}
+
+/* ================= حرکت =================
+   فقط opacity و transform (کامپوزیت روی GPU). بدون کتابخانه انیمیشن. */
 @keyframes mcc-fade-in {
 	from {
 		opacity: 0;
@@ -170,96 +318,73 @@
 	}
 }
 
+@keyframes mcc-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
 @keyframes mcc-float {
 	0%,
 	100% {
 		transform: translateY(0);
 	}
 	50% {
-		transform: translateY(-4px);
+		transform: translateY(-5px);
 	}
 }
 
 @keyframes mcc-pop {
 	0% {
-		transform: scale(0.96);
+		transform: scale(0.97);
 	}
 	60% {
-		transform: scale(1.02);
+		transform: scale(1.015);
 	}
 	100% {
 		transform: scale(1);
 	}
 }
 
-/* ترانزیشن عمومی اجزای تعاملی (همه نقش‌ها: مادر، ماما، متخصص) */
-body .btn,
-body .badge,
-body .nav__item,
-body .input,
-body .icon-btn,
-body .card {
-	transition:
-		background-color var(--motion-fast) var(--ease-soft),
-		border-color var(--motion-fast) var(--ease-soft),
-		color var(--motion-fast) var(--ease-soft),
-		box-shadow var(--motion-base) var(--ease-soft),
-		transform var(--motion-fast) var(--ease-out);
-}
-
-body .btn:active {
-	transform: scale(0.98);
-}
-
-/* ظاهر شدن نرم محتوای صفحه — page transition سبک برای همه پنل‌ها */
+/* همه پنل‌ها: ظاهر شدن آرام صفحه و اعلان‌ها (بدون تزئین) */
 body .content > * {
 	animation: mcc-fade-in var(--motion-base) var(--ease-soft) both;
 }
 
-/* اعلان‌ها و کشو — ظاهر شدن ملایم (همه نقش‌ها) */
 body .notif__item,
 body .drawer__body > * {
 	animation: mcc-fade-up var(--motion-base) var(--ease-out) both;
 }
 
-/* سطح پریمیوم کارت‌ها و نوار کناری */
-body .card {
-	background: var(--gradient-surface);
-}
-
-body .brand__mark,
-body .icon-btn__dot {
-	background: var(--gradient-primary);
-	color: #ffffff;
-	border-color: transparent;
-}
-
-/* صفحه ورود — حس مادرانه و آرام */
-body .auth__brand {
-	background: var(--gradient-soft);
-}
-
-/* —— مخصوص پنل مادر: کارت سفر بارداری و کارت‌های مراقبت —— */
+/* ================= پنل مادر — طراحی احساسی =================
+   کلاس‌های bgc* و care-list* فقط در تجربه مادر استفاده می‌شوند. */
 body .bgc {
-	background: var(--gradient-soft);
-	border-radius: var(--radius-lg);
+	background: var(--gradient-hero);
+	border-radius: var(--radius-xl);
+	border: 1px solid var(--primary-border);
 	animation: mcc-fade-up var(--motion-slow) var(--ease-out) both;
 }
 
 body .bgc__image,
 body .bgc__placeholder {
-	animation: mcc-float 6s var(--ease-soft) infinite;
+	animation: mcc-float 6.5s var(--ease-soft) infinite;
 	will-change: transform;
 }
 
 body .bgc__progress {
-	background: var(--surface-3);
+	background: color-mix(in srgb, var(--primary) 18%, var(--surface));
 	border-radius: var(--radius-pill);
 	overflow: hidden;
 }
 
 body .bgc__progress-fill {
 	background: var(--gradient-primary);
+	border-radius: var(--radius-pill);
 	transition: width var(--motion-slow) var(--ease-out);
 }
 
@@ -278,7 +403,10 @@ body .bgc__week--active {
 	animation: mcc-pop var(--motion-base) var(--ease-out);
 }
 
+/* کارت‌های فعالیت روزانه: رنگ دسته + میکرو اینتراکشن */
 body .care-list__item {
+	border-radius: var(--radius-md);
+	border-inline-start: 4px solid var(--border);
 	transition:
 		background-color var(--motion-base) var(--ease-soft),
 		border-color var(--motion-base) var(--ease-soft),
@@ -291,11 +419,46 @@ body .care-list__item:hover {
 	box-shadow: var(--shadow-sm);
 }
 
-body .care-list__item--done {
-	animation: mcc-pop var(--motion-base) var(--ease-out);
+body .care-list__item:active {
+	transform: scale(0.995);
 }
 
-/* —— احترام به تنظیم کاهش حرکت کاربر —— */
+body .care-list__item--cat-sleep {
+	background: var(--cat-sleep-soft);
+	border-inline-start-color: var(--cat-sleep);
+}
+
+body .care-list__item--cat-nutrition {
+	background: var(--cat-nutrition-soft);
+	border-inline-start-color: var(--cat-nutrition);
+}
+
+body .care-list__item--cat-exercise {
+	background: var(--cat-exercise-soft);
+	border-inline-start-color: var(--cat-exercise);
+}
+
+body .care-list__item--cat-other {
+	background: var(--cat-other-soft);
+	border-inline-start-color: var(--cat-other);
+}
+
+body .care-list__item--done {
+	animation: mcc-pop var(--motion-base) var(--ease-out);
+	border-inline-start-color: var(--success);
+}
+
+/* ================= پنل ماما و متخصص — حرفه‌ای و بدون تزئین ================= */
+body .table thead th {
+	background: var(--neutral-soft);
+	color: var(--text-soft);
+}
+
+body .table tbody tr {
+	transition: background-color var(--motion-fast) var(--ease-soft);
+}
+
+/* ================= احترام به کاهش حرکت ================= */
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,
@@ -307,7 +470,7 @@ body .care-list__item--done {
 	}
 }
 
-/* در نمایشگرهای کوچک، مقیاس تیپوگرافی کمی جمع‌تر می‌شود. */
+/* ================= موبایل ================= */
 @media (max-width: 760px) {
 	:root {
 		--fs-page-title: 23px;
@@ -317,7 +480,7 @@ body .care-list__item--done {
 		--topbar-h: 60px;
 	}
 
-	/* در موبایل انیمیشن شناور خاموش می‌شود تا مصرف باتری کمتر شود. */
+	/* صرفه‌جویی در باتری: انیمیشن شناور در موبایل خاموش است. */
 	body .bgc__image,
 	body .bgc__placeholder {
 		animation: none;

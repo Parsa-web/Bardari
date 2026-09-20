@@ -61,6 +61,7 @@ export function DailyActivitiesPage() {
 				return {
 					id: `${item.id}-${selectedDate}`,
 					title: item.title,
+					category: item.category,
 					badge: (
 						<span className="care-list__actions">
 							<Badge tone="info">تکرار روزانه</Badge>
@@ -84,6 +85,7 @@ export function DailyActivitiesPage() {
 		...dayActivities.map<CareRecordItem>((item) => ({
 			id: item.id,
 			title: item.title,
+			category: item.category,
 			badge: <Badge tone={item.done ? "success" : "neutral"}>{item.done ? "انجام شد" : "انجام نشده"}</Badge>,
 			meta: `${ACTIVITY_CATEGORY_LABELS[item.category]} · ${timeRange(item.startTime, item.endTime)}`,
 			body: item.description || undefined,
@@ -108,6 +110,7 @@ export function DailyActivitiesPage() {
 	const recurringItems: CareRecordItem[] = recurring.map((item) => ({
 		id: item.id,
 		title: item.title,
+		category: item.category,
 		badge: <Badge tone={item.active ? "success" : "neutral"}>{item.active ? "فعال" : "غیرفعال"}</Badge>,
 		meta: `${ACTIVITY_CATEGORY_LABELS[item.category]} · هر روز ${timeRange(item.startTime, item.endTime)}`,
 		body: item.description || undefined,
