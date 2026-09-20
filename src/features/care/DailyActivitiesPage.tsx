@@ -7,7 +7,6 @@ import {
 	Field,
 	PageHeader,
 	Select,
-	TextArea,
 	TextInput,
 } from "../../shared/components/ui"
 import { JalaliDateInput } from "../../shared/components/DateInput"
@@ -20,32 +19,12 @@ import { ACTIVITY_CATEGORY_LABELS, ACTIVITY_CATEGORY_OPTIONS } from "../../data/
 import { addDays, formatDate, formatTime, todayIso } from "../../shared/utils/date"
 import "./care.css"
 
-type ActivityForm = {
-	category: ActivityCategory
-	title: string
-	date: string
-	startTime: string
-	endTime: string
-	description: string
-}
-
 type RecurringForm = {
 	category: ActivityCategory
 	title: string
 	startTime: string
 	endTime: string
 	description: string
-}
-
-function emptyActivity(date: string): ActivityForm {
-	return {
-		category: "exercise",
-		title: "",
-		date,
-		startTime: "08:00",
-		endTime: "08:30",
-		description: "",
-	}
 }
 
 const EMPTY_RECURRING: RecurringForm = {
@@ -56,12 +35,11 @@ const EMPTY_RECURRING: RecurringForm = {
 	description: "",
 }
 
-/** فعالیت روزانه مادر: فعالیت‌های همان روز + فعالیت‌های تکرارشونده. */
+/** برنامه روزانه مادر: فعالیت‌های همان روز + روتین‌های ثابت تکرارشونده. */
 export function DailyActivitiesPage() {
 	const { motherId } = useMotherContext()
 	const care = useCareState()
 	const [selectedDate, setSelectedDate] = useState<string>(todayIso())
-	const [form, setForm] = useState<ActivityForm>(() => emptyActivity(todayIso()))
 	const [recForm, setRecForm] = useState<RecurringForm>(EMPTY_RECURRING)
 	const [error, setError] = useState<string | null>(null)
 	const [notice, setNotice] = useState<string | null>(null)
@@ -146,32 +124,9 @@ export function DailyActivitiesPage() {
 		),
 	}))
 
-	const submitActivity = () => {
-		setNotice(null)
-		if (!form.title.trim()) return setError("عنوان فعالیت را وارد کنید.")
-		if (!form.date) return setError("تاریخ فعالیت را انتخاب کنید.")
-		if (!form.startTime || !form.endTime) return setError("ساعت شروع و پایان را وارد کنید.")
-		if (form.endTime <= form.startTime) return setError("ساعت پایان باید بعد از ساعت شروع باشد.")
-		careActions.addActivity({
-			motherId,
-			category: form.category,
-			title: form.title.trim(),
-			date: form.date,
-			startTime: form.startTime,
-			endTime: form.endTime,
-			description: form.description.trim(),
-			done: false,
-		})
-		setSelectedDate(form.date)
-		setForm(emptyActivity(form.date))
-		setError(null)
-		setNotice("فعالیت ثبت شد.")
-		return undefined
-	}
-
 	const submitRecurring = () => {
 		setNotice(null)
-		if (!recForm.title.trim()) return setError("عنوان فعالیت تکرارشونده را وارد کنید.")
+		if (!recForm.title.trim()) return setError("عنوان روتین را وارد کنید.")
 		if (recForm.endTime <= recForm.startTime) return setError("ساعت پایان باید بعد از ساعت شروع باشد.")
 		careActions.addRecurring({
 			motherId,
@@ -185,7 +140,7 @@ export function DailyActivitiesPage() {
 		})
 		setRecForm(EMPTY_RECURRING)
 		setError(null)
-		setNotice("فعالیت تکرارشونده اضافه شد.")
+		setNotice("روتین ثابت اضافه شد و از امروز هر روز نمایش داده می‌شود.")
 		return undefined
 	}
 
@@ -224,75 +179,18 @@ export function DailyActivitiesPage() {
 				<CareRecordList
 					items={dayItems}
 					emptyTitle="برای این روز فعالیتی ثبت نشده است."
-					emptyHint="می‌توانید خواب، ورزش، تغذیه یا فعالیت دیگری را ثبت کنید."
+					emptyHint="یک روتین ثابت بسازید یا فعالیت را در دفترچه فعالیت ثبت کنید."
 				/>
 			</Card>
 
-			<Card title="ثبت فعالیت جدید">
-				<div className="care-form">
-					<Field label="دسته">
-						<Select
-							value={form.category}
-							onChange={(value) => setForm({ ...form, category: value as ActivityCategory })}
-							options={ACTIVITY_CATEGORY_OPTIONS}
-						/>
-					</Field>
-					<Field label="عنوان">
-						<TextInput
-							value={form.title}
-							onChange={(value) => setForm({ ...form, title: value })}
-							placeholder="مانند پیاده‌روی سبک"
-						/>
-					</Field>
-					<Field label="تاریخ (شمسی)">
-						<JalaliDateInput
-							value={form.date}
-							onChange={(value) => setForm({ ...form, date: value })}
-							yearsBack={2}
-							yearsAhead={1}
-						/>
-					</Field>
-					<Field label="ساعت شروع و پایان">
-						<div className="care-list__actions">
-							<TextInput
-								value={form.startTime}
-								onChange={(value) => setForm({ ...form, startTime: value })}
-								type="time"
-								inline
-							/>
-							<TextInput
-								value={form.endTime}
-								onChange={(value) => setForm({ ...form, endTime: value })}
-								type="time"
-								inline
-							/>
-						</div>
-					</Field>
-					<div className="care-form__wide">
-						<Field label="توضیح">
-							<TextArea
-								value={form.description}
-								onChange={(value) => setForm({ ...form, description: value })}
-								placeholder="مانند پیاده‌روی بیرون از خانه"
-							/>
-						</Field>
-					</div>
-					<div className="care-form__actions">
-						<Button variant="primary" icon="check" onClick={submitActivity}>
-							ثبت فعالیت
-						</Button>
-					</div>
-				</div>
-			</Card>
-
 			<Card
-				title="فعالیت‌های تکرارشونده"
-				subtitle="مانند «هر روز از ۸:۰۰ تا ۸:۳۰ پیاده‌روی بیرون از خانه»"
+				title="روتین‌های ثابت"
+				subtitle="یک‌بار بسازید — مانند «هر روز از ۸:۰۰ تا ۸:۳۰ پیاده‌روی بیرون از خانه»"
 			>
 				<CareRecordList
 					items={recurringItems}
-					emptyTitle="فعالیت تکرارشونده‌ای ثبت نشده است."
-					emptyHint="فعالیت‌های هرروزه را یک‌بار ثبت کنید تا هر روز نمایش داده شوند."
+					emptyTitle="روتین ثابتی ثبت نشده است."
+					emptyHint="فعالیت‌های هرروزه را یک‌بار ثبت کنید تا هر روز خودکار نمایش داده شوند."
 				/>
 
 				<div className="care-form">
@@ -335,7 +233,7 @@ export function DailyActivitiesPage() {
 					</Field>
 					<div className="care-form__actions">
 						<Button variant="secondary" icon="refresh" onClick={submitRecurring}>
-							افزودن فعالیت روزانه
+							افزودن روتین ثابت
 						</Button>
 					</div>
 				</div>
