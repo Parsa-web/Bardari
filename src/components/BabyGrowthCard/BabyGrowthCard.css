@@ -1,9 +1,139 @@
-/* استایل بخش «رشد هفتگی نوزاد». فقط همین کامپوننت را هدف می‌گیرد. */
+/* استایل کارت «سفر بارداری». فقط همین کامپوننت را هدف می‌گیرد. */
 
 .bgc {
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-4);
+}
+
+.bgc__journey {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+	padding: var(--space-4);
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--border);
+	background: var(--primary-soft, var(--surface-2, var(--bg)));
+}
+
+.bgc__progress {
+	position: relative;
+	height: 10px;
+	border-radius: 999px;
+	background: var(--surface);
+	border: 1px solid var(--border);
+	overflow: hidden;
+}
+
+.bgc__progress-fill {
+	position: absolute;
+	inset-block: 0;
+	inset-inline-start: 0;
+	border-radius: 999px;
+	background: var(--primary);
+	transition: width 0.3s ease;
+}
+
+.bgc__progress-meta {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-2);
+	font-size: 0.8rem;
+	opacity: 0.8;
+}
+
+.bgc__timeline {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: var(--space-1);
+	overflow-x: auto;
+}
+
+.bgc__timeline-item {
+	flex: 1 1 0;
+	min-width: 64px;
+	position: relative;
+	display: flex;
+	justify-content: center;
+}
+
+.bgc__timeline-item::before {
+	content: "";
+	position: absolute;
+	top: 9px;
+	inset-inline: -50% 50%;
+	height: 2px;
+	background: var(--border);
+}
+
+.bgc__timeline-item:first-child::before {
+	display: none;
+}
+
+.bgc__week {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	background: transparent;
+	border: 0;
+	padding: 0;
+	cursor: pointer;
+	color: inherit;
+	font: inherit;
+	opacity: 0.7;
+}
+
+.bgc__week:hover {
+	opacity: 1;
+}
+
+.bgc__week-dot {
+	width: 14px;
+	height: 14px;
+	border-radius: 999px;
+	border: 2px solid var(--border);
+	background: var(--surface);
+}
+
+.bgc__week--past .bgc__week-dot {
+	background: var(--primary);
+	border-color: var(--primary);
+	opacity: 0.65;
+}
+
+.bgc__week--active {
+	opacity: 1;
+	font-weight: 700;
+}
+
+.bgc__week--active .bgc__week-dot {
+	width: 18px;
+	height: 18px;
+	background: var(--primary);
+	border-color: var(--primary);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+
+.bgc__week-label {
+	font-size: 0.82rem;
+	white-space: nowrap;
+}
+
+.bgc__week-tag {
+	font-size: 0.68rem;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: var(--primary);
+	color: #fff;
+	white-space: nowrap;
 }
 
 .bgc__nav {
@@ -129,5 +259,9 @@
 
 	.bgc__placeholder {
 		min-height: 140px;
+	}
+
+	.bgc__timeline {
+		justify-content: flex-start;
 	}
 }
