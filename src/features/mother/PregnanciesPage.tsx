@@ -14,6 +14,7 @@ import {
 	TextArea,
 	TextInput,
 } from "../../shared/components/ui"
+import { JalaliDateInput } from "../../shared/components/DateInput"
 import { useMotherContext } from "./useMotherContext"
 import { getPregnancies } from "../../services/selectors"
 import { createPregnancy, recordBirth, updatePregnancy } from "../../services/mutations"
@@ -189,17 +190,19 @@ export function PregnanciesPage() {
 					/>
 				</Field>
 				<FormRow>
-					<Field label="اولین روز آخرین قاعدگی" hint="اختیاری">
-						<TextInput
-							type="date"
+					<Field label="اولین روز آخرین قاعدگی (شمسی)" hint="اختیاری">
+						<JalaliDateInput
 							value={newForm.lmpDate}
+							yearsBack={2}
+							yearsAhead={0}
 							onChange={(value) => setNewForm({ ...newForm, lmpDate: value })}
 						/>
 					</Field>
-					<Field label="تاریخ تخمینی زایمان" hint="اختیاری">
-						<TextInput
-							type="date"
+					<Field label="تاریخ تخمینی زایمان (شمسی)" hint="اختیاری">
+						<JalaliDateInput
 							value={newForm.eddDate}
+							yearsBack={1}
+							yearsAhead={2}
 							onChange={(value) => setNewForm({ ...newForm, eddDate: value })}
 						/>
 					</Field>
@@ -207,7 +210,6 @@ export function PregnanciesPage() {
 				<Field label="یادداشت" hint="اختیاری">
 					<TextArea
 						value={newForm.note}
-						rows={3}
 						onChange={(value) => setNewForm({ ...newForm, note: value })}
 					/>
 				</Field>
@@ -232,10 +234,11 @@ export function PregnanciesPage() {
 				}
 			>
 				<FormRow>
-					<Field label="تاریخ زایمان">
-						<TextInput
-							type="date"
+					<Field label="تاریخ زایمان (شمسی)">
+						<JalaliDateInput
 							value={birthForm.date}
+							yearsBack={2}
+							yearsAhead={0}
 							onChange={(value) => setBirthForm({ ...birthForm, date: value })}
 						/>
 					</Field>
