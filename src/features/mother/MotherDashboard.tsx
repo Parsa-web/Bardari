@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { Badge, Card, EmptyState, Grid, PageHeader, Stat } from "../../shared/components/ui"
 import { BabyGrowthCard } from "../../components/BabyGrowthCard/BabyGrowthCard"
+import { CareSummary } from "../care/CareSummary"
 import { useMotherContext } from "./useMotherContext"
 import {
 	checkupViewStatus,
@@ -68,6 +69,8 @@ export function MotherDashboard() {
 			</Grid>
 
 			{gest && <BabyGrowthCard week={gest.weeks} />}
+
+			<CareSummary />
 
 			<Grid cols={2}>
 				<Card title="چکاپ‌های در پیش" actions={<Link className="btn btn--ghost" to="/mother/checkups">همه چکاپ‌ها</Link>}>
