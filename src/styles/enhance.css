@@ -1,0 +1,364 @@
+/*
+ * لایه ارتقای رابط کاربری: دراپ‌داون‌ها، ورودی تاریخ شمسی، نمودار رشد
+ * و فهرست‌های گروه‌بندی‌شده. این فایل آخر از همه بارگذاری می‌شود.
+ */
+
+/* ------------------------------ دراپ‌داون ------------------------------ */
+select.input,
+select.input--select {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	cursor: pointer;
+	background-color: var(--surface);
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%235b6b85' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: left 12px center;
+	background-size: 16px 16px;
+	padding-inline-start: 12px;
+	padding-inline-end: 36px;
+	text-overflow: ellipsis;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+select.input:hover:not(:disabled) {
+	border-color: var(--primary-border);
+	background-color: var(--surface-2);
+}
+
+select.input:focus-visible,
+select.input:focus {
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+select.input:disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+select.input option {
+	background: var(--surface);
+	color: var(--text);
+	padding: 6px 8px;
+}
+
+select.input optgroup {
+	background: var(--surface);
+	color: var(--muted);
+	font-weight: 700;
+}
+
+[data-theme="dark"] select.input {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a7c7' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.input--invalid {
+	border-color: var(--danger, #c0392b);
+}
+
+/* ---------------------------- تاریخ شمسی ---------------------------- */
+.datefield {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.datefield__row {
+	display: grid;
+	grid-template-columns: 0.85fr 1.25fr 1fr;
+	gap: 8px;
+	min-width: 0;
+}
+
+.datefield__row .input {
+	min-width: 0;
+	width: 100%;
+}
+
+.datefield__preview {
+	font-size: 12.5px;
+	color: var(--muted);
+	line-height: 1.7;
+}
+
+@media (max-width: 420px) {
+	.datefield__row {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.datefield__row > :last-child {
+		grid-column: 1 / -1;
+	}
+}
+
+/* ------------------------------- نمودار ------------------------------- */
+.chart {
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.chart__svg {
+	width: 100%;
+	height: 240px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	background: var(--surface-2);
+}
+
+.chart__grid {
+	stroke: var(--border);
+	stroke-width: 1;
+	stroke-dasharray: 4 6;
+}
+
+.chart__axis {
+	fill: var(--muted);
+	font-size: 11px;
+	font-family: var(--font-sans);
+}
+
+.chart__line {
+	fill: none;
+	stroke: var(--primary);
+	stroke-width: 2.5;
+	stroke-linejoin: round;
+	stroke-linecap: round;
+}
+
+.chart__area {
+	fill: var(--primary-soft);
+	stroke: none;
+}
+
+.chart__dot {
+	fill: var(--surface);
+	stroke: var(--primary);
+	stroke-width: 2.5;
+}
+
+.chart__caption {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 14px;
+	justify-content: space-between;
+	font-size: 12.5px;
+	color: var(--muted);
+}
+
+.chart__empty {
+	margin: 0;
+	padding: 24px 12px;
+	text-align: center;
+	color: var(--muted);
+	font-size: 13.5px;
+	border: 1px dashed var(--border);
+	border-radius: var(--radius-md);
+}
+
+.chart__tabs {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+/* -------------------- پیمایش روز و گروه‌بندی فهرست -------------------- */
+.daynav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	flex-wrap: wrap;
+	padding: 10px 12px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	background: var(--surface-2);
+}
+
+.daynav__label {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.daynav__title {
+	font-size: 14.5px;
+	font-weight: 700;
+	color: var(--text);
+	line-height: 1.6;
+}
+
+.daynav__hint {
+	font-size: 12.5px;
+	color: var(--muted);
+}
+
+.daynav__actions {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	flex-wrap: wrap;
+}
+
+.group {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.group + .group {
+	margin-top: 18px;
+}
+
+.group__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	flex-wrap: wrap;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--border);
+}
+
+.group__title {
+	margin: 0;
+	font-size: 14.5px;
+	font-weight: 700;
+	color: var(--text);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.group__count {
+	font-size: 12.5px;
+	color: var(--muted);
+	font-weight: 500;
+}
+
+/* ------------------------- نوار جستجو و فیلتر ------------------------- */
+.filterbar {
+	display: grid;
+	grid-template-columns: minmax(200px, 1.6fr) minmax(150px, 1fr) minmax(150px, 1fr);
+	gap: 10px;
+	align-items: end;
+}
+
+@media (max-width: 760px) {
+	.filterbar {
+		grid-template-columns: 1fr;
+	}
+}
+
+.filterbar .field {
+	margin: 0;
+}
+
+.result-count {
+	font-size: 12.5px;
+	color: var(--muted);
+	line-height: 1.8;
+}
+
+/* --------------------------- فهرست سؤال‌ها --------------------------- */
+.qlist {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.qitem {
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	background: var(--surface);
+	overflow: hidden;
+}
+
+.qitem[open] {
+	border-color: var(--primary-border);
+}
+
+.qitem__summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	flex-wrap: wrap;
+	padding: 12px 14px;
+	cursor: pointer;
+	list-style: none;
+	user-select: none;
+}
+
+.qitem__summary::-webkit-details-marker {
+	display: none;
+}
+
+.qitem__summary:hover {
+	background: var(--surface-2);
+}
+
+.qitem__summary:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: -2px;
+}
+
+.qitem__main {
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+	min-width: 0;
+}
+
+.qitem__title {
+	font-size: 14.5px;
+	font-weight: 700;
+	color: var(--text);
+	line-height: 1.6;
+	overflow-wrap: anywhere;
+}
+
+.qitem__meta {
+	font-size: 12.5px;
+	color: var(--muted);
+	line-height: 1.7;
+	overflow-wrap: anywhere;
+}
+
+.qitem__side {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.qitem__body {
+	padding: 0 14px 14px;
+	border-top: 1px solid var(--border);
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+
+.qitem__body > * {
+	flex: 0 0 auto;
+}
+
+/* --------------------------- فهرست چکاپ‌ها --------------------------- */
+.list__item--overdue {
+	border-inline-start: 3px solid var(--danger, #c0392b);
+}
+
+.list__item--due_soon {
+	border-inline-start: 3px solid var(--warn, #b7791f);
+}
+
+.list__item--done {
+	opacity: 0.85;
+}
