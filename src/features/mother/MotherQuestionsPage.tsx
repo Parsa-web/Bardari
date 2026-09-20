@@ -16,7 +16,20 @@ import {
 import { decodeSubject, useMotherContext } from "./useMotherContext"
 import { getQuestions, subjectLabel } from "../../services/selectors"
 import { addQuestionMessage, createQuestion } from "../../services/mutations"
-import { QUESTION_STATUS_LABELS, QUESTION_STATUS_TONES, ROLE_LABELS } from "../../shared/constants/labels"
+import {
+	questionPriority,
+	QUESTION_PRIORITY_ORDER,
+	sortQuestionsByPriority,
+} from "../../services/questionPriority"
+import {
+	QUESTION_PRIORITY_HINTS,
+	QUESTION_PRIORITY_LABELS,
+	QUESTION_PRIORITY_TONES,
+	QUESTION_STATUS_LABELS,
+	QUESTION_STATUS_TONES,
+	ROLE_LABELS,
+} from "../../shared/constants/labels"
+import type { QuestionPriority } from "../../shared/types/domain"
 import { formatTimestamp, toFa } from "../../shared/utils/date"
 
 export function MotherQuestionsPage() {
@@ -26,12 +39,13 @@ export function MotherQuestionsPage() {
 	const [error, setError] = useState<string | null>(null)
 	const [search, setSearch] = useState("")
 	const [statusFilter, setStatusFilter] = useState<string>("open")
-	const [sort, setSort] = useState<string>("recent")
+	const [sort, setSort] = useState<string>("priority")
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 	const [form, setForm] = useState({
 		subjectValue: subjectOptions[1]?.value ?? subjectOptions[0]?.value ?? "",
 		title: "",
 		text: "",
+		priority: "normal" as QuestionPriority,
 	})
 	const [replies, setReplies] = useState<Record<string, string>>({})
 
@@ -57,10 +71,13 @@ export function MotherQuestionsPage() {
 				.toLowerCase()
 			return haystack.includes(term)
 		})
+		const recentFirst = (a: QuestionItem, b: QuestionItem) =>
+			lastActivity(a) < lastActivity(b) ? 1 : -1
+		if (sort === "priority") return sortQuestionsByPriority(list, recentFirst)
 		return [...list].sort((a, b) => {
 			if (sort === "oldest") return lastActivity(a) < lastActivity(b) ? -1 : 1
 			if (sort === "title") return a.title.localeCompare(b.title, "fa")
-			return lastActivity(a) < lastActivity(b) ? 1 : -1
+			return recentFirst(a, b)
 		})
 	}, [questions, db, search, statusFilter, sort])
 
@@ -80,15 +97,16 @@ export function MotherQuestionsPage() {
 				title: form.title.trim(),
 				text: form.text.trim(),
 				authorName: displayName,
+				priority: form.priority,
 			}),
-		).then(() => setForm({ ...form, title: "", text: "" }))
+		).then(() => setForm({ ...form, title: "", text: "", priority: "normal" }))
 	}
 
 	return (
 		<>
 			<PageHeader
 				title="سؤال از ماما"
-				subtitle="هر سؤال یک پرونده گفتگوی مستقل با وضعیت مشخص است"
+				subtitle="هر سؤال یک گفتگوی مستقل است؛ اولویت را درست انتخاب کنید تا سریع‌تر دیده شود"
 			/>
 
 			{error && <Alert tone="danger">{error}</Alert>}
@@ -102,10 +120,20 @@ export function MotherQuestionsPage() {
 							options={subjectOptions.map((option) => ({ value: option.value, label: option.label }))}
 						/>
 					</Field>
-					<Field label="عنوان سؤال">
-						<TextInput value={form.title} onChange={(value) => setForm({ ...form, title: value })} />
+					<Field label="اولویت" hint={QUESTION_PRIORITY_HINTS[form.priority]}>
+						<Select
+							value={form.priority}
+							onChange={(value) => setForm({ ...form, priority: value as QuestionPriority })}
+							options={QUESTION_PRIORITY_ORDER.map((priority) => ({
+								value: priority,
+								label: QUESTION_PRIORITY_LABELS[priority],
+							}))}
+						/>
 					</Field>
 				</FormRow>
+				<Field label="عنوان سؤال">
+					<TextInput value={form.title} onChange={(value) => setForm({ ...form, title: value })} />
+				</Field>
 				<Field label="متن سؤال">
 					<TextArea value={form.text} onChange={(value) => setForm({ ...form, text: value })} />
 				</Field>
@@ -145,6 +173,7 @@ export function MotherQuestionsPage() {
 							value={sort}
 							onChange={setSort}
 							options={[
+								{ value: "priority", label: "اولویت (فوری ← عادی)" },
 								{ value: "recent", label: "تازه‌ترین گفتگو" },
 								{ value: "oldest", label: "قدیمی‌ترین گفتگو" },
 								{ value: "title", label: "عنوان (الفبا)" },
@@ -165,6 +194,7 @@ export function MotherQuestionsPage() {
 						{visible.map((question, index) => {
 							const isOpen = expanded[question.id] ?? (index === 0 && question.status !== "closed")
 							const last = question.messages[question.messages.length - 1]
+							const priority = questionPriority(question)
 							return (
 								<details
 									key={question.id}
@@ -186,6 +216,9 @@ export function MotherQuestionsPage() {
 											</span>
 										</span>
 										<span className="qitem__side">
+											<Badge tone={QUESTION_PRIORITY_TONES[priority]}>
+												{QUESTION_PRIORITY_LABELS[priority]}
+											</Badge>
 											<Badge tone={QUESTION_STATUS_TONES[question.status]}>
 												{QUESTION_STATUS_LABELS[question.status]}
 											</Badge>
