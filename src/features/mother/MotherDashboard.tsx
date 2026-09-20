@@ -22,7 +22,6 @@ import {
 	QUESTION_STATUS_TONES,
 } from "../../shared/constants/labels"
 import {
-	formatAge,
 	formatDate,
 	formatDateTime,
 	formatGestation,
@@ -98,7 +97,7 @@ export function MotherDashboard() {
 
 				<Card title="فعالیت‌های امروز" actions={<Link className="btn btn--ghost" to="/mother/activities">ثبت فعالیت</Link>}>
 					{todayActivities.length === 0 ? (
-						<EmptyState title="برای امروز فعالیتی ثبت نشده است." hint="می‌توانید غذا، حرکت، دارو یا علامت را ثبت کنید." />
+						<EmptyState title="برای امروز فعالیتی ثبت نشده است." hint="می‌توانید خواب، تغذیه، ورزش یا سایر را ثبت کنید." />
 					) : (
 						<ul className="list">
 							{todayActivities.map((activity) => (
@@ -109,9 +108,7 @@ export function MotherDashboard() {
 											ساعت {formatTime(activity.time)} · {ACTIVITY_CATEGORY_LABELS[activity.category]}
 										</p>
 									</div>
-									<Badge tone={activity.category === "symptom" ? "warn" : "info"}>
-										{subjectLabel(db, activity.subject)}
-									</Badge>
+									<Badge tone="info">{subjectLabel(db, activity.subject)}</Badge>
 								</li>
 							))}
 						</ul>
@@ -119,45 +116,25 @@ export function MotherDashboard() {
 				</Card>
 			</Grid>
 
-			<Grid cols={2}>
-				<Card title="سؤال‌های من" actions={<Link className="btn btn--ghost" to="/mother/questions">مشاهده</Link>}>
-					{openQuestions.length === 0 ? (
-						<EmptyState title="سؤال در جریانی ندارید." />
-					) : (
-						<ul className="list">
-							{openQuestions.slice(0, 4).map((question) => (
-								<li key={question.id} className="list__item">
-									<div>
-										<strong>{question.title}</strong>
-										<p className="muted">{subjectLabel(db, question.subject)}</p>
-									</div>
-									<Badge tone={QUESTION_STATUS_TONES[question.status]}>
-										{QUESTION_STATUS_LABELS[question.status]}
-									</Badge>
-								</li>
-							))}
-						</ul>
-					)}
-				</Card>
-
-				<Card title="کودکان" actions={<Link className="btn btn--ghost" to="/mother/children">پرونده کودکان</Link>}>
-					{children.length === 0 ? (
-						<EmptyState title="پرونده کودکی ثبت نشده است." />
-					) : (
-						<ul className="list">
-							{children.map((child) => (
-								<li key={child.id} className="list__item">
-									<div>
-										<strong>کودک: {child.name}</strong>
-										<p className="muted">سن: {formatAge(child.birthDate)}</p>
-									</div>
-									<span className="muted">{formatDate(child.birthDate)}</span>
-								</li>
-							))}
-						</ul>
-					)}
-				</Card>
-			</Grid>
+			<Card title="سؤال‌های من" actions={<Link className="btn btn--ghost" to="/mother/questions">مشاهده</Link>}>
+				{openQuestions.length === 0 ? (
+					<EmptyState title="سؤال در جریانی ندارید." />
+				) : (
+					<ul className="list">
+						{openQuestions.slice(0, 4).map((question) => (
+							<li key={question.id} className="list__item">
+								<div>
+									<strong>{question.title}</strong>
+									<p className="muted">{subjectLabel(db, question.subject)}</p>
+								</div>
+								<Badge tone={QUESTION_STATUS_TONES[question.status]}>
+									{QUESTION_STATUS_LABELS[question.status]}
+								</Badge>
+							</li>
+						))}
+					</ul>
+				)}
+			</Card>
 		</>
 	)
 }
