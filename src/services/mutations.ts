@@ -10,6 +10,7 @@ import type {
 	HealthRecord,
 	Pregnancy,
 	QuestionCase,
+	QuestionPriority,
 	QuestionStatus,
 	Referral,
 	ReferralStatus,
@@ -99,10 +100,13 @@ export type QuestionInput = {
 	title: string
 	text: string
 	authorName: string
+	/** اولویت انتخابی مادر؛ پیش‌فرض «عادی» */
+	priority?: QuestionPriority
 }
 
 export function createQuestion(db: AppDatabase, input: QuestionInput): AppDatabase {
 	const now = nowIsoTimestamp()
+	const priority: QuestionPriority = input.priority ?? "normal"
 	const question: QuestionCase = {
 		id: createId("qc"),
 		motherId: input.motherId,
@@ -110,6 +114,7 @@ export function createQuestion(db: AppDatabase, input: QuestionInput): AppDataba
 		subject: input.subject ?? null,
 		title: input.title,
 		status: "open",
+		priority,
 		createdAt: now,
 		updatedAt: now,
 		messages: [
@@ -122,11 +127,12 @@ export function createQuestion(db: AppDatabase, input: QuestionInput): AppDataba
 			},
 		],
 	}
+	const priorityLabel = priority === "urgent" ? "فوری" : priority === "important" ? "مهم" : "عادی"
 	const notified = pushNotification(db, {
 		audience: "midwife",
 		motherId: input.motherId,
-		title: "سؤال جدید",
-		body: `سؤال جدیدی ثبت شد: ${input.title}`,
+		title: priority === "urgent" ? "سؤال فوری" : "سؤال جدید",
+		body: `سؤال جدید (اولویت ${priorityLabel}): ${input.title}`,
 		link: "/midwife/questions",
 	})
 	return { ...notified, questions: [question, ...notified.questions] }
@@ -172,6 +178,20 @@ export function setQuestionStatus(
 		...db,
 		questions: db.questions.map((q) =>
 			q.id === questionId ? { ...q, status, updatedAt: nowIsoTimestamp() } : q,
+		),
+	}
+}
+
+/** تغییر اولویت سؤال (برای مادر یا ماما) */
+export function setQuestionPriority(
+	db: AppDatabase,
+	questionId: string,
+	priority: QuestionPriority,
+): AppDatabase {
+	return {
+		...db,
+		questions: db.questions.map((q) =>
+			q.id === questionId ? { ...q, priority, updatedAt: nowIsoTimestamp() } : q,
 		),
 	}
 }
