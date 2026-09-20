@@ -91,6 +91,11 @@ export type AuthAccount = {
 	createdAt: string
 }
 
+/**
+ * دسته فعالیت.
+ * چهار دسته رسمی: sleep (خواب)، food (تغذیه)، movement (ورزش)، note (سایر).
+ * symptom و medication فقط برای سازگاری با رکوردهای قدیمی باقی مانده‌اند و قابل انتخاب نیستند.
+ */
 export type ActivityCategory =
 	| "food"
 	| "movement"
@@ -109,7 +114,7 @@ export type Activity = {
 	category: ActivityCategory
 	/** مخصوص دسته «فعالیت» و «خواب» */
 	durationMinutes?: number | null
-	/** مخصوص دسته «علائم»: شدت ۱ تا ۵ */
+	/** مخصوص رکوردهای قدیمی علائم: شدت ۱ تا ۵ */
 	severity?: number | null
 	description?: string
 	createdAt: string
@@ -149,6 +154,9 @@ export type QuestionStatus =
 	| "referred"
 	| "closed"
 
+/** اولویت سؤال که مادر هنگام ثبت انتخاب می‌کند */
+export type QuestionPriority = "urgent" | "important" | "normal"
+
 export type CaseMessage = {
 	id: string
 	authorRole: Role
@@ -165,6 +173,8 @@ export type QuestionCase = {
 	subject?: SubjectRef | null
 	title: string
 	status: QuestionStatus
+	/** سؤال‌های قدیمی ممکن است اولویت نداشته باشند؛ پیش‌فرض «عادی» است */
+	priority?: QuestionPriority
 	createdAt: string
 	updatedAt: string
 	messages: CaseMessage[]
