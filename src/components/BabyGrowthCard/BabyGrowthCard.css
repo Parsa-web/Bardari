@@ -1,0 +1,133 @@
+/* استایل بخش «رشد هفتگی نوزاد». فقط همین کامپوننت را هدف می‌گیرد. */
+
+.bgc {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+.bgc__nav {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+}
+
+.bgc__nav-title {
+	font-weight: 700;
+	font-size: 1.02rem;
+}
+
+.bgc__nav-actions {
+	display: flex;
+	align-items: center;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+}
+
+.bgc__placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+	gap: var(--space-1);
+	min-height: 168px;
+	border-radius: var(--radius-lg);
+	border: 1px dashed var(--border);
+	background: var(--surface-2, var(--bg));
+	color: var(--text-muted, inherit);
+	text-align: center;
+	padding: var(--space-4);
+}
+
+.bgc__placeholder-icon {
+	font-size: 1.6rem;
+	line-height: 1;
+}
+
+.bgc__placeholder-text {
+	font-size: 0.85rem;
+	opacity: 0.8;
+	margin: 0;
+}
+
+.bgc__image {
+	width: 100%;
+	max-height: 280px;
+	object-fit: contain;
+	border-radius: var(--radius-lg);
+	border: 1px solid var(--border);
+	background: var(--surface-2, var(--bg));
+}
+
+.bgc__facts {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--space-3);
+}
+
+.bgc__fact {
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: var(--space-3);
+	background: var(--surface);
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.bgc__fact-label {
+	font-size: 0.8rem;
+	opacity: 0.75;
+}
+
+.bgc__fact-value {
+	font-weight: 600;
+}
+
+.bgc__block {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.bgc__block-title {
+	margin: 0;
+	font-size: 0.92rem;
+	font-weight: 700;
+}
+
+.bgc__block-text {
+	margin: 0;
+	line-height: 1.9;
+}
+
+.bgc__message {
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: var(--space-3) var(--space-4);
+	background: var(--primary-soft, var(--surface-2, var(--bg)));
+	border-inline-start: 4px solid var(--primary);
+}
+
+.bgc__disclaimer {
+	margin: 0;
+	font-size: 0.78rem;
+	opacity: 0.7;
+	line-height: 1.8;
+}
+
+@media (max-width: 640px) {
+	.bgc__facts {
+		grid-template-columns: 1fr;
+	}
+
+	.bgc__nav {
+		align-items: stretch;
+	}
+
+	.bgc__placeholder {
+		min-height: 140px;
+	}
+}
