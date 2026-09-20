@@ -9,7 +9,6 @@ import {
 	APPOINTMENT_TYPE_LABELS,
 } from "../../data/appointments"
 import { HEALTH_CATEGORY_LABELS, HEALTH_SEVERITY_LABELS, HEALTH_SEVERITY_TONES } from "../../data/healthRecords"
-import { CARE_CHECKUP_TYPE_LABELS, CARE_CHECKUP_TYPE_TONES } from "../../data/checkups"
 import { getCareProviderName } from "../../data/doctors"
 import { formatDate, formatTime, todayIso } from "../../shared/utils/date"
 import "./care.css"
@@ -33,10 +32,6 @@ export function CareSummary() {
 
 	const health = ownedBy(care.healthRecords, motherId).sort((a, b) => b.date.localeCompare(a.date))[0]
 
-	const checkup = ownedBy(care.checkups, motherId)
-		.filter((item) => !item.done && item.date >= today)
-		.sort((a, b) => a.date.localeCompare(b.date))[0]
-
 	const child = ownedBy(care.children, motherId)[0] ?? null
 	const childRecords = child ? care.medicalRecords.filter((record) => record.childId === child.id) : []
 	const openChildRecords = childRecords.filter((record) => !record.endDate)
@@ -44,7 +39,7 @@ export function CareSummary() {
 	return (
 		<Grid cols={2}>
 			<Card
-				title="فعالیت‌های امروز"
+				title="فعالیت‌های برنامه روزانه"
 				actions={<Link to="/mother/daily-activities">مشاهده</Link>}
 			>
 				{totalCount === 0 ? (
@@ -124,25 +119,6 @@ export function CareSummary() {
 					</ul>
 				) : (
 					<p className="care-note">وضعیت سلامتی ثبت نشده است.</p>
-				)}
-			</Card>
-
-			<Card title="چکاپ بعدی" actions={<Link to="/mother/pregnancy-checkups">مشاهده</Link>}>
-				{checkup ? (
-					<ul className="care-list">
-						<li className="care-list__item care-list__item--due">
-							<div className="care-list__head">
-								<span className="care-list__title">
-									{checkup.type === "general" ? checkup.title || "چکاپ عمومی" : checkup.reason || "چکاپ سایر"}
-								</span>
-								<Badge tone={CARE_CHECKUP_TYPE_TONES[checkup.type]}>{CARE_CHECKUP_TYPE_LABELS[checkup.type]}</Badge>
-							</div>
-							<span className="care-list__meta">{formatDate(checkup.date)}</span>
-							{checkup.notes && <div className="care-list__body">{checkup.notes}</div>}
-						</li>
-					</ul>
-				) : (
-					<p className="care-note">چکاپ پیش‌رویی ثبت نشده است.</p>
 				)}
 			</Card>
 
