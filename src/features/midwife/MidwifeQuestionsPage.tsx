@@ -18,7 +18,10 @@ import {
 import { useProviderSession } from "./useProviderSession"
 import { getMother, getQuestions, motherFullName, subjectLabel } from "../../services/selectors"
 import { addQuestionMessage, createReferral, setQuestionStatus } from "../../services/mutations"
+import { questionPriority, sortQuestionsByPriority } from "../../services/questionPriority"
 import {
+	QUESTION_PRIORITY_LABELS,
+	QUESTION_PRIORITY_TONES,
 	QUESTION_STATUS_LABELS,
 	QUESTION_STATUS_TONES,
 	ROLE_LABELS,
@@ -39,7 +42,7 @@ export function MidwifeQuestionsPage() {
 	const [error, setError] = useState<string | null>(null)
 	const [search, setSearch] = useState("")
 	const [statusFilter, setStatusFilter] = useState<string>("open")
-	const [sort, setSort] = useState<string>("recent")
+	const [sort, setSort] = useState<string>("priority")
 	const [expanded, setExpanded] = useState<Record<string, boolean>>({})
 	const [referralForm, setReferralForm] = useState({
 		specialistId: specialists[0]?.id ?? "",
@@ -73,6 +76,9 @@ export function MidwifeQuestionsPage() {
 				.toLowerCase()
 			return haystack.includes(term)
 		})
+		const recentFirst = (a: QuestionItem, b: QuestionItem) =>
+			lastActivity(a) < lastActivity(b) ? 1 : -1
+		if (sort === "priority") return sortQuestionsByPriority(list, recentFirst)
 		return [...list].sort((a, b) => {
 			if (sort === "oldest") return lastActivity(a) < lastActivity(b) ? -1 : 1
 			if (sort === "mother") {
@@ -81,11 +87,14 @@ export function MidwifeQuestionsPage() {
 					"fa",
 				)
 			}
-			return lastActivity(a) < lastActivity(b) ? 1 : -1
+			return recentFirst(a, b)
 		})
 	}, [questions, db, search, statusFilter, sort])
 
 	const openCount = questions.filter((item) => item.status !== "closed").length
+	const urgentCount = questions.filter(
+		(item) => item.status !== "closed" && questionPriority(item) === "urgent",
+	).length
 
 	const submitReferral = () => {
 		if (!question) return
@@ -114,9 +123,13 @@ export function MidwifeQuestionsPage() {
 
 	return (
 		<>
-			<PageHeader title="سؤال‌های مادران" subtitle="پاسخ، تغییر وضعیت و ارجاع به متخصص" />
+			<PageHeader title="سؤال‌های مادران" subtitle="ابتدا سؤال‌های فوری، سپس مهم و عادی نمایش داده می‌شوند" />
 
 			{error && <Alert tone="danger">{error}</Alert>}
+
+			{urgentCount > 0 && (
+				<Alert tone="danger">{`${toFa(urgentCount)} سؤال فوری باز دارید.`}</Alert>
+			)}
 
 			<Card
 				title="صندوق سؤال‌ها"
@@ -149,6 +162,7 @@ export function MidwifeQuestionsPage() {
 							value={sort}
 							onChange={setSort}
 							options={[
+								{ value: "priority", label: "اولویت (فوری ← عادی)" },
 								{ value: "recent", label: "تازه‌ترین گفتگو" },
 								{ value: "oldest", label: "قدیمی‌ترین گفتگو" },
 								{ value: "mother", label: "نام مادر" },
@@ -169,6 +183,7 @@ export function MidwifeQuestionsPage() {
 						{visible.map((item, index) => {
 							const isOpen = expanded[item.id] ?? (index === 0 && item.status !== "closed")
 							const last = item.messages[item.messages.length - 1]
+							const priority = questionPriority(item)
 							return (
 								<details
 									key={item.id}
@@ -190,6 +205,9 @@ export function MidwifeQuestionsPage() {
 											</span>
 										</span>
 										<span className="qitem__side">
+											<Badge tone={QUESTION_PRIORITY_TONES[priority]}>
+												{QUESTION_PRIORITY_LABELS[priority]}
+											</Badge>
 											<Badge tone={QUESTION_STATUS_TONES[item.status]}>
 												{QUESTION_STATUS_LABELS[item.status]}
 											</Badge>
