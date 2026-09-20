@@ -1,0 +1,140 @@
+/* استایل بخش‌های جدید مراقبت. فقط کلاس‌های care-* را هدف می‌گیرد. */
+
+.care-stack {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4);
+}
+
+.care-form {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: var(--space-3) var(--space-4);
+	align-items: start;
+}
+
+.care-form__wide {
+	grid-column: 1 / -1;
+}
+
+.care-form__actions {
+	grid-column: 1 / -1;
+	display: flex;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+}
+
+.care-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-2);
+}
+
+.care-list__item {
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: var(--space-3);
+	background: var(--surface);
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	border-inline-start: 4px solid transparent;
+}
+
+.care-list__item--done {
+	border-inline-start-color: var(--success, #2e9e6b);
+}
+
+.care-list__item--due {
+	border-inline-start-color: var(--primary);
+}
+
+.care-list__item--alert {
+	border-inline-start-color: var(--danger, #d7504b);
+}
+
+.care-list__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+}
+
+.care-list__title {
+	font-weight: 600;
+}
+
+.care-list__meta {
+	font-size: 0.82rem;
+	opacity: 0.75;
+}
+
+.care-list__body {
+	line-height: 1.85;
+}
+
+.care-list__actions {
+	display: flex;
+	gap: var(--space-2);
+	flex-wrap: wrap;
+}
+
+.care-provider {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3);
+	flex-wrap: wrap;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: var(--space-3);
+}
+
+.care-timeline {
+	list-style: none;
+	margin: 0;
+	padding-inline-start: var(--space-4);
+	border-inline-start: 2px solid var(--border);
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-3);
+}
+
+.care-timeline__item {
+	position: relative;
+}
+
+.care-timeline__item::before {
+	content: "";
+	position: absolute;
+	inset-inline-start: calc(var(--space-4) * -1 - 6px);
+	top: 8px;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: var(--primary);
+}
+
+.care-timeline__date {
+	font-size: 0.82rem;
+	opacity: 0.75;
+	display: block;
+	margin-bottom: 4px;
+}
+
+.care-note {
+	margin: 0;
+	font-size: 0.8rem;
+	opacity: 0.75;
+	line-height: 1.8;
+}
+
+@media (max-width: 720px) {
+	.care-form {
+		grid-template-columns: 1fr;
+	}
+}
