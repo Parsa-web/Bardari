@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react"
+import { Link } from "react-router-dom"
 import { useData } from "../../app/providers/DataProvider"
 import {
 	Alert,
@@ -19,7 +20,10 @@ import { JalaliDateInput } from "../../shared/components/DateInput"
 import { decodeSubject, useMotherContext } from "./useMotherContext"
 import { getActivities, subjectLabel } from "../../services/selectors"
 import { addActivity, deleteActivity, updateActivity } from "../../services/mutations"
-import { ACTIVITY_CATEGORY_LABELS } from "../../shared/constants/labels"
+import {
+	ACTIVITY_CATEGORY_LABELS,
+	MOTHER_ACTIVITY_CATEGORIES,
+} from "../../shared/constants/labels"
 import type { ActivityCategory } from "../../shared/types/domain"
 import {
 	addDays,
@@ -30,7 +34,8 @@ import {
 	toFa,
 } from "../../shared/utils/date"
 
-const CATEGORIES = Object.keys(ACTIVITY_CATEGORY_LABELS) as ActivityCategory[]
+/** فقط چهار دسته رسمی: خواب، تغذیه، ورزش، سایر. */
+const CATEGORIES = MOTHER_ACTIVITY_CATEGORIES
 
 type FormState = {
 	subjectValue: string
@@ -39,7 +44,6 @@ type FormState = {
 	title: string
 	category: ActivityCategory
 	duration: string
-	severity: string
 	description: string
 }
 
@@ -49,14 +53,13 @@ function emptyForm(subjectValue: string, date: string): FormState {
 		date,
 		time: nowTime(),
 		title: "",
-		category: "food",
+		category: "sleep",
 		duration: "",
-		severity: "",
 		description: "",
 	}
 }
 
-/** قابلیت اصلی سامانه: ثبت و مدیریت فعالیت روزانه. */
+/** دفترچه ثبت دقیق فعالیت‌های روزانه و آرشیو روزهای گذشته. */
 export function ActivitiesPage() {
 	const { db, motherId, subjectOptions } = useMotherContext()
 	const { mutate } = useData()
@@ -67,18 +70,21 @@ export function ActivitiesPage() {
 	const [form, setForm] = useState<FormState>(() => emptyForm(defaultSubject, today))
 	const [editingId, setEditingId] = useState<string | null>(null)
 	const [filter, setFilter] = useState<string>("all")
+	const [categoryFilter, setCategoryFilter] = useState<string>("all")
 	const [error, setError] = useState<string | null>(null)
 	const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
 
 	const activities = useMemo(() => {
 		const subject = filter === "all" ? null : decodeSubject(filter)
-		const list = [...getActivities(db, motherId, subject)]
+		const list = [...getActivities(db, motherId, subject)].filter(
+			(activity) => categoryFilter === "all" || activity.category === categoryFilter,
+		)
 		list.sort((a, b) => {
 			if (a.date !== b.date) return a.date < b.date ? 1 : -1
 			return (a.time ?? "") < (b.time ?? "") ? 1 : -1
 		})
 		return list
-	}, [db, motherId, filter])
+	}, [db, motherId, filter, categoryFilter])
 
 	type ActivityItem = (typeof activities)[number]
 
@@ -107,9 +113,8 @@ export function ActivitiesPage() {
 			date: activity.date,
 			time: activity.time,
 			title: activity.title,
-			category: activity.category,
+			category: CATEGORIES.includes(activity.category) ? activity.category : "note",
 			duration: activity.durationMinutes ? String(activity.durationMinutes) : "",
-			severity: activity.severity ? String(activity.severity) : "",
 			description: activity.description ?? "",
 		})
 		if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
@@ -129,6 +134,10 @@ export function ActivitiesPage() {
 			setError("تاریخ و ساعت الزامی است.")
 			return
 		}
+		if (!CATEGORIES.includes(form.category)) {
+			setError("دسته فعالیت فقط می‌تواند خواب، تغذیه، ورزش یا سایر باشد.")
+			return
+		}
 		const payload = {
 			motherId,
 			subject,
@@ -137,7 +146,7 @@ export function ActivitiesPage() {
 			title: form.title.trim(),
 			category: form.category,
 			durationMinutes: form.duration ? Number(form.duration) : null,
-			severity: form.category === "symptom" && form.severity ? Number(form.severity) : null,
+			severity: null,
 			description: form.description.trim() || undefined,
 		}
 		setError(null)
@@ -160,14 +169,11 @@ export function ActivitiesPage() {
 					ساعت {formatTime(activity.time)} · {ACTIVITY_CATEGORY_LABELS[activity.category]} ·{" "}
 					{subjectLabel(db, activity.subject)}
 					{activity.durationMinutes ? ` · ${toFa(activity.durationMinutes)} دقیقه` : ""}
-					{activity.severity ? ` · شدت ${toFa(activity.severity)}` : ""}
 				</p>
 				{activity.description && <p>{activity.description}</p>}
 			</div>
 			<div className="row-actions">
-				<Badge tone={activity.category === "symptom" ? "warn" : "info"}>
-					{ACTIVITY_CATEGORY_LABELS[activity.category]}
-				</Badge>
+				<Badge tone="info">{ACTIVITY_CATEGORY_LABELS[activity.category]}</Badge>
 				<Button variant="ghost" size="sm" onClick={() => startEdit(activity)}>
 					ویرایش
 				</Button>
@@ -183,9 +189,15 @@ export function ActivitiesPage() {
 	return (
 		<>
 			<PageHeader
-				title="فعالیت روزانه"
-				subtitle="به‌صورت پیش‌فرض فعالیت‌های امروز نمایش داده می‌شود؛ می‌توانید روزهای گذشته را هم مرور کنید."
+				title="دفترچه فعالیت"
+				subtitle="ثبت دقیق فعالیت‌های هر روز در چهار دسته: خواب، تغذیه، ورزش و سایر"
 			/>
+
+			<Alert tone="info">
+				برای کارهایی که هر روز تکرار می‌شوند، یک‌بار در{" "}
+				<Link to="/mother/daily-activities">برنامه روزانه و روتین‌ها</Link> روتین بسازید تا هر روز
+				خودکار نمایش داده شود.
+			</Alert>
 
 			<Card title={editingId ? "ویرایش فعالیت" : "ثبت فعالیت جدید"}>
 				{error && <Alert tone="danger">{error}</Alert>}
@@ -226,32 +238,14 @@ export function ActivitiesPage() {
 					/>
 				</Field>
 
-				<FormRow>
-					<Field label="مدت (دقیقه)" hint="اختیاری">
-						<TextInput
-							type="number"
-							inputMode="numeric"
-							value={form.duration}
-							onChange={(value) => update({ duration: value })}
-						/>
-					</Field>
-					{form.category === "symptom" && (
-						<Field label="شدت علامت (۱ تا ۵)">
-							<Select
-								value={form.severity}
-								onChange={(value) => update({ severity: value })}
-								options={[
-									{ value: "", label: "ثبت نشده" },
-									{ value: "1", label: "۱ — خیلی خفیف" },
-									{ value: "2", label: "۲ — خفیف" },
-									{ value: "3", label: "۳ — متوسط" },
-									{ value: "4", label: "۴ — شدید" },
-									{ value: "5", label: "۵ — خیلی شدید" },
-								]}
-							/>
-						</Field>
-					)}
-				</FormRow>
+				<Field label="مدت (دقیقه)" hint="اختیاری">
+					<TextInput
+						type="number"
+						inputMode="numeric"
+						value={form.duration}
+						onChange={(value) => update({ duration: value })}
+					/>
+				</Field>
 
 				<Field label="توضیحات" hint="اختیاری">
 					<TextArea value={form.description} onChange={(value) => update({ description: value })} />
@@ -290,6 +284,20 @@ export function ActivitiesPage() {
 					/>
 				}
 			>
+				<Field label="دسته">
+					<Select
+						value={categoryFilter}
+						onChange={(value) => setCategoryFilter(value)}
+						options={[
+							{ value: "all", label: "همه دسته‌ها" },
+							...CATEGORIES.map((category) => ({
+								value: category,
+								label: ACTIVITY_CATEGORY_LABELS[category],
+							})),
+						]}
+					/>
+				</Field>
+
 				<Toolbar>
 					<Button variant={view === "day" ? "primary" : "ghost"} size="sm" onClick={() => setView("day")}>
 						نمایش روزانه
@@ -309,7 +317,7 @@ export function ActivitiesPage() {
 							<span className="daynav__label">
 								<span className="daynav__title">{formatDateLong(selectedDate)}</span>
 								<span className="daynav__hint">
-									{selectedDate === today ? "امروز" : "روز گذشته/آینده انتخاب‌شده"} ·{" "}
+									{selectedDate === today ? "امروز" : "روز دیگری انتخاب شده"} ·{" "}
 									{toFa(dayActivities.length)} فعالیت
 								</span>
 							</span>
@@ -350,7 +358,7 @@ export function ActivitiesPage() {
 							<EmptyState
 								icon="activity"
 								title="برای این روز فعالیتی ثبت نشده است"
-								hint="از فرم بالا می‌توانید غذا، حرکت، دارو، خواب یا علامت را ثبت کنید."
+								hint="از فرم بالا می‌توانید خواب، تغذیه، ورزش یا سایر را ثبت کنید."
 							/>
 						) : (
 							<ul className="list">{dayActivities.map(renderItem)}</ul>
@@ -360,7 +368,7 @@ export function ActivitiesPage() {
 					<EmptyState
 						icon="activity"
 						title="فعالیتی برای این فیلتر ثبت نشده است"
-						hint="فیلتر موضوع را تغییر دهید یا فعالیت جدیدی ثبت کنید."
+						hint="فیلتر موضوع یا دسته را تغییر دهید یا فعالیت جدیدی ثبت کنید."
 					/>
 				) : (
 					grouped.map(([date, items]) => (
