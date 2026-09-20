@@ -21,22 +21,23 @@ import { formatTimestamp } from "../../shared/utils/date"
 
 type NavItem = { to: string; label: string; icon: IconName; group: string }
 
+// ساختار ناوبری مادر در شش دسته روشن: خانه، بارداری، فعالیت‌ها، سلامت، ارتباط با ماما، پروفایل.
 const NAV: Record<string, NavItem[]> = {
 	mother: [
-		{ to: "/mother", label: "خانه", icon: "home", group: "مرور کلی" },
-		{ to: "/mother/profile", label: "پروفایل من", icon: "user", group: "مرور کلی" },
-		{ to: "/mother/pregnancies", label: "بارداری‌ها", icon: "pregnancy", group: "مراقبت" },
-		{ to: "/mother/activities", label: "فعالیت روزانه", icon: "activity", group: "مراقبت" },
-		{ to: "/mother/children", label: "کودکان", icon: "child", group: "مراقبت" },
-		{ to: "/mother/checkups", label: "چکاپ‌ها", icon: "calendar", group: "مراقبت" },
-		{ to: "/mother/daily-activities", label: "برنامه روزانه", icon: "activity", group: "برنامه و نوبت‌ها" },
-		{ to: "/mother/appointments", label: "نوبت‌ها", icon: "calendar", group: "برنامه و نوبت‌ها" },
-		{ to: "/mother/health", label: "وضعیت سلامت", icon: "heart", group: "برنامه و نوبت‌ها" },
-		{ to: "/mother/pregnancy-checkups", label: "چکاپ بارداری", icon: "check", group: "برنامه و نوبت‌ها" },
-		{ to: "/mother/child-health", label: "سلامت کودک", icon: "child", group: "برنامه و نوبت‌ها" },
-		{ to: "/mother/questions", label: "سؤال از ماما", icon: "question", group: "پیگیری" },
-		{ to: "/mother/timeline", label: "خط زمانی", icon: "timeline", group: "پیگیری" },
-		{ to: "/mother/assistant", label: "دستیار مراقبت", icon: "assistant", group: "پیگیری" },
+		{ to: "/mother", label: "خانه", icon: "home", group: "خانه" },
+		{ to: "/mother/pregnancies", label: "بارداری من", icon: "pregnancy", group: "بارداری" },
+		{ to: "/mother/pregnancy-checkups", label: "چکاپ بارداری", icon: "check", group: "بارداری" },
+		{ to: "/mother/timeline", label: "خط زمانی", icon: "timeline", group: "بارداری" },
+		{ to: "/mother/daily-activities", label: "برنامه و روتین‌ها", icon: "activity", group: "فعالیت‌ها" },
+		{ to: "/mother/activities", label: "دفترچه فعالیت", icon: "activity", group: "فعالیت‌ها" },
+		{ to: "/mother/health", label: "وضعیت سلامت", icon: "heart", group: "سلامت" },
+		{ to: "/mother/appointments", label: "نوبت‌ها", icon: "calendar", group: "سلامت" },
+		{ to: "/mother/checkups", label: "چکاپ و واکسن", icon: "calendar", group: "سلامت" },
+		{ to: "/mother/children", label: "کودکان", icon: "child", group: "سلامت" },
+		{ to: "/mother/child-health", label: "سلامت کودک", icon: "child", group: "سلامت" },
+		{ to: "/mother/questions", label: "سؤال از ماما", icon: "question", group: "ارتباط با ماما" },
+		{ to: "/mother/assistant", label: "دستیار مراقبت", icon: "assistant", group: "ارتباط با ماما" },
+		{ to: "/mother/profile", label: "پروفایل من", icon: "user", group: "پروفایل" },
 	],
 	midwife: [
 		{ to: "/midwife", label: "خانه", icon: "home", group: "مرور کلی" },
