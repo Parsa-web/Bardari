@@ -10,6 +10,11 @@ import { ChildrenPage } from "../../features/mother/ChildrenPage"
 import { MotherCheckupsPage } from "../../features/mother/MotherCheckupsPage"
 import { MotherQuestionsPage } from "../../features/mother/MotherQuestionsPage"
 import { TimelinePage } from "../../features/mother/TimelinePage"
+import { DailyActivitiesPage } from "../../features/care/DailyActivitiesPage"
+import { AppointmentsPage } from "../../features/care/AppointmentsPage"
+import { HealthStatusPage } from "../../features/care/HealthStatusPage"
+import { PregnancyCheckupsPage } from "../../features/care/PregnancyCheckupsPage"
+import { ChildHealthPage } from "../../features/care/ChildHealthPage"
 import { AssistantPage } from "../../features/chatbot/AssistantPage"
 import { MidwifeDashboard } from "../../features/midwife/MidwifeDashboard"
 import { MidwifeMothersPage } from "../../features/midwife/MidwifeMothersPage"
@@ -40,6 +45,11 @@ export function AppRoutes() {
 				<Route path="checkups" element={<MotherCheckupsPage />} />
 				<Route path="questions" element={<MotherQuestionsPage />} />
 				<Route path="timeline" element={<TimelinePage />} />
+				<Route path="daily-activities" element={<DailyActivitiesPage />} />
+				<Route path="appointments" element={<AppointmentsPage />} />
+				<Route path="health" element={<HealthStatusPage />} />
+				<Route path="pregnancy-checkups" element={<PregnancyCheckupsPage />} />
+				<Route path="child-health" element={<ChildHealthPage />} />
 				<Route path="assistant" element={<AssistantPage />} />
 				<Route path="*" element={<Navigate to="/mother" replace />} />
 			</Route>
