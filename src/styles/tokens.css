@@ -197,6 +197,7 @@ body .btn,
 body .badge,
 body .nav__item,
 body .input,
+body .icon-btn,
 body .card {
 	transition:
 		background-color var(--motion-fast) var(--ease-soft),
@@ -210,9 +211,32 @@ body .btn:active {
 	transform: scale(0.98);
 }
 
-/* ظاهر شدن نرم محتوای صفحه — معادل page transition سبک برای همه پنل‌ها */
+/* ظاهر شدن نرم محتوای صفحه — page transition سبک برای همه پنل‌ها */
 body .content > * {
 	animation: mcc-fade-in var(--motion-base) var(--ease-soft) both;
+}
+
+/* اعلان‌ها و کشو — ظاهر شدن ملایم (همه نقش‌ها) */
+body .notif__item,
+body .drawer__body > * {
+	animation: mcc-fade-up var(--motion-base) var(--ease-out) both;
+}
+
+/* سطح پریمیوم کارت‌ها و نوار کناری */
+body .card {
+	background: var(--gradient-surface);
+}
+
+body .brand__mark,
+body .icon-btn__dot {
+	background: var(--gradient-primary);
+	color: #ffffff;
+	border-color: transparent;
+}
+
+/* صفحه ورود — حس مادرانه و آرام */
+body .auth__brand {
+	background: var(--gradient-soft);
 }
 
 /* —— مخصوص پنل مادر: کارت سفر بارداری و کارت‌های مراقبت —— */
@@ -291,5 +315,12 @@ body .care-list__item--done {
 		--fs-card-title: 16px;
 		--fs-body: 14.5px;
 		--topbar-h: 60px;
+	}
+
+	/* در موبایل انیمیشن شناور خاموش می‌شود تا مصرف باتری کمتر شود. */
+	body .bgc__image,
+	body .bgc__placeholder {
+		animation: none;
+		will-change: auto;
 	}
 }
