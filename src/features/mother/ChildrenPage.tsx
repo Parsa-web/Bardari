@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useData } from "../../app/providers/DataProvider"
 import {
 	Badge,
@@ -9,8 +9,13 @@ import {
 	FormRow,
 	Grid,
 	PageHeader,
+	Select,
 	Stat,
+	TextInput,
 } from "../../shared/components/ui"
+import { JalaliDateInput } from "../../shared/components/DateInput"
+import { GrowthChart } from "../../shared/components/GrowthChart"
+import type { ChartPoint } from "../../shared/components/GrowthChart"
 import { useMotherContext } from "./useMotherContext"
 import {
 	getChildren,
@@ -23,14 +28,37 @@ import { addGrowthMeasurement, setMilestoneAchieved, setVaccinationDone } from "
 import { HEALTH_RECORD_KIND_LABELS, NOT_RECORDED, SEX_LABELS } from "../../shared/constants/labels"
 import { ageInMonths, formatAge, formatDate, todayIso, toFa } from "../../shared/utils/date"
 
+type Metric = "weight" | "height" | "head"
+
+const METRICS: Array<{ value: Metric; label: string; unit: string }> = [
+	{ value: "weight", label: "وزن", unit: "کیلوگرم" },
+	{ value: "height", label: "قد", unit: "سانتی‌متر" },
+	{ value: "head", label: "دور سر", unit: "سانتی‌متر" },
+]
+
 export function ChildrenPage() {
 	const { db, motherId } = useMotherContext()
 	const { mutate } = useData()
 	const children = getChildren(db, motherId)
 	const [selectedId, setSelectedId] = useState<string>(children[0]?.id ?? "")
+	const [metric, setMetric] = useState<Metric>("weight")
 	const [growthForm, setGrowthForm] = useState({ date: todayIso(), weight: "", height: "", head: "" })
 
-	if (children.length === 0) {
+	const child = children.find((item) => item.id === selectedId) ?? children[0] ?? null
+	const growth = useMemo(() => (child ? getGrowth(db, child.id) : []), [db, child])
+
+	const chartPoints = useMemo<ChartPoint[]>(() => {
+		const ordered = [...growth].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0))
+		return ordered
+			.map((item) => {
+				const raw =
+					metric === "weight" ? item.weightKg : metric === "height" ? item.heightCm : item.headCm
+				return typeof raw === "number" && Number.isFinite(raw) ? { date: item.date, value: raw } : null
+			})
+			.filter((point): point is ChartPoint => point !== null)
+	}, [growth, metric])
+
+	if (children.length === 0 || !child) {
 		return (
 			<>
 				<PageHeader title="کودکان" />
@@ -44,12 +72,11 @@ export function ChildrenPage() {
 		)
 	}
 
-	const child = children.find((item) => item.id === selectedId) ?? children[0]
 	const vaccinations = getVaccinations(db, child.id)
-	const growth = getGrowth(db, child.id)
 	const milestones = getMilestones(db, child.id)
 	const records = getHealthRecords(db, child.id)
 	const months = ageInMonths(child.birthDate)
+	const activeMetric = METRICS.find((item) => item.value === metric) ?? METRICS[0]
 
 	const submitGrowth = () => {
 		if (!growthForm.date) return
@@ -70,13 +97,12 @@ export function ChildrenPage() {
 				title="پرونده کودکان"
 				subtitle="واکسیناسیون، رشد، مراحل تحول و سابقه سلامت"
 				actions={
-					<select className="input input--inline" value={child.id} onChange={(event) => setSelectedId(event.target.value)}>
-						{children.map((item) => (
-							<option key={item.id} value={item.id}>
-								{item.name}
-							</option>
-						))}
-					</select>
+					<Select
+						inline
+						value={child.id}
+						onChange={(value) => setSelectedId(value)}
+						options={children.map((item) => ({ value: item.id, label: item.name }))}
+					/>
 				}
 			/>
 
@@ -109,6 +135,7 @@ export function ChildrenPage() {
 										</Badge>
 										<Button
 											variant="ghost"
+											size="sm"
 											onClick={() => {
 												void mutate((current) =>
 													setVaccinationDone(current, item.id, item.doneDate ? null : todayIso()),
@@ -148,6 +175,7 @@ export function ChildrenPage() {
 											</Badge>
 											<Button
 												variant="ghost"
+												size="sm"
 												onClick={() => {
 													void mutate((current) =>
 														setMilestoneAchieved(current, item.id, item.achievedDate ? null : todayIso()),
@@ -165,71 +193,87 @@ export function ChildrenPage() {
 				</Card>
 			</Grid>
 
+			<Card
+				title="نمودار رشد"
+				subtitle="روند اندازه‌گیری‌های ثبت‌شده؛ محور زمان از راست (قدیمی‌تر) به چپ (تازه‌تر)"
+				actions={
+					<Select
+						inline
+						value={metric}
+						onChange={(value) => setMetric(value as Metric)}
+						options={METRICS.map((item) => ({ value: item.value, label: item.label }))}
+					/>
+				}
+			>
+				<GrowthChart
+					points={chartPoints}
+					unit={activeMetric.unit}
+					empty={`برای «${activeMetric.label}» هنوز اندازه‌گیری ثبت نشده است.`}
+				/>
+			</Card>
+
 			<Card title="اندازه‌گیری رشد">
 				<FormRow>
-					<Field label="تاریخ">
-						<input
-							className="input"
-							type="date"
+					<Field label="تاریخ (شمسی)">
+						<JalaliDateInput
 							value={growthForm.date}
-							onChange={(event) => setGrowthForm({ ...growthForm, date: event.target.value })}
+							onChange={(value) => setGrowthForm({ ...growthForm, date: value })}
 						/>
 					</Field>
 					<Field label="وزن (کیلوگرم)">
-						<input
-							className="input"
+						<TextInput
 							type="number"
-							step="0.1"
+							inputMode="numeric"
 							value={growthForm.weight}
-							onChange={(event) => setGrowthForm({ ...growthForm, weight: event.target.value })}
+							onChange={(value) => setGrowthForm({ ...growthForm, weight: value })}
 						/>
 					</Field>
 					<Field label="قد (سانتی‌متر)">
-						<input
-							className="input"
+						<TextInput
 							type="number"
-							step="0.5"
+							inputMode="numeric"
 							value={growthForm.height}
-							onChange={(event) => setGrowthForm({ ...growthForm, height: event.target.value })}
+							onChange={(value) => setGrowthForm({ ...growthForm, height: value })}
 						/>
 					</Field>
 					<Field label="دور سر (سانتی‌متر)">
-						<input
-							className="input"
+						<TextInput
 							type="number"
-							step="0.5"
+							inputMode="numeric"
 							value={growthForm.head}
-							onChange={(event) => setGrowthForm({ ...growthForm, head: event.target.value })}
+							onChange={(value) => setGrowthForm({ ...growthForm, head: value })}
 						/>
 					</Field>
 				</FormRow>
-				<Button variant="primary" onClick={submitGrowth}>
+				<Button variant="primary" icon="plus" onClick={submitGrowth}>
 					ثبت اندازه‌گیری
 				</Button>
 
 				{growth.length === 0 ? (
 					<EmptyState title="اندازه‌گیری ثبت نشده است." />
 				) : (
-					<table className="table">
-						<thead>
-							<tr>
-								<th>تاریخ</th>
-								<th>وزن</th>
-								<th>قد</th>
-								<th>دور سر</th>
-							</tr>
-						</thead>
-						<tbody>
-							{growth.map((item) => (
-								<tr key={item.id}>
-									<td>{formatDate(item.date)}</td>
-									<td>{item.weightKg ? toFa(item.weightKg) : "—"}</td>
-									<td>{item.heightCm ? toFa(item.heightCm) : "—"}</td>
-									<td>{item.headCm ? toFa(item.headCm) : "—"}</td>
+					<div className="table-wrap">
+						<table className="table">
+							<thead>
+								<tr>
+									<th>تاریخ</th>
+									<th>وزن</th>
+									<th>قد</th>
+									<th>دور سر</th>
 								</tr>
-							))}
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								{growth.map((item) => (
+									<tr key={item.id}>
+										<td>{formatDate(item.date)}</td>
+										<td>{item.weightKg ? toFa(item.weightKg) : "—"}</td>
+										<td>{item.heightCm ? toFa(item.heightCm) : "—"}</td>
+										<td>{item.headCm ? toFa(item.headCm) : "—"}</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+					</div>
 				)}
 			</Card>
 

@@ -15,12 +15,20 @@ import {
 	TextInput,
 	Toolbar,
 } from "../../shared/components/ui"
+import { JalaliDateInput } from "../../shared/components/DateInput"
 import { decodeSubject, useMotherContext } from "./useMotherContext"
 import { getActivities, subjectLabel } from "../../services/selectors"
 import { addActivity, deleteActivity, updateActivity } from "../../services/mutations"
 import { ACTIVITY_CATEGORY_LABELS } from "../../shared/constants/labels"
 import type { ActivityCategory } from "../../shared/types/domain"
-import { formatDateLong, formatTime, nowTime, todayIso, toFa } from "../../shared/utils/date"
+import {
+	addDays,
+	formatDateLong,
+	formatTime,
+	nowTime,
+	todayIso,
+	toFa,
+} from "../../shared/utils/date"
 
 const CATEGORIES = Object.keys(ACTIVITY_CATEGORY_LABELS) as ActivityCategory[]
 
@@ -35,10 +43,10 @@ type FormState = {
 	description: string
 }
 
-function emptyForm(subjectValue: string): FormState {
+function emptyForm(subjectValue: string, date: string): FormState {
 	return {
 		subjectValue,
-		date: todayIso(),
+		date,
 		time: nowTime(),
 		title: "",
 		category: "food",
@@ -53,7 +61,10 @@ export function ActivitiesPage() {
 	const { db, motherId, subjectOptions } = useMotherContext()
 	const { mutate } = useData()
 	const defaultSubject = subjectOptions[1]?.value ?? subjectOptions[0]?.value ?? ""
-	const [form, setForm] = useState<FormState>(() => emptyForm(defaultSubject))
+	const today = todayIso()
+	const [selectedDate, setSelectedDate] = useState<string>(today)
+	const [view, setView] = useState<"day" | "archive">("day")
+	const [form, setForm] = useState<FormState>(() => emptyForm(defaultSubject, today))
 	const [editingId, setEditingId] = useState<string | null>(null)
 	const [filter, setFilter] = useState<string>("all")
 	const [error, setError] = useState<string | null>(null)
@@ -61,11 +72,23 @@ export function ActivitiesPage() {
 
 	const activities = useMemo(() => {
 		const subject = filter === "all" ? null : decodeSubject(filter)
-		return getActivities(db, motherId, subject)
+		const list = [...getActivities(db, motherId, subject)]
+		list.sort((a, b) => {
+			if (a.date !== b.date) return a.date < b.date ? 1 : -1
+			return (a.time ?? "") < (b.time ?? "") ? 1 : -1
+		})
+		return list
 	}, [db, motherId, filter])
 
+	type ActivityItem = (typeof activities)[number]
+
+	const dayActivities = useMemo(
+		() => activities.filter((activity) => activity.date === selectedDate),
+		[activities, selectedDate],
+	)
+
 	const grouped = useMemo(() => {
-		const map = new Map<string, typeof activities>()
+		const map = new Map<string, ActivityItem[]>()
 		for (const activity of activities) {
 			const list = map.get(activity.date) ?? []
 			list.push(activity)
@@ -75,6 +98,22 @@ export function ActivitiesPage() {
 	}, [activities])
 
 	const update = (patch: Partial<FormState>) => setForm((current) => ({ ...current, ...patch }))
+
+	const startEdit = (activity: ActivityItem) => {
+		setEditingId(activity.id)
+		setError(null)
+		setForm({
+			subjectValue: `${activity.subject.kind}:${activity.subject.id}`,
+			date: activity.date,
+			time: activity.time,
+			title: activity.title,
+			category: activity.category,
+			duration: activity.durationMinutes ? String(activity.durationMinutes) : "",
+			severity: activity.severity ? String(activity.severity) : "",
+			description: activity.description ?? "",
+		})
+		if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" })
+	}
 
 	const submit = () => {
 		const subject = decodeSubject(form.subjectValue)
@@ -108,8 +147,36 @@ export function ActivitiesPage() {
 		} else {
 			void mutate((current) => addActivity(current, payload))
 		}
-		setForm(emptyForm(form.subjectValue))
+		setSelectedDate(form.date)
+		setView("day")
+		setForm(emptyForm(form.subjectValue, form.date))
 	}
+
+	const renderItem = (activity: ActivityItem) => (
+		<li key={activity.id} className="list__item">
+			<div>
+				<strong>{activity.title}</strong>
+				<p className="meta">
+					ساعت {formatTime(activity.time)} · {ACTIVITY_CATEGORY_LABELS[activity.category]} ·{" "}
+					{subjectLabel(db, activity.subject)}
+					{activity.durationMinutes ? ` · ${toFa(activity.durationMinutes)} دقیقه` : ""}
+					{activity.severity ? ` · شدت ${toFa(activity.severity)}` : ""}
+				</p>
+				{activity.description && <p>{activity.description}</p>}
+			</div>
+			<div className="row-actions">
+				<Badge tone={activity.category === "symptom" ? "warn" : "info"}>
+					{ACTIVITY_CATEGORY_LABELS[activity.category]}
+				</Badge>
+				<Button variant="ghost" size="sm" onClick={() => startEdit(activity)}>
+					ویرایش
+				</Button>
+				<Button variant="ghost" size="sm" onClick={() => setPendingDeleteId(activity.id)}>
+					حذف
+				</Button>
+			</div>
+		</li>
+	)
 
 	if (!motherId) return <Alert tone="warn">پرونده مادر انتخاب نشده است.</Alert>
 
@@ -117,7 +184,7 @@ export function ActivitiesPage() {
 		<>
 			<PageHeader
 				title="فعالیت روزانه"
-				subtitle="هر روز می‌توانید چند فعالیت ثبت کنید؛ همه در خط زمانی نمایش داده می‌شوند."
+				subtitle="به‌صورت پیش‌فرض فعالیت‌های امروز نمایش داده می‌شود؛ می‌توانید روزهای گذشته را هم مرور کنید."
 			/>
 
 			<Card title={editingId ? "ویرایش فعالیت" : "ثبت فعالیت جدید"}>
@@ -143,8 +210,8 @@ export function ActivitiesPage() {
 				</FormRow>
 
 				<FormRow>
-					<Field label="تاریخ">
-						<TextInput type="date" value={form.date} onChange={(value) => update({ date: value })} />
+					<Field label="تاریخ (شمسی)">
+						<JalaliDateInput value={form.date} onChange={(value) => update({ date: value })} />
 					</Field>
 					<Field label="ساعت">
 						<TextInput type="time" value={form.time} onChange={(value) => update({ time: value })} />
@@ -163,26 +230,31 @@ export function ActivitiesPage() {
 					<Field label="مدت (دقیقه)" hint="اختیاری">
 						<TextInput
 							type="number"
-							min={0}
+							inputMode="numeric"
 							value={form.duration}
 							onChange={(value) => update({ duration: value })}
 						/>
 					</Field>
 					{form.category === "symptom" && (
 						<Field label="شدت علامت (۱ تا ۵)">
-							<TextInput
-								type="number"
-								min={1}
-								max={5}
+							<Select
 								value={form.severity}
 								onChange={(value) => update({ severity: value })}
+								options={[
+									{ value: "", label: "ثبت نشده" },
+									{ value: "1", label: "۱ — خیلی خفیف" },
+									{ value: "2", label: "۲ — خفیف" },
+									{ value: "3", label: "۳ — متوسط" },
+									{ value: "4", label: "۴ — شدید" },
+									{ value: "5", label: "۵ — خیلی شدید" },
+								]}
 							/>
 						</Field>
 					)}
 				</FormRow>
 
 				<Field label="توضیحات" hint="اختیاری">
-					<TextArea value={form.description} onChange={(value) => update({ description: value })} rows={3} />
+					<TextArea value={form.description} onChange={(value) => update({ description: value })} />
 				</Field>
 
 				<Toolbar>
@@ -195,7 +267,7 @@ export function ActivitiesPage() {
 							onClick={() => {
 								setEditingId(null)
 								setError(null)
-								setForm(emptyForm(form.subjectValue))
+								setForm(emptyForm(form.subjectValue, selectedDate))
 							}}
 						>
 							انصراف
@@ -211,7 +283,6 @@ export function ActivitiesPage() {
 						inline
 						value={filter}
 						onChange={(value) => setFilter(value)}
-						aria-label="فیلتر موضوع"
 						options={[
 							{ value: "all", label: "همه موضوع‌ها" },
 							...subjectOptions.map((option) => ({ value: option.value, label: option.label })),
@@ -219,60 +290,89 @@ export function ActivitiesPage() {
 					/>
 				}
 			>
-				{grouped.length === 0 ? (
+				<Toolbar>
+					<Button variant={view === "day" ? "primary" : "ghost"} size="sm" onClick={() => setView("day")}>
+						نمایش روزانه
+					</Button>
+					<Button
+						variant={view === "archive" ? "primary" : "ghost"}
+						size="sm"
+						onClick={() => setView("archive")}
+					>
+						آرشیو همه روزها
+					</Button>
+				</Toolbar>
+
+				{view === "day" ? (
+					<>
+						<div className="daynav">
+							<span className="daynav__label">
+								<span className="daynav__title">{formatDateLong(selectedDate)}</span>
+								<span className="daynav__hint">
+									{selectedDate === today ? "امروز" : "روز گذشته/آینده انتخاب‌شده"} ·{" "}
+									{toFa(dayActivities.length)} فعالیت
+								</span>
+							</span>
+							<span className="daynav__actions">
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => setSelectedDate(addDays(selectedDate, -1))}
+								>
+									روز قبل
+								</Button>
+								<Button
+									variant={selectedDate === today ? "primary" : "ghost"}
+									size="sm"
+									onClick={() => setSelectedDate(today)}
+								>
+									امروز
+								</Button>
+								<Button
+									variant="outline"
+									size="sm"
+									onClick={() => setSelectedDate(addDays(selectedDate, 1))}
+								>
+									روز بعد
+								</Button>
+							</span>
+						</div>
+
+						<Field label="انتخاب روز (شمسی)">
+							<JalaliDateInput
+								value={selectedDate}
+								showPreview={false}
+								onChange={(value) => setSelectedDate(value || today)}
+							/>
+						</Field>
+
+						{dayActivities.length === 0 ? (
+							<EmptyState
+								icon="activity"
+								title="برای این روز فعالیتی ثبت نشده است"
+								hint="از فرم بالا می‌توانید غذا، حرکت، دارو، خواب یا علامت را ثبت کنید."
+							/>
+						) : (
+							<ul className="list">{dayActivities.map(renderItem)}</ul>
+						)}
+					</>
+				) : grouped.length === 0 ? (
 					<EmptyState
 						icon="activity"
 						title="فعالیتی برای این فیلتر ثبت نشده است"
-						hint="از فرم بالا می‌توانید غذا، حرکت، دارو، خواب یا علامت را ثبت کنید."
+						hint="فیلتر موضوع را تغییر دهید یا فعالیت جدیدی ثبت کنید."
 					/>
 				) : (
 					grouped.map(([date, items]) => (
-						<div key={date} className="day-group">
-							<h3 className="day-group__title">{formatDateLong(date)}</h3>
-							<ul className="list">
-								{items.map((activity) => (
-									<li key={activity.id} className="list__item">
-										<div>
-											<strong>{activity.title}</strong>
-											<p className="meta">
-												ساعت {formatTime(activity.time)} · {ACTIVITY_CATEGORY_LABELS[activity.category]} ·{" "}
-												{subjectLabel(db, activity.subject)}
-												{activity.durationMinutes ? ` · ${toFa(activity.durationMinutes)} دقیقه` : ""}
-												{activity.severity ? ` · شدت ${toFa(activity.severity)}` : ""}
-											</p>
-											{activity.description && <p>{activity.description}</p>}
-										</div>
-										<div className="row-actions">
-											<Badge tone={activity.category === "symptom" ? "warn" : "info"}>
-												{ACTIVITY_CATEGORY_LABELS[activity.category]}
-											</Badge>
-											<Button
-												variant="ghost"
-												size="sm"
-												onClick={() => {
-													setEditingId(activity.id)
-													setError(null)
-													setForm({
-														subjectValue: `${activity.subject.kind}:${activity.subject.id}`,
-														date: activity.date,
-														time: activity.time,
-														title: activity.title,
-														category: activity.category,
-														duration: activity.durationMinutes ? String(activity.durationMinutes) : "",
-														severity: activity.severity ? String(activity.severity) : "",
-														description: activity.description ?? "",
-													})
-												}}
-											>
-												ویرایش
-											</Button>
-											<Button variant="ghost" size="sm" onClick={() => setPendingDeleteId(activity.id)}>
-												حذف
-											</Button>
-										</div>
-									</li>
-								))}
-							</ul>
+						<div key={date} className="group">
+							<div className="group__head">
+								<h3 className="group__title">
+									{formatDateLong(date)}
+									{date === today && <Badge tone="info">امروز</Badge>}
+								</h3>
+								<span className="group__count">{toFa(items.length)} فعالیت</span>
+							</div>
+							<ul className="list">{items.map(renderItem)}</ul>
 						</div>
 					))
 				)}
@@ -292,7 +392,7 @@ export function ActivitiesPage() {
 					if (!id) return
 					if (editingId === id) {
 						setEditingId(null)
-						setForm(emptyForm(form.subjectValue))
+						setForm(emptyForm(form.subjectValue, selectedDate))
 					}
 					void mutate((current) => deleteActivity(current, id))
 				}}
