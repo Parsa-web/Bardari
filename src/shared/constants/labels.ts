@@ -5,6 +5,7 @@ import type {
 	HealthRecordKind,
 	MotherCurrentStatus,
 	PregnancyStatus,
+	QuestionPriority,
 	QuestionStatus,
 	ReferralStatus,
 	Role,
@@ -40,14 +41,23 @@ export const SUBJECT_KIND_LABELS: Record<SubjectKind, string> = {
 	child: "کودک",
 }
 
+/**
+ * دسته‌های فعالیت.
+ * فقط چهار دسته رسمی داریم: خواب، تغذیه، ورزش، سایر.
+ * دو دسته قدیمی (علائم/دارو) فقط برای نمایش رکوردهای قدیمی باقی مانده‌اند
+ * و در هیچ فرم یا فیلتری قابل انتخاب نیستند.
+ */
 export const ACTIVITY_CATEGORY_LABELS: Record<ActivityCategory, string> = {
-	food: "غذا",
-	movement: "فعالیت",
-	symptom: "علائم",
-	medication: "دارو",
 	sleep: "خواب",
-	note: "یادداشت",
+	food: "تغذیه",
+	movement: "ورزش",
+	note: "سایر",
+	symptom: "سایر (بایگانی)",
+	medication: "سایر (بایگانی)",
 }
+
+/** تنها دسته‌هایی که مادر می‌تواند انتخاب کند. */
+export const MOTHER_ACTIVITY_CATEGORIES: ActivityCategory[] = ["sleep", "food", "movement", "note"]
 
 export const PREGNANCY_STATUS_LABELS: Record<PregnancyStatus, string> = {
 	planning: "پیش از بارداری",
@@ -90,10 +100,11 @@ export const CHECKUP_STATUS_TONES: Record<CheckupViewStatus, Tone> = {
 	canceled: "neutral",
 }
 
+/** وضعیت سؤال با زبان ساده و قابل فهم برای مادر. */
 export const QUESTION_STATUS_LABELS: Record<QuestionStatus, string> = {
-	open: "باز",
-	in_review: "در حال بررسی",
-	answered: "پاسخ داده شد",
+	open: "ارسال شده",
+	in_review: "دیده شده",
+	answered: "پاسخ داده شده",
 	needs_followup: "نیازمند پیگیری",
 	referred: "ارجاع به متخصص",
 	closed: "بسته شد",
@@ -106,6 +117,24 @@ export const QUESTION_STATUS_TONES: Record<QuestionStatus, Tone> = {
 	needs_followup: "warn",
 	referred: "info",
 	closed: "neutral",
+}
+
+export const QUESTION_PRIORITY_LABELS: Record<QuestionPriority, string> = {
+	urgent: "فوری",
+	important: "مهم",
+	normal: "عادی",
+}
+
+export const QUESTION_PRIORITY_TONES: Record<QuestionPriority, Tone> = {
+	urgent: "danger",
+	important: "warn",
+	normal: "neutral",
+}
+
+export const QUESTION_PRIORITY_HINTS: Record<QuestionPriority, string> = {
+	urgent: "نگرانی فوری که باید سریع دیده شود",
+	important: "سؤال مهم درباره روند بارداری",
+	normal: "سؤال آموزشی و عمومی",
 }
 
 export const REFERRAL_STATUS_LABELS: Record<ReferralStatus, string> = {
