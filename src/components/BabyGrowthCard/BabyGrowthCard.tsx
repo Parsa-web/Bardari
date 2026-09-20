@@ -6,27 +6,30 @@ import {
 	MAX_PREGNANCY_WEEK,
 	MIN_PREGNANCY_WEEK,
 } from "../../data/pregnancyWeeks"
+import { buildPregnancyTimeline, pregnancyProgress, trimesterLabel } from "../../services/pregnancyJourney"
 import { toFa } from "../../shared/utils/date"
 import "./BabyGrowthCard.css"
 
 /**
- * کارت «رشد هفتگی نوزاد».
- * داده‌ها از src/data/pregnancyWeeks.ts خوانده می‌شود و هیچ داده‌ای درون کامپوننت hardcode نیست.
+ * کارت «سفر بارداری».
+ * داده‌ها از src/data/pregnancyWeeks.ts و منطق تایم‌لاین از src/services/pregnancyJourney.ts خوانده می‌شود.
  *
- * نمونه استفاده: <BabyGrowthCard week={9} />
+ * نمونه استفاده: <BabyGrowthCard week={20} />
  */
 export function BabyGrowthCard({ week }: { week?: number | null }) {
 	const currentWeek = typeof week === "number" ? clampPregnancyWeek(week) : null
 	const [selectedWeek, setSelectedWeek] = useState<number | null>(null)
 	const activeWeek = selectedWeek ?? currentWeek ?? MIN_PREGNANCY_WEEK
 	const info = getPregnancyWeek(activeWeek)
+	const progress = pregnancyProgress(activeWeek)
+	const timeline = buildPregnancyTimeline(activeWeek, currentWeek)
 
 	const goTo = (value: number) => setSelectedWeek(clampPregnancyWeek(value))
 
 	return (
 		<Card
 			title={`هفته ${toFa(activeWeek)} بارداری`}
-			subtitle="رشد هفتگی نوزاد — اطلاعات آموزشی و تقریبی"
+			subtitle={`${trimesterLabel(activeWeek)} · سفر بارداری شما`}
 			actions={
 				currentWeek !== null && activeWeek !== currentWeek ? (
 					<Button variant="ghost" size="sm" onClick={() => setSelectedWeek(null)}>
@@ -36,6 +39,35 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 			}
 		>
 			<div className="bgc">
+				<div className="bgc__journey">
+					<div className="bgc__progress" role="img" aria-label={`پیشرفت بارداری ${toFa(progress)} درصد`}>
+						<span className="bgc__progress-fill" style={{ width: `${progress}%` }} />
+					</div>
+					<div className="bgc__progress-meta">
+						<span>{`پیشرفت: ${toFa(progress)}٪`}</span>
+						<span>{`${toFa(Math.max(MAX_PREGNANCY_WEEK - activeWeek, 0))} هفته تا روز تولد`}</span>
+					</div>
+
+					<ol className="bgc__timeline">
+						{timeline.map((point) => (
+							<li key={point.week} className="bgc__timeline-item">
+								<button
+									type="button"
+									className={`bgc__week${point.isActive ? " bgc__week--active" : ""}${
+										point.isPast ? " bgc__week--past" : ""
+									}`}
+									aria-current={point.isActive ? "true" : undefined}
+									onClick={() => goTo(point.week)}
+								>
+									<span className="bgc__week-dot" aria-hidden="true" />
+									<span className="bgc__week-label">{`هفته ${toFa(point.week)}`}</span>
+									{point.isCurrent && <span className="bgc__week-tag">هفته فعلی</span>}
+								</button>
+							</li>
+						))}
+					</ol>
+				</div>
+
 				<div className="bgc__nav">
 					<span className="bgc__nav-title">{`هفته ${toFa(activeWeek)} از ${toFa(MAX_PREGNANCY_WEEK)}`}</span>
 					<div className="bgc__nav-actions">
@@ -85,7 +117,7 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 						) : (
 							<div className="bgc__placeholder" role="img" aria-label="تصویر این هفته هنوز اضافه نشده است">
 								<span className="bgc__placeholder-icon" aria-hidden="true">
-									🖼️
+									🫧
 								</span>
 								<p className="bgc__placeholder-text">تصویر این هفته به‌زودی اضافه می‌شود</p>
 							</div>
@@ -93,17 +125,17 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 
 						<div className="bgc__facts">
 							<div className="bgc__fact">
-								<span className="bgc__fact-label">اندازه</span>
+								<span className="bgc__fact-label">اندازه کوچولو</span>
 								<span className="bgc__fact-value">{info.size}</span>
 							</div>
 							<div className="bgc__fact">
-								<span className="bgc__fact-label">وزن</span>
+								<span className="bgc__fact-label">وزن تقریبی</span>
 								<span className="bgc__fact-value">{info.weight}</span>
 							</div>
 						</div>
 
 						<div className="bgc__block">
-							<h3 className="bgc__block-title">رشد این هفته</h3>
+							<h3 className="bgc__block-title">اتفاق این هفته</h3>
 							<p className="bgc__block-text">{info.development}</p>
 						</div>
 
