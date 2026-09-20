@@ -40,21 +40,14 @@ export function CareSummary() {
 		<Grid cols={2}>
 			<Card
 				title="فعالیت‌های برنامه روزانه"
+				subtitle={totalCount > 0 ? `انجام‌شده ${doneCount} از ${totalCount}` : undefined}
 				actions={<Link to="/mother/daily-activities">مشاهده</Link>}
 			>
 				{totalCount === 0 ? (
 					<p className="care-note">برای امروز فعالیتی ثبت نشده است.</p>
 				) : (
-					<ul className="care-list">
-						<li className="care-list__item">
-							<div className="care-list__head">
-								<span className="care-list__title">وضعیت انجام</span>
-								<Badge tone={doneCount === totalCount ? "success" : "neutral"}>
-									{doneCount} از {totalCount}
-								</Badge>
-							</div>
-						</li>
-						{activeRecurring.slice(0, 2).map((item) => (
+					<ul className="care-list care-list--compact">
+						{activeRecurring.map((item) => (
 							<li key={item.id} className="care-list__item care-list__item--due">
 								<div className="care-list__head">
 									<span className="care-list__title">{item.title}</span>
@@ -65,7 +58,7 @@ export function CareSummary() {
 								</span>
 							</li>
 						))}
-						{todayActivities.slice(0, 2).map((item) => (
+						{todayActivities.map((item) => (
 							<li key={item.id} className="care-list__item">
 								<div className="care-list__head">
 									<span className="care-list__title">{item.title}</span>

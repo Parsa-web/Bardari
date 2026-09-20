@@ -33,6 +33,31 @@
 	gap: var(--space-2);
 }
 
+/* نمای فشرده و اسکرول‌شونده: هر بار یک مورد دیده می‌شود. */
+.care-list--compact {
+	max-height: 88px;
+	overflow-y: auto;
+	padding-inline-end: 6px;
+	scroll-snap-type: y mandatory;
+	scrollbar-width: thin;
+	overscroll-behavior: contain;
+}
+
+.care-list--compact .care-list__item {
+	scroll-snap-align: start;
+	padding: var(--space-2) var(--space-3);
+	gap: 4px;
+}
+
+.care-list--compact::-webkit-scrollbar {
+	width: 6px;
+}
+
+.care-list--compact::-webkit-scrollbar-thumb {
+	background: var(--border);
+	border-radius: 999px;
+}
+
 .care-list__item {
 	border: 1px solid var(--border);
 	border-radius: var(--radius-md);
