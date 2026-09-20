@@ -1,4 +1,6 @@
-/* ================= توکن‌های طراحی — منبع واحد تمام تصمیمات بصری ================= */
+/* ================= توکن‌های طراحی — منبع واحد تمام تصمیمات بصری =================
+   هویت: بنفش (اعتماد، حس پریمیوم) + صورتی ملایم (گرما، مادرانه)
+   قاعده: هیچ رنگی در کامپوننت‌ها hardcode نمی‌شود؛ همه از این توکن‌ها می‌آیند. */
 :root {
 	/* --- فاصله‌گذاری --- */
 	--space-1: 4px;
@@ -12,10 +14,10 @@
 	--space-12: 48px;
 	--space-16: 64px;
 
-	/* --- شعاع --- */
-	--radius-sm: 10px;
-	--radius-md: 12px;
-	--radius-lg: 16px;
+	/* --- شعاع (کارت‌های نرم و مادرانه) --- */
+	--radius-sm: 12px;
+	--radius-md: 16px;
+	--radius-lg: 22px;
 	--radius-pill: 999px;
 
 	/* --- تیپوگرافی --- */
@@ -43,79 +45,242 @@
 	--z-drawer: 40;
 	--z-modal: 60;
 
-	/* --- رنگ — تم روشن --- */
-	--bg: #f4f7fb;
-	--bg-soft: #eef3f9;
-	--surface: #ffffff;
-	--surface-2: #f5f8fc;
-	--surface-3: #eaf0f7;
-	--border: #e3e9f2;
-	--border-strong: #cfd9e6;
-	--text: #16263d;
-	--text-soft: #41546e;
-	--muted: #6d7f96;
+	/* --- حرکت و انیمیشن (سبک و کم‌هزینه) --- */
+	--motion-fast: 140ms;
+	--motion-base: 220ms;
+	--motion-slow: 420ms;
+	--ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
 
-	--primary: #2f6fd0;
-	--primary-hover: #2760b8;
-	--primary-soft: #e8f0fc;
-	--primary-border: #c9dcf7;
+	/* --- رنگ — تم روشن --- */
+	--bg: #faf7ff;
+	--bg-soft: #f4eefc;
+	--surface: #ffffff;
+	--surface-2: #fff1f7;
+	--surface-3: #ede9fe;
+	--border: #e5e7eb;
+	--border-strong: #d8cdf3;
+	--text: #1f2937;
+	--text-soft: #6b7280;
+	--muted: #9ca3af;
+
+	--primary: #7c3aed;
+	--primary-hover: #6d28d9;
+	--primary-soft: #ede9fe;
+	--primary-border: #ddd2fb;
 	--on-primary: #ffffff;
 
-	--success: #1d7a56;
-	--success-soft: #e6f5ee;
-	--warn: #8a5a05;
-	--warn-soft: #fdf3e2;
-	--danger: #a52f2a;
-	--danger-soft: #fceceb;
-	--info: #1f628f;
-	--info-soft: #e8f2f9;
-	--neutral-soft: #eef2f7;
+	--accent: #db2777;
+	--accent-soft: #fce7f3;
+	--accent-border: #f9cfe4;
+	--pink-soft: #f9a8d4;
 
-	--focus-ring: 0 0 0 3px rgba(47, 111, 208, 0.22);
-	--shadow-xs: 0 1px 2px rgba(19, 38, 63, 0.05);
-	--shadow-sm: 0 1px 2px rgba(19, 38, 63, 0.05), 0 4px 12px rgba(19, 38, 63, 0.04);
-	--shadow-md: 0 8px 28px rgba(19, 38, 63, 0.1);
-	--overlay: rgba(16, 27, 43, 0.42);
+	--success: #15803d;
+	--success-soft: #e7f8ed;
+	--warn: #b45309;
+	--warn-soft: #fdf3e0;
+	--danger: #b91c1c;
+	--danger-soft: #fdecec;
+	--info: #1d4ed8;
+	--info-soft: #e8efff;
+	--neutral-soft: #f1effa;
+
+	/* --- گرادیانت‌های ملایم مادرانه --- */
+	--gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #ec4899 100%);
+	--gradient-soft: linear-gradient(135deg, #ede9fe 0%, #fce7f3 100%);
+	--gradient-surface: linear-gradient(160deg, #ffffff 0%, #fdf7ff 100%);
+
+	--focus-ring: 0 0 0 3px rgba(139, 92, 246, 0.26);
+	--shadow-xs: 0 1px 2px rgba(76, 29, 149, 0.06);
+	--shadow-sm: 0 1px 2px rgba(76, 29, 149, 0.05), 0 6px 16px rgba(139, 92, 246, 0.08);
+	--shadow-md: 0 10px 30px rgba(109, 40, 217, 0.12);
+	--shadow-lift: 0 14px 34px rgba(219, 39, 119, 0.14);
+	--overlay: rgba(46, 16, 71, 0.44);
 
 	color-scheme: light;
 }
 
 /* --- رنگ — تم تاریک (طراحی مستقل، نه معکوس‌سازی) --- */
 [data-theme="dark"] {
-	--bg: #10182a;
-	--bg-soft: #0d1422;
-	--surface: #182238;
-	--surface-2: #1e2942;
-	--surface-3: #24314d;
-	--border: #2a3855;
-	--border-strong: #3a4a6b;
-	--text: #e8eef8;
-	--text-soft: #c2cee0;
-	--muted: #93a3bb;
+	--bg: #150f23;
+	--bg-soft: #100b1b;
+	--surface: #1e1733;
+	--surface-2: #271d3f;
+	--surface-3: #2f2450;
+	--border: #362a56;
+	--border-strong: #4a3a72;
+	--text: #f1ecfb;
+	--text-soft: #c9c0e3;
+	--muted: #9d94ba;
 
-	--primary: #74a8f0;
-	--primary-hover: #8cb8f5;
-	--primary-soft: #1d2c47;
-	--primary-border: #2f4771;
-	--on-primary: #0d1728;
+	--primary: #b79bfa;
+	--primary-hover: #c9b4fc;
+	--primary-soft: #2b2149;
+	--primary-border: #453569;
+	--on-primary: #1b1030;
 
-	--success: #79d0a8;
-	--success-soft: #17301f;
-	--warn: #e2b872;
+	--accent: #f9a8d4;
+	--accent-soft: #3a1f33;
+	--accent-border: #5a3049;
+	--pink-soft: #f9a8d4;
+
+	--success: #7bd6a2;
+	--success-soft: #16301f;
+	--warn: #eabf78;
 	--warn-soft: #33270f;
-	--danger: #ef9b95;
-	--danger-soft: #361c1c;
-	--info: #8cc2e8;
-	--info-soft: #152a3a;
-	--neutral-soft: #202c45;
+	--danger: #f49b95;
+	--danger-soft: #3a1d1d;
+	--info: #93b4fb;
+	--info-soft: #1b2444;
+	--neutral-soft: #26203c;
 
-	--focus-ring: 0 0 0 3px rgba(116, 168, 240, 0.28);
-	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.28), 0 4px 14px rgba(0, 0, 0, 0.24);
-	--shadow-md: 0 10px 30px rgba(0, 0, 0, 0.38);
-	--overlay: rgba(6, 11, 20, 0.6);
+	--gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #db2777 100%);
+	--gradient-soft: linear-gradient(135deg, #2b2149 0%, #3a1f33 100%);
+	--gradient-surface: linear-gradient(160deg, #1e1733 0%, #261a38 100%);
+
+	--focus-ring: 0 0 0 3px rgba(183, 155, 250, 0.3);
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.32);
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 6px 18px rgba(0, 0, 0, 0.26);
+	--shadow-md: 0 12px 32px rgba(0, 0, 0, 0.42);
+	--shadow-lift: 0 16px 36px rgba(0, 0, 0, 0.48);
+	--overlay: rgba(10, 6, 18, 0.64);
 
 	color-scheme: dark;
+}
+
+/* ================= لایه حرکت — سبک، فقط opacity/transform =================
+   بدون کتابخانه خارجی، بدون blur سنگین، بدون re-render اضافی. */
+@keyframes mcc-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(8px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes mcc-fade-in {
+	from {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes mcc-float {
+	0%,
+	100% {
+		transform: translateY(0);
+	}
+	50% {
+		transform: translateY(-4px);
+	}
+}
+
+@keyframes mcc-pop {
+	0% {
+		transform: scale(0.96);
+	}
+	60% {
+		transform: scale(1.02);
+	}
+	100% {
+		transform: scale(1);
+	}
+}
+
+/* ترانزیشن عمومی اجزای تعاملی (همه نقش‌ها: مادر، ماما، متخصص) */
+body .btn,
+body .badge,
+body .nav__item,
+body .input,
+body .card {
+	transition:
+		background-color var(--motion-fast) var(--ease-soft),
+		border-color var(--motion-fast) var(--ease-soft),
+		color var(--motion-fast) var(--ease-soft),
+		box-shadow var(--motion-base) var(--ease-soft),
+		transform var(--motion-fast) var(--ease-out);
+}
+
+body .btn:active {
+	transform: scale(0.98);
+}
+
+/* ظاهر شدن نرم محتوای صفحه — معادل page transition سبک برای همه پنل‌ها */
+body .content > * {
+	animation: mcc-fade-in var(--motion-base) var(--ease-soft) both;
+}
+
+/* —— مخصوص پنل مادر: کارت سفر بارداری و کارت‌های مراقبت —— */
+body .bgc {
+	background: var(--gradient-soft);
+	border-radius: var(--radius-lg);
+	animation: mcc-fade-up var(--motion-slow) var(--ease-out) both;
+}
+
+body .bgc__image,
+body .bgc__placeholder {
+	animation: mcc-float 6s var(--ease-soft) infinite;
+	will-change: transform;
+}
+
+body .bgc__progress {
+	background: var(--surface-3);
+	border-radius: var(--radius-pill);
+	overflow: hidden;
+}
+
+body .bgc__progress-fill {
+	background: var(--gradient-primary);
+	transition: width var(--motion-slow) var(--ease-out);
+}
+
+body .bgc__week {
+	transition:
+		background-color var(--motion-fast) var(--ease-soft),
+		color var(--motion-fast) var(--ease-soft),
+		transform var(--motion-fast) var(--ease-out);
+}
+
+body .bgc__week:hover {
+	transform: translateY(-2px);
+}
+
+body .bgc__week--active {
+	animation: mcc-pop var(--motion-base) var(--ease-out);
+}
+
+body .care-list__item {
+	transition:
+		background-color var(--motion-base) var(--ease-soft),
+		border-color var(--motion-base) var(--ease-soft),
+		box-shadow var(--motion-base) var(--ease-soft),
+		transform var(--motion-fast) var(--ease-out);
+}
+
+body .care-list__item:hover {
+	transform: translateY(-1px);
+	box-shadow: var(--shadow-sm);
+}
+
+body .care-list__item--done {
+	animation: mcc-pop var(--motion-base) var(--ease-out);
+}
+
+/* —— احترام به تنظیم کاهش حرکت کاربر —— */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.001ms !important;
+		scroll-behavior: auto !important;
+	}
 }
 
 /* در نمایشگرهای کوچک، مقیاس تیپوگرافی کمی جمع‌تر می‌شود. */
