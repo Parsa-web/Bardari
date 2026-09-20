@@ -22,6 +22,7 @@ import {
 	Select,
 	TextInput,
 } from "../../shared/components/ui"
+import { JalaliDateInput } from "../../shared/components/DateInput"
 import { Icon } from "../../shared/components/icons"
 import { MOTHER_STATUS_LABELS, NOT_RECORDED } from "../../shared/constants/labels"
 import type { MotherCurrentStatus, Role } from "../../shared/types/domain"
@@ -557,14 +558,15 @@ export default function LoginPage() {
 			{step === 2 ? (
 				<div className="authx__fields">
 					<Field
-						label="تاریخ تولد"
+						label="تاریخ تولد (شمسی)"
 						hint="وارد کردن این تاریخ اختیاری است."
 						error={errors.birthDate}
 					>
-						<TextInput
+						<JalaliDateInput
 							value={form.birthDate}
 							onChange={(value) => set({ birthDate: value })}
-							type="date"
+							yearsBack={70}
+							yearsAhead={0}
 							invalid={Boolean(errors.birthDate)}
 							disabled={busy}
 						/>
@@ -584,14 +586,15 @@ export default function LoginPage() {
 			{step === 3 ? (
 				<div className="authx__fields">
 					<Field
-						label="تاریخ شروع آخرین قاعدگی"
+						label="تاریخ شروع آخرین قاعدگی (شمسی)"
 						hint="اگر این تاریخ را نمی‌دانید، خالی بگذارید و بعداً ثبت کنید."
 						error={errors.lmpDate}
 					>
-						<TextInput
+						<JalaliDateInput
 							value={form.lmpDate}
 							onChange={(value) => set({ lmpDate: value })}
-							type="date"
+							yearsBack={2}
+							yearsAhead={0}
 							invalid={Boolean(errors.lmpDate)}
 							disabled={busy}
 						/>
