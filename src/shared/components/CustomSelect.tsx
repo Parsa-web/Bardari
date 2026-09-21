@@ -1,0 +1,239 @@
+import { useEffect, useId, useMemo, useRef, useState } from "react"
+import { Icon } from "./icons"
+import "./CustomSelect.css"
+
+/**
+ * دراپ‌داون سفارشی و قابل استفاده دوباره.
+ * جایگزین کامل منوی پیش‌فرض مرورگر است: راست‌به‌چپ، تم روشن/تاریک،
+ * پیمایش کامل با صفحه‌کلید و الگوی دسترسی‌پذیر combobox/listbox.
+ */
+export type SelectOption = {
+	value: string
+	label: string
+	hint?: string
+	disabled?: boolean
+}
+
+export type CustomSelectProps = {
+	value: string
+	onChange: (value: string) => void
+	options: ReadonlyArray<SelectOption>
+	placeholder?: string
+	disabled?: boolean
+	invalid?: boolean
+	inline?: boolean
+	label?: string
+	emptyText?: string
+}
+
+export function CustomSelect({
+	value,
+	onChange,
+	options,
+	placeholder = "انتخاب کنید",
+	disabled,
+	invalid,
+	inline,
+	label,
+	emptyText = "گزینه‌ای موجود نیست",
+}: CustomSelectProps) {
+	const [open, setOpen] = useState(false)
+	const [activeIndex, setActiveIndex] = useState(-1)
+	const [dropUp, setDropUp] = useState(false)
+	const rootRef = useRef<HTMLDivElement | null>(null)
+	const buttonRef = useRef<HTMLButtonElement | null>(null)
+	const listRef = useRef<HTMLUListElement | null>(null)
+	const listId = useId()
+
+	const selectedIndex = useMemo(
+		() => options.findIndex((option) => option.value === value),
+		[options, value],
+	)
+	const selected = selectedIndex >= 0 ? options[selectedIndex] : undefined
+
+	/* بستن منو با کلیک بیرون، اسکرول صفحه یا تغییر اندازه */
+	useEffect(() => {
+		if (!open) return
+		const close = () => setOpen(false)
+		const onPointerDown = (event: PointerEvent) => {
+			if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+		}
+		document.addEventListener("pointerdown", onPointerDown)
+		window.addEventListener("resize", close)
+		window.addEventListener("scroll", close, true)
+		return () => {
+			document.removeEventListener("pointerdown", onPointerDown)
+			window.removeEventListener("resize", close)
+			window.removeEventListener("scroll", close, true)
+		}
+	}, [open])
+
+	/* نگه‌داشتن گزینه فعال در محدوده دید */
+	useEffect(() => {
+		if (!open || activeIndex < 0) return
+		const node = listRef.current?.children[activeIndex] as HTMLElement | undefined
+		node?.scrollIntoView({ block: "nearest" })
+	}, [open, activeIndex])
+
+	const firstEnabled = () => options.findIndex((option) => !option.disabled)
+
+	const stepIndex = (from: number, direction: 1 | -1) => {
+		const count = options.length
+		if (count === 0) return -1
+		let index = from < 0 ? (direction === 1 ? -1 : 0) : from
+		for (let attempt = 0; attempt < count; attempt += 1) {
+			index = (index + direction + count) % count
+			if (!options[index]?.disabled) return index
+		}
+		return from
+	}
+
+	const openMenu = (startIndex?: number) => {
+		if (disabled) return
+		const rect = buttonRef.current?.getBoundingClientRect()
+		if (rect) {
+			const spaceBelow = window.innerHeight - rect.bottom
+			setDropUp(spaceBelow < 260 && rect.top > spaceBelow)
+		}
+		setActiveIndex(startIndex ?? (selectedIndex >= 0 ? selectedIndex : firstEnabled()))
+		setOpen(true)
+	}
+
+	const closeMenu = (focusControl = true) => {
+		setOpen(false)
+		if (focusControl) buttonRef.current?.focus()
+	}
+
+	const commit = (index: number) => {
+		const option = options[index]
+		if (!option || option.disabled) return
+		onChange(option.value)
+		closeMenu()
+	}
+
+	const onKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+		if (disabled) return
+		switch (event.key) {
+			case "ArrowDown":
+			case "ArrowUp": {
+				event.preventDefault()
+				const direction = event.key === "ArrowDown" ? 1 : -1
+				if (!open) openMenu()
+				else setActiveIndex((current) => stepIndex(current, direction))
+				break
+			}
+			case "Home":
+				if (open) {
+					event.preventDefault()
+					setActiveIndex(firstEnabled())
+				}
+				break
+			case "End":
+				if (open) {
+					event.preventDefault()
+					setActiveIndex(stepIndex(0, -1))
+				}
+				break
+			case "Enter":
+			case " ":
+			case "Spacebar":
+				event.preventDefault()
+				if (!open) openMenu()
+				else commit(activeIndex)
+				break
+			case "Escape":
+				if (open) {
+					event.preventDefault()
+					closeMenu()
+				}
+				break
+			case "Tab":
+				if (open) setOpen(false)
+				break
+			default:
+				break
+		}
+	}
+
+	const classes = [
+		"cselect",
+		inline ? "cselect--inline" : "",
+		open ? "is-open" : "",
+		disabled ? "is-disabled" : "",
+		invalid ? "is-invalid" : "",
+	]
+		.filter(Boolean)
+		.join(" ")
+
+	return (
+		<div className={classes} ref={rootRef}>
+			<button
+				ref={buttonRef}
+				type="button"
+				className="cselect__control"
+				role="combobox"
+				aria-haspopup="listbox"
+				aria-expanded={open}
+				aria-controls={listId}
+				aria-label={label}
+				aria-invalid={invalid || undefined}
+				aria-activedescendant={open && activeIndex >= 0 ? `${listId}-${activeIndex}` : undefined}
+				disabled={disabled}
+				onClick={() => (open ? closeMenu(false) : openMenu())}
+				onKeyDown={onKeyDown}
+			>
+				<span className={`cselect__value${selected ? "" : " cselect__value--placeholder"}`}>
+					{selected?.label ?? placeholder}
+				</span>
+				<span className="cselect__arrow" aria-hidden="true">
+					<Icon name="chevron" size={18} />
+				</span>
+			</button>
+
+			{open && (
+				<ul
+					ref={listRef}
+					id={listId}
+					className={`cselect__menu${dropUp ? " cselect__menu--up" : ""}`}
+					role="listbox"
+					aria-label={label}
+				>
+					{options.length === 0 && <li className="cselect__empty">{emptyText}</li>}
+					{options.map((option, index) => {
+						const isSelected = option.value === value
+						const itemClasses = [
+							"cselect__option",
+							isSelected ? "is-selected" : "",
+							index === activeIndex ? "is-active" : "",
+							option.disabled ? "is-disabled" : "",
+						]
+							.filter(Boolean)
+							.join(" ")
+						return (
+							<li
+								key={option.value}
+								id={`${listId}-${index}`}
+								className={itemClasses}
+								role="option"
+								aria-selected={isSelected}
+								aria-disabled={option.disabled || undefined}
+								onMouseEnter={() => !option.disabled && setActiveIndex(index)}
+								onClick={() => commit(index)}
+							>
+								<span className="cselect__option-text">
+									<span className="cselect__option-label">{option.label}</span>
+									{option.hint && <span className="cselect__option-hint">{option.hint}</span>}
+								</span>
+								{isSelected && (
+									<span className="cselect__check" aria-hidden="true">
+										<Icon name="check" size={16} />
+									</span>
+								)}
+							</li>
+						)
+					})}
+				</ul>
+			)}
+		</div>
+	)
+}
