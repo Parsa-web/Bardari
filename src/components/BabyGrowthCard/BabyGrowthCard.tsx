@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Button, Card, EmptyState } from "../../shared/components/ui"
+import { Button, Card, EmptyState, Icon } from "../../shared/components/ui"
 import {
 	clampPregnancyWeek,
 	getPregnancyWeek,
@@ -21,6 +21,7 @@ function weekImageUrl(week: number) {
 /**
  * کارت «رشد هفتگی کوچولو».
  * چیدمان دوستونه: پنل اطلاعات + حلقه تصویر نوزاد؛ زیر آن پیام احساسی و تایم‌لاین هفته‌ها.
+ * فقط آیکن خطی مینیمال استفاده می‌شود؛ هیچ ایموجی‌ای در رابط کاربری نیست.
  *
  * نمونه استفاده: <BabyGrowthCard week={20} />
  */
@@ -74,8 +75,8 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 
 								<div className="bgc__facts">
 									<div className="bgc__fact">
-										<span className="bgc__fact-icon" aria-hidden="true">
-											📏
+										<span className="bgc__fact-icon">
+											<Icon name="ruler" size={18} />
 										</span>
 										<span className="bgc__fact-body">
 											<span className="bgc__fact-label">اندازه</span>
@@ -83,8 +84,8 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 										</span>
 									</div>
 									<div className="bgc__fact">
-										<span className="bgc__fact-icon" aria-hidden="true">
-											⚖️
+										<span className="bgc__fact-icon">
+											<Icon name="weight" size={18} />
 										</span>
 										<span className="bgc__fact-body">
 											<span className="bgc__fact-label">وزن</span>
@@ -92,8 +93,8 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 										</span>
 									</div>
 									<div className="bgc__fact bgc__fact--wide">
-										<span className="bgc__fact-icon" aria-hidden="true">
-											🌱
+										<span className="bgc__fact-icon">
+											<Icon name="leaf" size={18} />
 										</span>
 										<span className="bgc__fact-body">
 											<span className="bgc__fact-label">رشد این هفته</span>
@@ -137,8 +138,8 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 										</>
 									) : (
 										<div className="bgc__placeholder" role="img" aria-label="تصویر این هفته هنوز اضافه نشده است">
-											<span className="bgc__placeholder-icon" aria-hidden="true">
-												🫧
+											<span className="bgc__placeholder-icon">
+												<Icon name="image" size={26} />
 											</span>
 											<p className="bgc__placeholder-text">تصویر این هفته به‌زودی اضافه می‌شود</p>
 										</div>
@@ -149,8 +150,8 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 						</div>
 
 						<div className="bgc__message">
-							<span className="bgc__message-icon" aria-hidden="true">
-								💌
+							<span className="bgc__message-icon">
+								<Icon name="message" size={18} />
 							</span>
 							<div className="bgc__message-body">
 								<h4 className="bgc__message-title">پیام کوچولو</h4>
