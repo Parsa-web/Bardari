@@ -3,6 +3,10 @@ import type { ChangeEvent, ReactNode } from "react"
 import type { Tone } from "../constants/labels"
 import { Icon } from "./icons"
 import type { IconName } from "./icons"
+import { CustomSelect } from "./CustomSelect"
+import type { SelectOption } from "./CustomSelect"
+import { SegmentedControl } from "./SegmentedControl"
+import type { SegmentOption } from "./SegmentedControl"
 
 /**
  * اجزای پایه رابط کاربری (فارسی، RTL، تم روشن/تاریک).
@@ -11,6 +15,10 @@ import type { IconName } from "./icons"
 
 export { Icon } from "./icons"
 export type { IconName } from "./icons"
+export { CustomSelect } from "./CustomSelect"
+export type { SelectOption } from "./CustomSelect"
+export { SegmentedControl } from "./SegmentedControl"
+export type { SegmentOption } from "./SegmentedControl"
 
 /* ------------------------------- نشانک ------------------------------- */
 export function Badge({
@@ -359,6 +367,11 @@ export function TextArea({ value, onChange, placeholder, disabled, invalid }: Ba
 	)
 }
 
+/**
+ * دراپ‌داون مشترک برنامه.
+ * این کامپوننت حالا یک لایه نازک روی CustomSelect است؛ بنابراین تمام صفحات
+ * بدون تغییر کد، منوی سفارشی (بدون منوی پیش‌فرض مرورگر) دریافت می‌کنند.
+ */
 export function Select({
 	value,
 	onChange,
@@ -366,23 +379,24 @@ export function Select({
 	disabled,
 	invalid,
 	inline,
+	placeholder,
+	label,
 }: Omit<BaseInputProps, "placeholder"> & {
-	options: ReadonlyArray<{ value: string; label: string }>
+	options: ReadonlyArray<SelectOption>
+	placeholder?: string
+	label?: string
 }) {
 	return (
-		<select
-			className={`input${inline ? " input--inline" : ""}`}
+		<CustomSelect
 			value={value}
+			onChange={onChange}
+			options={options}
 			disabled={disabled}
-			aria-invalid={invalid || undefined}
-			onChange={(event: ChangeEvent<HTMLSelectElement>) => onChange(event.target.value)}
-		>
-			{options.map((option) => (
-				<option key={option.value} value={option.value}>
-					{option.label}
-				</option>
-			))}
-		</select>
+			invalid={invalid}
+			inline={inline}
+			placeholder={placeholder}
+			label={label}
+		/>
 	)
 }
 
