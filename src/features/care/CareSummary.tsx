@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import { Badge, Card, Grid } from "../../shared/components/ui"
+import { Badge, Card } from "../../shared/components/ui"
 import { useMotherContext } from "../mother/useMotherContext"
 import { ownedBy, useCareState } from "./careStore"
 import {
@@ -11,7 +11,7 @@ import { getCareProviderName } from "../../data/doctors"
 import { formatDate, formatTime, todayIso } from "../../shared/utils/date"
 import "./care.css"
 
-/** خلاصه مراقبت برای داشبورد مادر: فقط نوبت پیش‌رو. */
+/** خلاصه مراقبت برای داشبورد مادر: فقط نوبت پیش‌رو (تمام‌عرض). */
 export function CareSummary() {
 	const { motherId } = useMotherContext()
 	const care = useCareState()
@@ -22,29 +22,27 @@ export function CareSummary() {
 		.sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)))[0]
 
 	return (
-		<Grid cols={2}>
-			<Card title="نوبت پیش‌رو" actions={<Link to="/mother/appointments">مشاهده</Link>}>
-				{appointment ? (
-					<ul className="care-list">
-						<li className="care-list__item care-list__item--due">
-							<div className="care-list__head">
-								<span className="care-list__title">
-									{APPOINTMENT_TYPE_LABELS[appointment.type]} · {getCareProviderName(appointment.doctorId)}
-								</span>
-								<Badge tone={APPOINTMENT_STATUS_TONES[appointment.status]}>
-									{APPOINTMENT_STATUS_LABELS[appointment.status]}
-								</Badge>
-							</div>
-							<span className="care-list__meta">
-								{formatDate(appointment.date)} — ساعت {formatTime(appointment.time)}
+		<Card title="نوبت پیش‌رو" actions={<Link to="/mother/appointments">مشاهده</Link>}>
+			{appointment ? (
+				<ul className="care-list">
+					<li className="care-list__item care-list__item--due">
+						<div className="care-list__head">
+							<span className="care-list__title">
+								{APPOINTMENT_TYPE_LABELS[appointment.type]} · {getCareProviderName(appointment.doctorId)}
 							</span>
-							{appointment.notes && <div className="care-list__body">{appointment.notes}</div>}
-						</li>
-					</ul>
-				) : (
-					<p className="care-note">نوبت پیش‌رویی ندارید.</p>
-				)}
-			</Card>
-		</Grid>
+							<Badge tone={APPOINTMENT_STATUS_TONES[appointment.status]}>
+								{APPOINTMENT_STATUS_LABELS[appointment.status]}
+							</Badge>
+						</div>
+						<span className="care-list__meta">
+							{formatDate(appointment.date)} — ساعت {formatTime(appointment.time)}
+						</span>
+						{appointment.notes && <div className="care-list__body">{appointment.notes}</div>}
+					</li>
+				</ul>
+			) : (
+				<p className="care-note">نوبت پیش‌رویی ندارید.</p>
+			)}
+		</Card>
 	)
 }

@@ -91,7 +91,7 @@
 	--cat-other: #8a7fae;
 	--cat-other-soft: #f3f0fa;
 
-	/* وضعیت‌ها (مستقل از هویت بنفش/صورتی ، خوانا در سطح AA) */
+	/* وضعیت‌ها (مستقل از هویت بنفش/صورتی، خوانا در سطح AA) */
 	--success: #2f8f5b;
 	--success-soft: #e8f7ef;
 	--warn: #a86a12;
@@ -412,37 +412,51 @@ body .icon-btn__dot {
 	inset-inline-end: 6px;
 }
 
-/* چیپ کاربر: آواتار + نام + نقش، دقیقاً وسط‌چین عمودی و بدون سرریز */
+/* =====================================================================
+   چیپ کاربر — تقارن کامل
+   آواتار ۴۰px در سمت آغاز با ۶px فاصله از لبه؛ متن با همان نسبت در سمت پایان.
+   مرکز نوری آواتار و بلوک متن دقیقاً روی یک خط افقی قرار می‌گیرند.
+   ===================================================================== */
 body .user-chip {
 	display: inline-flex;
 	align-items: center;
+	justify-content: flex-start;
 	gap: var(--space-3);
-	padding: 5px var(--space-4) 5px 5px;
+	padding-block: 6px;
+	padding-inline: 6px var(--space-4);
 	border-radius: var(--radius-pill);
 	border: 1px solid var(--border);
 	background: var(--surface);
 	max-width: 260px;
 	min-width: 0;
+	line-height: 1;
 }
 
 body .avatar {
-	width: 36px;
-	height: 36px;
-	flex: 0 0 36px;
+	width: 40px;
+	height: 40px;
+	flex: 0 0 40px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: var(--radius-pill);
 	background: var(--gradient-hero);
 	color: var(--primary-strong);
 	font-size: 13.5px;
+	font-weight: 700;
 	line-height: 1;
+	text-align: center;
 	align-self: center;
 }
 
 body .user-chip__text {
 	display: flex;
 	flex-direction: column;
+	align-items: flex-start;
 	justify-content: center;
-	gap: 1px;
+	gap: 3px;
 	min-width: 0;
-	line-height: 1.45;
+	height: 40px;
 }
 
 body .user-chip__name {
@@ -453,13 +467,14 @@ body .user-chip__name {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	line-height: 1.45;
+	line-height: 1.25;
 }
 
 body .user-chip__role {
 	font-size: var(--fs-meta);
 	color: var(--muted);
-	line-height: 1.45;
+	line-height: 1.25;
+	max-width: 150px;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -558,7 +573,6 @@ body .drawer__body > * {
 
 /* =====================================================================
    پنل مادر — گرم، مادرانه، با حرکت‌های ملایم
-   (کلاس‌های bgc* و care-list* فقط در تجربه مادر استفاده می‌شوند)
    ===================================================================== */
 body .bgc {
 	animation: mcc-fade-up var(--motion-slow) var(--ease-out) both;
@@ -622,7 +636,12 @@ body .care-list__item--done {
    ===================================================================== */
 @media (max-width: 1024px) {
 	body .user-chip {
-		max-width: 210px;
+		max-width: 215px;
+	}
+
+	body .user-chip__name,
+	body .user-chip__role {
+		max-width: 120px;
 	}
 }
 
@@ -644,7 +663,7 @@ body .care-list__item--done {
 	body .user-chip {
 		border: none;
 		background: transparent;
-		padding: 0;
+		padding-inline: 0;
 		max-width: none;
 	}
 
