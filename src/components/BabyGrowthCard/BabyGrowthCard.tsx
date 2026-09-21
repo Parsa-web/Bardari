@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Button, Card, EmptyState, Icon } from "../../shared/components/ui"
 import {
 	clampPregnancyWeek,
@@ -11,11 +11,79 @@ import { toFa } from "../../shared/utils/date"
 import "./BabyGrowthCard.css"
 
 /**
- * مسیر تصویر هر هفته.
- * فایل‌های public/weeks/1..40 در زمان بیلد به مسیر «weeks/<week>.jpg» تبدیل می‌شوند.
+ * زنجیره مسیرهای ممکن برای تصویر یک هفته.
+ * اول خروجی تبدیل‌شده در بیلد (jpg)، سپس فایل خام (jfif) و در آخر تصویر پشتیبان داده‌ها.
  */
-function weekImageUrl(week: number) {
-	return `${import.meta.env.BASE_URL}weeks/${week}.jpg`
+function weekImageSources(week: number, fallback?: string): string[] {
+	const base = import.meta.env.BASE_URL
+	const list = [`${base}weeks/${week}.jpg`, `${base}weeks/${week}.jfif`]
+	if (fallback) list.push(fallback)
+	return list
+}
+
+/**
+ * تصویر دایره‌ای هفته.
+ *
+ * این کامپوننت عمداً جداست و با key={week} ساخته می‌شود تا با عوض شدن هفته
+ * وضعیت بارگذاری از نو ساخته شود. مشکل قبلی این بود که بازنشانی در useEffect
+ * بعد از رویداد load اجرا می‌شد و تصویر تا رفرش بعدی مخفی می‌ماند.
+ */
+function WeekImage({ week, alt, fallback }: { week: number; alt: string; fallback?: string }) {
+	const sources = useMemo(() => weekImageSources(week, fallback), [week, fallback])
+	const [index, setIndex] = useState(0)
+	const [ready, setReady] = useState(false)
+	const imageRef = useRef<HTMLImageElement>(null)
+	const src = sources[index]
+
+	// تصویری که از کش مرورگر می‌آید ممکن است رویداد load را قبل از اتصال شنونده فعال کند؛
+	// پس وضعیت واقعی عنصر را هم مستقیم می‌خوانیم.
+	useEffect(() => {
+		const node = imageRef.current
+		if (!node) return
+		if (node.complete && node.naturalWidth > 0) {
+			setReady(true)
+		} else if (node.complete && node.naturalWidth === 0) {
+			setIndex((value) => value + 1)
+		}
+	}, [src])
+
+	// محافظ نهایی: اگر به هر دلیل رویداد load نرسید، تصویر بعد از ۱.۵ ثانیه نمایش داده می‌شود.
+	useEffect(() => {
+		if (ready) return undefined
+		const timer = window.setTimeout(() => setReady(true), 1500)
+		return () => window.clearTimeout(timer)
+	}, [ready, src])
+
+	if (!src) {
+		return (
+			<div className="bgc__placeholder" role="img" aria-label="تصویر این هفته هنوز اضافه نشده است">
+				<span className="bgc__placeholder-icon">
+					<Icon name="image" size={26} />
+				</span>
+				<p className="bgc__placeholder-text">تصویر این هفته به‌زودی اضافه می‌شود</p>
+			</div>
+		)
+	}
+
+	return (
+		<>
+			{!ready && <span className="bgc__orb-skeleton" aria-hidden="true" />}
+			<img
+				ref={imageRef}
+				className={`bgc__image${ready ? " is-ready" : ""}`}
+				src={src}
+				alt={alt}
+				loading="eager"
+				decoding="async"
+				draggable={false}
+				onLoad={() => setReady(true)}
+				onError={() => {
+					setReady(false)
+					setIndex((value) => value + 1)
+				}}
+			/>
+		</>
+	)
 }
 
 /**
@@ -28,18 +96,27 @@ function weekImageUrl(week: number) {
 export function BabyGrowthCard({ week }: { week?: number | null }) {
 	const currentWeek = typeof week === "number" ? clampPregnancyWeek(week) : null
 	const [selectedWeek, setSelectedWeek] = useState<number | null>(null)
-	const [brokenImages, setBrokenImages] = useState<Record<number, boolean>>({})
-	const [imageReady, setImageReady] = useState(false)
 	const activeWeek = selectedWeek ?? currentWeek ?? MIN_PREGNANCY_WEEK
 	const info = getPregnancyWeek(activeWeek)
 	const progress = pregnancyProgress(activeWeek)
 	const timeline = buildPregnancyTimeline(activeWeek, currentWeek)
-	const isBroken = brokenImages[activeWeek] === true
-	const imageSrc = isBroken ? info?.image : weekImageUrl(activeWeek)
 
-	// با تغییر هفته، حالت لودینگ تصویر بازنشانی می‌شود تا fade-in دوباره اجرا شود.
+	// پیش‌بارگذاری هفته قبل و بعد تا جابجایی بدون مکث باشد.
 	useEffect(() => {
-		setImageReady(false)
+		const neighbors = [activeWeek - 1, activeWeek + 1].filter(
+			(value) => value >= MIN_PREGNANCY_WEEK && value <= MAX_PREGNANCY_WEEK,
+		)
+		const images = neighbors.map((value) => {
+			const image = new Image()
+			image.decoding = "async"
+			image.src = weekImageSources(value)[0] ?? ""
+			return image
+		})
+		return () => {
+			images.forEach((image) => {
+				image.src = ""
+			})
+		}
 	}, [activeWeek])
 
 	const goTo = (value: number) => setSelectedWeek(clampPregnancyWeek(value))
@@ -120,30 +197,12 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 
 							<div className="bgc__visual">
 								<div className="bgc__orb">
-									{imageSrc ? (
-										<>
-											{!imageReady && <span className="bgc__orb-skeleton" aria-hidden="true" />}
-											<img
-												className={`bgc__image${imageReady ? " is-ready" : ""}`}
-												src={imageSrc}
-												alt={`تصویر رشد نوزاد در هفته ${toFa(info.week)} بارداری`}
-												loading="lazy"
-												decoding="async"
-												onLoad={() => setImageReady(true)}
-												onError={() => {
-													setImageReady(true)
-													setBrokenImages((prev) => ({ ...prev, [activeWeek]: true }))
-												}}
-											/>
-										</>
-									) : (
-										<div className="bgc__placeholder" role="img" aria-label="تصویر این هفته هنوز اضافه نشده است">
-											<span className="bgc__placeholder-icon">
-												<Icon name="image" size={26} />
-											</span>
-											<p className="bgc__placeholder-text">تصویر این هفته به‌زودی اضافه می‌شود</p>
-										</div>
-									)}
+									<WeekImage
+										key={activeWeek}
+										week={activeWeek}
+										fallback={info.image}
+										alt={`تصویر رشد نوزاد در هفته ${toFa(info.week)} بارداری`}
+									/>
 									<span className="bgc__orb-badge">{`هفته ${toFa(activeWeek)}`}</span>
 								</div>
 							</div>
