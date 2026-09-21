@@ -4,24 +4,41 @@
 	display: flex;
 	flex-direction: column;
 	gap: var(--space-4);
+	min-width: 0;
 }
 
+/* ---------------- سفر بارداری: تایم‌لاین نرم ---------------- */
 .bgc__journey {
+	position: relative;
 	display: flex;
 	flex-direction: column;
-	gap: var(--space-3);
-	padding: var(--space-4);
-	border-radius: var(--radius-lg);
-	border: 1px solid var(--border);
-	background: var(--primary-soft, var(--surface-2, var(--bg)));
+	gap: var(--space-4);
+	padding: var(--space-5);
+	border-radius: var(--radius-xl);
+	border: 1px solid var(--primary-border);
+	background: var(--gradient-hero);
+	overflow: hidden;
+}
+
+/* عنصر تزئینی بسیار ملایم (بدون انیمیشن، بدون هزینه رندر) */
+.bgc__journey::after {
+	content: "";
+	position: absolute;
+	inset-inline-end: -60px;
+	top: -70px;
+	width: 190px;
+	height: 190px;
+	border-radius: 50%;
+	background: color-mix(in srgb, var(--accent) 12%, transparent);
+	pointer-events: none;
 }
 
 .bgc__progress {
 	position: relative;
-	height: 10px;
-	border-radius: 999px;
-	background: var(--surface);
-	border: 1px solid var(--border);
+	height: 12px;
+	border-radius: var(--radius-pill);
+	background: color-mix(in srgb, var(--surface) 70%, transparent);
+	border: 1px solid var(--primary-border);
 	overflow: hidden;
 }
 
@@ -29,9 +46,9 @@
 	position: absolute;
 	inset-block: 0;
 	inset-inline-start: 0;
-	border-radius: 999px;
-	background: var(--primary);
-	transition: width 0.3s ease;
+	border-radius: var(--radius-pill);
+	background: var(--gradient-primary);
+	transition: width var(--motion-slow) var(--ease-out);
 }
 
 .bgc__progress-meta {
@@ -39,36 +56,44 @@
 	align-items: center;
 	justify-content: space-between;
 	gap: var(--space-2);
-	font-size: 0.8rem;
-	opacity: 0.8;
+	flex-wrap: wrap;
+	font-size: var(--fs-meta);
+	color: var(--text-soft);
+	font-weight: 600;
 }
 
+/* ریل هفته‌ها: اسکرول افقی امن، بدون سرریز از کارت */
 .bgc__timeline {
 	list-style: none;
 	margin: 0;
-	padding: 0;
+	padding: var(--space-2) 0 var(--space-1);
 	display: flex;
 	align-items: flex-start;
 	justify-content: space-between;
 	gap: var(--space-1);
 	overflow-x: auto;
+	overflow-y: hidden;
+	min-width: 0;
+	scrollbar-width: thin;
 }
 
 .bgc__timeline-item {
 	flex: 1 1 0;
-	min-width: 64px;
+	min-width: 62px;
 	position: relative;
 	display: flex;
 	justify-content: center;
 }
 
+/* خط اتصال نرم بین نقطه‌ها */
 .bgc__timeline-item::before {
 	content: "";
 	position: absolute;
-	top: 9px;
+	top: 10px;
 	inset-inline: -50% 50%;
-	height: 2px;
-	background: var(--border);
+	height: 3px;
+	border-radius: var(--radius-pill);
+	background: color-mix(in srgb, var(--primary) 20%, transparent);
 }
 
 .bgc__timeline-item:first-child::before {
@@ -81,72 +106,92 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 4px;
+	gap: 6px;
 	background: transparent;
 	border: 0;
-	padding: 0;
+	padding: 2px 4px;
+	border-radius: var(--radius-sm);
 	cursor: pointer;
-	color: inherit;
+	color: var(--text-soft);
 	font: inherit;
-	opacity: 0.7;
+	transition:
+		color var(--motion-fast) var(--ease-soft),
+		background-color var(--motion-fast) var(--ease-soft);
 }
 
 .bgc__week:hover {
-	opacity: 1;
+	color: var(--text);
+	background: color-mix(in srgb, var(--surface) 55%, transparent);
 }
 
 .bgc__week-dot {
 	width: 14px;
 	height: 14px;
-	border-radius: 999px;
-	border: 2px solid var(--border);
+	border-radius: var(--radius-pill);
+	border: 2px solid var(--primary-border);
 	background: var(--surface);
+	transition:
+		width var(--motion-base) var(--ease-out),
+		height var(--motion-base) var(--ease-out),
+		background-color var(--motion-base) var(--ease-soft),
+		box-shadow var(--motion-base) var(--ease-soft);
 }
 
+/* هفته‌های طی‌شده */
 .bgc__week--past .bgc__week-dot {
 	background: var(--primary);
 	border-color: var(--primary);
-	opacity: 0.65;
 }
 
+.bgc__week--past .bgc__week-label {
+	color: var(--text-soft);
+}
+
+/* هفته جاری — کاملاً متمایز */
 .bgc__week--active {
-	opacity: 1;
+	color: var(--primary-strong);
 	font-weight: 700;
 }
 
 .bgc__week--active .bgc__week-dot {
-	width: 18px;
-	height: 18px;
-	background: var(--primary);
-	border-color: var(--primary);
-	box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 22%, transparent);
+	width: 20px;
+	height: 20px;
+	background: var(--gradient-primary);
+	border-color: var(--surface);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 26%, transparent);
 }
 
 .bgc__week-label {
-	font-size: 0.82rem;
+	font-size: var(--fs-meta);
 	white-space: nowrap;
 }
 
 .bgc__week-tag {
-	font-size: 0.68rem;
-	padding: 2px 8px;
-	border-radius: 999px;
-	background: var(--primary);
+	font-size: 11px;
+	padding: 2px 9px;
+	border-radius: var(--radius-pill);
+	background: var(--gradient-primary);
 	color: #fff;
 	white-space: nowrap;
+	font-weight: 700;
 }
 
+/* ---------------- سربرگ پیمایش هفته ---------------- */
 .bgc__nav {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: var(--space-2);
+	gap: var(--space-3);
 	flex-wrap: wrap;
+	min-width: 0;
 }
 
 .bgc__nav-title {
 	font-weight: 700;
-	font-size: 1.02rem;
+	font-size: var(--fs-card-title);
+	color: var(--text);
+	min-width: 0;
+	overflow-wrap: anywhere;
 }
 
 .bgc__nav-actions {
@@ -156,29 +201,30 @@
 	flex-wrap: wrap;
 }
 
+/* ---------------- تصویر و جایگزین ---------------- */
 .bgc__placeholder {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
-	gap: var(--space-1);
+	gap: var(--space-2);
 	min-height: 168px;
 	border-radius: var(--radius-lg);
-	border: 1px dashed var(--border);
-	background: var(--surface-2, var(--bg));
-	color: var(--text-muted, inherit);
+	border: 1px dashed var(--primary-border);
+	background: var(--surface-2);
+	color: var(--text-soft);
 	text-align: center;
-	padding: var(--space-4);
+	padding: var(--space-5);
 }
 
 .bgc__placeholder-icon {
-	font-size: 1.6rem;
+	font-size: 1.7rem;
 	line-height: 1;
 }
 
 .bgc__placeholder-text {
-	font-size: 0.85rem;
-	opacity: 0.8;
+	font-size: var(--fs-secondary);
+	color: var(--muted);
 	margin: 0;
 }
 
@@ -188,9 +234,10 @@
 	object-fit: contain;
 	border-radius: var(--radius-lg);
 	border: 1px solid var(--border);
-	background: var(--surface-2, var(--bg));
+	background: var(--surface-2);
 }
 
+/* ---------------- حقایق هفته ---------------- */
 .bgc__facts {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -200,55 +247,69 @@
 .bgc__fact {
 	border: 1px solid var(--border);
 	border-radius: var(--radius-md);
-	padding: var(--space-3);
+	padding: var(--space-4);
 	background: var(--surface);
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
+	min-width: 0;
 }
 
 .bgc__fact-label {
-	font-size: 0.8rem;
-	opacity: 0.75;
+	font-size: var(--fs-meta);
+	color: var(--muted);
 }
 
 .bgc__fact-value {
-	font-weight: 600;
+	font-weight: 700;
+	color: var(--text);
+	overflow-wrap: anywhere;
 }
 
+/* ---------------- متن‌ها ---------------- */
 .bgc__block {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+	min-width: 0;
 }
 
 .bgc__block-title {
 	margin: 0;
-	font-size: 0.92rem;
+	font-size: var(--fs-secondary);
 	font-weight: 700;
+	color: var(--text);
 }
 
 .bgc__block-text {
 	margin: 0;
-	line-height: 1.9;
+	line-height: var(--lh-body);
+	color: var(--text-soft);
+	overflow-wrap: anywhere;
 }
 
 .bgc__message {
-	border: 1px solid var(--border);
-	border-radius: var(--radius-md);
-	padding: var(--space-3) var(--space-4);
-	background: var(--primary-soft, var(--surface-2, var(--bg)));
-	border-inline-start: 4px solid var(--primary);
+	border: 1px solid var(--accent-border);
+	border-radius: var(--radius-lg);
+	padding: var(--space-4);
+	background: var(--accent-soft);
+	border-inline-start: 4px solid var(--accent);
+	color: var(--text);
+	overflow-wrap: anywhere;
 }
 
 .bgc__disclaimer {
 	margin: 0;
-	font-size: 0.78rem;
-	opacity: 0.7;
+	font-size: var(--fs-meta);
+	color: var(--muted);
 	line-height: 1.8;
 }
 
 @media (max-width: 640px) {
+	.bgc__journey {
+		padding: var(--space-4);
+	}
+
 	.bgc__facts {
 		grid-template-columns: 1fr;
 	}

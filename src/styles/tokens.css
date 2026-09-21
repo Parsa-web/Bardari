@@ -1,8 +1,10 @@
-/* ================= سیستم طراحی «پاستل نرم بارداری» =================
-   هویت: بنفش ملایم (اعتماد و آرامش) + صورتی نوزادی (گرما و حس مادرانه)
-   قاعده طلایی: هیچ رنگی در کامپوننت‌ها hardcode نمی‌شود؛ همه از این توکن‌ها می‌آید. */
+/* =====================================================================
+   سیستم طراحی «پاستل نرم بارداری» — نسخه ۳
+   تنها منبع حقیقت برای رنگ، فاصله، شعاع، سایه، تیپوگرافی و حرکت.
+   قاعده ۷۰/۲۰/۱۰: پس‌زمینه خنثی غالب است؛ بنفش/صورتی فقط هویت است، نه کل رابط.
+   ===================================================================== */
 :root {
-	/* --- فاصله‌گذاری --- */
+	/* ---------- فاصله ---------- */
 	--space-1: 4px;
 	--space-2: 8px;
 	--space-3: 12px;
@@ -14,16 +16,17 @@
 	--space-12: 48px;
 	--space-16: 64px;
 
-	/* --- شعاع: کارت‌های نرم و دوستانه --- */
+	/* ---------- شعاع ---------- */
+	--radius-xs: 10px;
 	--radius-sm: 14px;
 	--radius-md: 18px;
 	--radius-lg: 22px;
 	--radius-xl: 26px;
 	--radius-pill: 999px;
 
-	/* --- تیپوگرافی --- */
+	/* ---------- تیپوگرافی ---------- */
 	--font-sans: "Vazirmatn", "IRANSansX", "Segoe UI", Tahoma, sans-serif;
-	--fs-page-title: 28px;
+	--fs-page-title: 27px;
 	--fs-section-title: 20px;
 	--fs-card-title: 17px;
 	--fs-body: 15px;
@@ -32,21 +35,21 @@
 	--fs-button: 14.5px;
 	--fs-input: 15px;
 	--fs-label: 13.5px;
-	--lh-tight: 1.5;
-	--lh-body: 1.8;
+	--lh-tight: 1.55;
+	--lh-body: 1.85;
 
-	/* --- ابعاد اجزا --- */
+	/* ---------- ابعاد ---------- */
 	--control-h: 46px;
 	--control-h-sm: 38px;
 	--topbar-h: 68px;
-	--sidebar-w: 264px;
+	--sidebar-w: 268px;
 
-	/* --- لایه‌ها --- */
+	/* ---------- لایه‌ها ---------- */
 	--z-sticky: 20;
 	--z-drawer: 40;
 	--z-modal: 60;
 
-	/* --- حرکت --- */
+	/* ---------- حرکت ---------- */
 	--motion-fast: 140ms;
 	--motion-base: 240ms;
 	--motion-slow: 520ms;
@@ -54,144 +57,204 @@
 	--ease-soft: cubic-bezier(0.4, 0, 0.2, 1);
 
 	/* ================= تم روشن ================= */
-	--bg: #fff8fc;
-	--bg-soft: #fdf2f9;
+	--bg: #fff9fc;
+	--bg-soft: #fff4fa;
 	--surface: #ffffff;
-	--surface-2: #fce7f3;
-	--surface-3: #f3e8ff;
-	--border: #f1e4f5;
-	--border-strong: #e6d5ef;
-	--text: #352b3f;
-	--text-soft: #6b6475;
-	--muted: #9ca3af;
+	--surface-2: #fff1f7;
+	--surface-3: #fce4f2;
+	--border: #f0ddea;
+	--border-strong: #e6cbdd;
+	--text: #30243a;
+	--text-soft: #6f647a;
+	--muted: #a69cad;
 
-	--primary: #a78bfa;
-	--primary-strong: #7c5ce0;
-	--primary-hover: #8b6df4;
-	--primary-soft: #f3e8ff;
-	--primary-border: #e6d8fb;
+	--primary: #9b6dff;
+	--primary-hover: #8a55f8;
+	--primary-strong: #7846e0;
+	--primary-soft: #ede1ff;
+	--primary-border: #e0cffb;
 	--on-primary: #ffffff;
 
-	--secondary: #f9a8d4;
-	--accent: #f472b6;
-	--accent-strong: #d1447f;
-	--accent-soft: #fce7f3;
-	--accent-border: #f8d4e7;
+	--secondary: #f7a8d8;
+	--accent: #ec6faf;
+	--accent-strong: #d24d92;
+	--accent-soft: #fce4f2;
+	--accent-border: #f7d3e7;
 
-	/* رنگ دسته فعالیت‌ها (پنل مادر) */
-	--cat-sleep: #8b78e8;
-	--cat-sleep-soft: #efe9ff;
-	--cat-nutrition: #3f9e74;
-	--cat-nutrition-soft: #e6f7ef;
-	--cat-exercise: #de6aa3;
-	--cat-exercise-soft: #fdeaf3;
-	--cat-other: #8e83b8;
-	--cat-other-soft: #f1eefb;
+	/* دسته فعالیت‌های مادر */
+	--cat-sleep: #7d68d8;
+	--cat-sleep-soft: #f1ecff;
+	--cat-nutrition: #3d9370;
+	--cat-nutrition-soft: #e9f7f0;
+	--cat-exercise: #d65f9d;
+	--cat-exercise-soft: #fdeaf4;
+	--cat-other: #8a7fae;
+	--cat-other-soft: #f3f0fa;
 
-	/* وضعیت‌ها — پاستلی ولی خوانا (AA) */
+	/* وضعیت‌ها (مستقل از هویت بنفش/صورتی ، خوانا در سطح AA) */
 	--success: #2f8f5b;
-	--success-soft: #e7f7ee;
-	--warn: #a96a12;
-	--warn-soft: #fdf2e0;
+	--success-soft: #e8f7ef;
+	--warn: #a86a12;
+	--warn-soft: #fdf3e2;
 	--danger: #c0435a;
-	--danger-soft: #fdeaee;
-	--info: #5a76d8;
-	--info-soft: #ecefff;
-	--neutral-soft: #f6f0fa;
+	--danger-soft: #fdebef;
+	--info: #5670cf;
+	--info-soft: #edf0ff;
+	--neutral-soft: #f6f1f6;
 
-	/* --- گرادیان‌های ملایم --- */
-	--gradient-primary: linear-gradient(135deg, #c084fc 0%, #f9a8d4 100%);
-	--gradient-hero: linear-gradient(135deg, #f3e8ff 0%, #fce7f3 100%);
-	--gradient-surface: linear-gradient(170deg, #ffffff 0%, #fffafd 100%);
+	/* ---------- گرادیان (فقط برای لحظات هویتی) ---------- */
+	--gradient-primary: linear-gradient(135deg, #9b6dff 0%, #f7a8d8 100%);
+	--gradient-hero: linear-gradient(135deg, #ede1ff 0%, #fce4f2 100%);
 
-	--focus-ring: 0 0 0 3px rgba(167, 139, 250, 0.3);
-	--shadow-xs: 0 1px 2px rgba(120, 80, 150, 0.05);
-	--shadow-sm: 0 2px 6px rgba(150, 100, 175, 0.07), 0 10px 24px rgba(244, 114, 182, 0.07);
-	--shadow-md: 0 14px 34px rgba(150, 100, 175, 0.14);
-	--shadow-lift: 0 16px 38px rgba(244, 114, 182, 0.16);
-	--overlay: rgba(53, 43, 63, 0.4);
+	/* ---------- سایه (بسیار نرم) ---------- */
+	--focus-ring: 0 0 0 3px rgba(155, 109, 255, 0.26);
+	--shadow-xs: 0 1px 2px rgba(103, 65, 130, 0.05);
+	--shadow-sm: 0 2px 8px rgba(103, 65, 130, 0.06);
+	--shadow-md: 0 10px 26px rgba(103, 65, 130, 0.1);
+	--shadow-lift: 0 6px 18px rgba(103, 65, 130, 0.1);
+	--overlay: rgba(48, 36, 58, 0.38);
+
+	/* ---------- نوار پیمایش ---------- */
+	--scroll-track: #fff4fa;
+	--scroll-thumb: #e3cdf6;
+	--scroll-thumb-hover: #c9a8ee;
 
 	color-scheme: light;
 }
 
-/* ================= تم تاریک (گرم، نه سیاه مطلق) ================= */
+/* ================= تم تاریک (گرم، بدون سیاه مطلق) ================= */
 [data-theme="dark"] {
-	--bg: #18121f;
-	--bg-soft: #140f1a;
-	--surface: #241a2e;
-	--surface-2: #30223d;
-	--surface-3: #3a2a49;
-	--border: #3b2d4a;
-	--border-strong: #4d3b60;
-	--text: #faf5ff;
-	--text-soft: #d8cfe3;
-	--muted: #a78bfa;
+	--bg: #17121f;
+	--bg-soft: #21182b;
+	--surface: #281e35;
+	--surface-2: #332342;
+	--surface-3: #3b2a4b;
+	--border: #433452;
+	--border-strong: #574367;
+	--text: #fff7ff;
+	--text-soft: #d8cce5;
+	--muted: #a995b8;
 
 	--primary: #c084fc;
-	--primary-strong: #d5aaff;
-	--primary-hover: #d0a1fd;
+	--primary-hover: #cf9dfd;
+	--primary-strong: #d9b0ff;
 	--primary-soft: #35244b;
-	--primary-border: #4c3a67;
-	--on-primary: #1d1229;
+	--primary-border: #4b3765;
+	--on-primary: #1c1228;
 
 	--secondary: #f9a8d4;
 	--accent: #fb7185;
-	--accent-strong: #ff93a3;
-	--accent-soft: #3d2130;
-	--accent-border: #5a3243;
+	--accent-strong: #ff97a5;
+	--accent-soft: #3c2231;
+	--accent-border: #563141;
 
-	--cat-sleep: #c4b0ff;
+	--cat-sleep: #c3aefd;
 	--cat-sleep-soft: #322449;
 	--cat-nutrition: #86dfb2;
-	--cat-nutrition-soft: #1d3329;
+	--cat-nutrition-soft: #1e3329;
 	--cat-exercise: #f9a8d4;
 	--cat-exercise-soft: #3d2334;
-	--cat-other: #bfb3e8;
-	--cat-other-soft: #2e2743;
+	--cat-other: #bfb1e2;
+	--cat-other-soft: #2f2743;
 
 	--success: #86dfb2;
-	--success-soft: #1d3329;
+	--success-soft: #1e3329;
 	--warn: #f0c47c;
 	--warn-soft: #382b16;
 	--danger: #fb9ba8;
 	--danger-soft: #3d2029;
 	--info: #a5b8fb;
 	--info-soft: #232a4a;
-	--neutral-soft: #2c2138;
+	--neutral-soft: #2d2239;
 
 	--gradient-primary: linear-gradient(135deg, #c084fc 0%, #f9a8d4 100%);
-	--gradient-hero: linear-gradient(135deg, #35244b 0%, #3d2334 100%);
-	--gradient-surface: linear-gradient(170deg, #241a2e 0%, #2a1e36 100%);
+	--gradient-hero: linear-gradient(135deg, #35244b 0%, #3c2231 100%);
 
-	--focus-ring: 0 0 0 3px rgba(192, 132, 252, 0.34);
-	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
-	--shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.28), 0 10px 26px rgba(0, 0, 0, 0.26);
-	--shadow-md: 0 16px 36px rgba(0, 0, 0, 0.44);
-	--shadow-lift: 0 18px 40px rgba(0, 0, 0, 0.5);
-	--overlay: rgba(12, 8, 17, 0.62);
+	--focus-ring: 0 0 0 3px rgba(192, 132, 252, 0.32);
+	--shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.28);
+	--shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+	--shadow-md: 0 12px 30px rgba(0, 0, 0, 0.42);
+	--shadow-lift: 0 6px 20px rgba(0, 0, 0, 0.36);
+	--overlay: rgba(10, 7, 15, 0.6);
+
+	--scroll-track: #21182b;
+	--scroll-thumb: #4b3765;
+	--scroll-thumb-hover: #63497f;
 
 	color-scheme: dark;
 }
 
-/* ================= لایه هویت بصری =================
-   این لایه روی کامپوننت‌های مشترک اعمال می‌شود و همه‌جا یکدست است. */
+/* =====================================================================
+   نوار پیمایش اختصاصی — یکدست در کل اپلیکیشن
+   ===================================================================== */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
 
-/* --- کارت‌ها: گوشه نرم، سایه پاستلی، تنفس بیشتر --- */
+*::-webkit-scrollbar {
+	width: 10px;
+	height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+	background: var(--scroll-track);
+	border-radius: var(--radius-pill);
+}
+
+*::-webkit-scrollbar-thumb {
+	background: var(--gradient-primary);
+	border-radius: var(--radius-pill);
+	border: 2px solid var(--scroll-track);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+	background: var(--scroll-thumb-hover);
+}
+
+[data-theme="dark"] *::-webkit-scrollbar-thumb {
+	background: var(--scroll-thumb);
+}
+
+*::-webkit-scrollbar-corner {
+	background: transparent;
+}
+
+/* =====================================================================
+   لایه هویت بصری — روی کامپوننت‌های مشترک
+   هیچ منطقی تغییر نمی‌کند؛ فقط ظاهر.
+   ===================================================================== */
+
+/* ---------- کارت: شعاع و پدینگ یکدست، سایه بسیار نرم، بدون سرریز ---------- */
 body .card,
 body .stat {
 	border-radius: var(--radius-lg);
-	box-shadow: var(--shadow-sm);
+	box-shadow: var(--shadow-xs);
+	padding: var(--space-5);
+	min-width: 0;
+	overflow-wrap: anywhere;
+	/* هاور فقط سایه و مرز را تغییر می‌دهد؛ هیچ transformی در کار نیست تا چیزی از قاب بیرون نزند. */
 	transition:
 		box-shadow var(--motion-base) var(--ease-soft),
 		border-color var(--motion-base) var(--ease-soft),
-		transform var(--motion-fast) var(--ease-out);
+		background-color var(--motion-base) var(--ease-soft);
+}
+
+body .card:hover {
+	box-shadow: var(--shadow-sm);
+	border-color: var(--border-strong);
+}
+
+body .card--flush {
+	padding: 0;
 }
 
 body .card--quiet {
+	background: var(--surface-2);
 	box-shadow: none;
 }
 
-/* --- دکمه‌ها: اصلی گرادیانی و قرصی، ثانویه پاستلی --- */
+/* ---------- دکمه ---------- */
 body .btn {
 	border-radius: var(--radius-pill);
 	transition:
@@ -199,11 +262,12 @@ body .btn {
 		border-color var(--motion-fast) var(--ease-soft),
 		color var(--motion-fast) var(--ease-soft),
 		box-shadow var(--motion-base) var(--ease-soft),
-		transform var(--motion-fast) var(--ease-out);
+		filter var(--motion-fast) var(--ease-soft);
+	max-width: 100%;
 }
 
 body .btn:active:not(:disabled) {
-	transform: scale(0.97);
+	filter: brightness(0.97);
 }
 
 body .btn--primary {
@@ -215,7 +279,7 @@ body .btn--primary {
 
 body .btn--primary:hover:not(:disabled) {
 	background: var(--gradient-primary);
-	filter: brightness(1.04);
+	filter: brightness(1.05);
 	box-shadow: var(--shadow-sm);
 }
 
@@ -235,7 +299,7 @@ body .btn--ghost {
 	color: var(--primary-strong);
 }
 
-/* --- ورودی‌ها: گوشه نرم، مرز ملایم، فوکوس دوستانه --- */
+/* ---------- ورودی و دراپ‌داون ---------- */
 body .input {
 	border-radius: var(--radius-sm);
 	border-color: var(--border-strong);
@@ -255,17 +319,56 @@ body .input:focus {
 	box-shadow: var(--focus-ring);
 }
 
+/* فلش دراپ‌داون با رنگ هویت (قبلاً آبی ثابت بود) */
+body select.input {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239b6dff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme="dark"] body select.input {
+	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c084fc' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+}
+
 body .chip {
 	border-radius: var(--radius-pill);
 }
 
-/* --- ناوبری و تب‌ها: نشانگر بنفش↔صورتی --- */
+/* ---------- نوار کناری ---------- */
+body .shell__side {
+	background: var(--bg-soft);
+	gap: var(--space-5);
+	overflow-x: hidden;
+}
+
+body .nav {
+	gap: var(--space-5);
+}
+
+body .nav__group {
+	gap: 6px;
+}
+
+body .nav__group-title {
+	letter-spacing: 0.01em;
+	padding-bottom: var(--space-2);
+}
+
 body .nav__item {
-	border-radius: var(--radius-pill);
+	border-radius: var(--radius-sm);
+	min-height: 46px;
+	padding-inline: var(--space-4) var(--space-3);
 	color: var(--text-soft);
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	transition:
 		background-color var(--motion-fast) var(--ease-soft),
 		color var(--motion-fast) var(--ease-soft);
+}
+
+body .nav__item:hover {
+	background: var(--surface-2);
+	color: var(--text);
 }
 
 body .nav__item--active {
@@ -273,42 +376,144 @@ body .nav__item--active {
 	color: var(--primary-strong);
 }
 
+/* نشانگر کوچک فعال — مطمئناً داخل خود آیتم */
 body .nav__item--active::before {
-	background: var(--gradient-primary);
+	inset-inline-start: 6px;
+	top: 13px;
+	bottom: 13px;
 	width: 4px;
+	border-radius: var(--radius-pill);
+	background: var(--gradient-primary);
+}
+
+/* ---------- سربرگ ---------- */
+body .topbar {
+	background: color-mix(in srgb, var(--surface) 90%, transparent);
+	gap: var(--space-4);
+}
+
+body .icon-btn {
+	width: 42px;
+	height: 42px;
+	border-radius: var(--radius-sm);
+	line-height: 0;
+}
+
+body .icon-btn:hover {
+	background: var(--surface-2);
+	color: var(--primary-strong);
+}
+
+body .icon-btn__dot {
+	background: var(--accent);
+	color: #ffffff;
+	border: 2px solid var(--surface);
+	top: 6px;
+	inset-inline-end: 6px;
+}
+
+/* چیپ کاربر: آواتار + نام + نقش، دقیقاً وسط‌چین عمودی و بدون سرریز */
+body .user-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: var(--space-3);
+	padding: 5px var(--space-4) 5px 5px;
+	border-radius: var(--radius-pill);
+	border: 1px solid var(--border);
+	background: var(--surface);
+	max-width: 260px;
+	min-width: 0;
+}
+
+body .avatar {
+	width: 36px;
+	height: 36px;
+	flex: 0 0 36px;
+	background: var(--gradient-hero);
+	color: var(--primary-strong);
+	font-size: 13.5px;
+	line-height: 1;
+	align-self: center;
+}
+
+body .user-chip__text {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	gap: 1px;
+	min-width: 0;
+	line-height: 1.45;
+}
+
+body .user-chip__name {
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--text);
+	max-width: 150px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	line-height: 1.45;
+}
+
+body .user-chip__role {
+	font-size: var(--fs-meta);
+	color: var(--muted);
+	line-height: 1.45;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 body .brand__mark,
-body .icon-btn__dot,
 body .notif__unread-dot {
 	background: var(--gradient-primary);
 	color: #ffffff;
 	border-color: transparent;
 }
 
-body .avatar {
-	background: var(--gradient-hero);
-	color: var(--primary-strong);
-}
-
-/* --- مودال و کشو --- */
-body .modal__panel,
-body .drawer__panel {
-	border-radius: var(--radius-lg);
+/* ---------- مودال، کشو، صفحه ورود ---------- */
+body .modal__panel {
+	border-radius: var(--radius-xl);
 	box-shadow: var(--shadow-md);
 }
 
 body .drawer__panel {
-	border-radius: 0;
+	box-shadow: var(--shadow-md);
 }
 
-/* --- صفحه ورود: حس آرام و مادرانه --- */
 body .auth__brand {
 	background: var(--gradient-hero);
 }
 
-/* ================= حرکت =================
-   فقط opacity و transform (کامپوزیت روی GPU). بدون کتابخانه انیمیشن. */
+/* ---------- جدول و فهرست (پنل‌های حرفه‌ای) ---------- */
+body .table thead th {
+	background: var(--neutral-soft);
+	color: var(--text-soft);
+}
+
+body .table tbody tr {
+	transition: background-color var(--motion-fast) var(--ease-soft);
+}
+
+body .list__item,
+body .qitem,
+body .notif__item {
+	border-radius: var(--radius-md);
+	transition:
+		border-color var(--motion-fast) var(--ease-soft),
+		background-color var(--motion-fast) var(--ease-soft),
+		box-shadow var(--motion-base) var(--ease-soft);
+}
+
+body .list__item:hover {
+	border-color: var(--primary-border);
+	box-shadow: var(--shadow-xs);
+}
+
+/* =====================================================================
+   سیستم حرکت — فقط opacity/transform، کامپوزیت روی GPU
+   ===================================================================== */
 @keyframes mcc-fade-in {
 	from {
 		opacity: 0;
@@ -321,7 +526,7 @@ body .auth__brand {
 @keyframes mcc-fade-up {
 	from {
 		opacity: 0;
-		transform: translateY(10px);
+		transform: translateY(8px);
 	}
 	to {
 		opacity: 1;
@@ -329,29 +534,19 @@ body .auth__brand {
 	}
 }
 
-@keyframes mcc-float {
-	0%,
-	100% {
-		transform: translateY(0);
-	}
-	50% {
-		transform: translateY(-5px);
-	}
-}
-
 @keyframes mcc-pop {
 	0% {
-		transform: scale(0.97);
+		transform: scale(0.985);
 	}
 	60% {
-		transform: scale(1.015);
+		transform: scale(1.008);
 	}
 	100% {
 		transform: scale(1);
 	}
 }
 
-/* همه پنل‌ها: ظاهر شدن آرام صفحه و اعلان‌ها (بدون تزئین) */
+/* همه پنل‌ها: ظاهر شدن آرام محتوا (یک انیمیشن کوتاه، بدون تکرار) */
 body .content > * {
 	animation: mcc-fade-in var(--motion-base) var(--ease-soft) both;
 }
@@ -361,66 +556,26 @@ body .drawer__body > * {
 	animation: mcc-fade-up var(--motion-base) var(--ease-out) both;
 }
 
-/* ================= پنل مادر — طراحی احساسی =================
-   کلاس‌های bgc* و care-list* فقط در تجربه مادر استفاده می‌شوند. */
+/* =====================================================================
+   پنل مادر — گرم، مادرانه، با حرکت‌های ملایم
+   (کلاس‌های bgc* و care-list* فقط در تجربه مادر استفاده می‌شوند)
+   ===================================================================== */
 body .bgc {
-	background: var(--gradient-hero);
-	border-radius: var(--radius-xl);
-	border: 1px solid var(--primary-border);
 	animation: mcc-fade-up var(--motion-slow) var(--ease-out) both;
 }
 
-body .bgc__image,
-body .bgc__placeholder {
-	animation: mcc-float 6.5s var(--ease-soft) infinite;
-	will-change: transform;
-}
-
-body .bgc__progress {
-	background: color-mix(in srgb, var(--primary) 18%, var(--surface));
-	border-radius: var(--radius-pill);
-	overflow: hidden;
-}
-
-body .bgc__progress-fill {
-	background: var(--gradient-primary);
-	border-radius: var(--radius-pill);
-	transition: width var(--motion-slow) var(--ease-out);
-}
-
-body .bgc__week {
-	transition:
-		background-color var(--motion-fast) var(--ease-soft),
-		color var(--motion-fast) var(--ease-soft),
-		transform var(--motion-fast) var(--ease-out);
-}
-
-body .bgc__week:hover {
-	transform: translateY(-2px);
-}
-
-body .bgc__week--active {
-	animation: mcc-pop var(--motion-base) var(--ease-out);
-}
-
-/* کارت‌های فعالیت روزانه: رنگ دسته + میکرو اینتراکشن */
 body .care-list__item {
 	border-radius: var(--radius-md);
 	border-inline-start: 4px solid var(--border);
+	overflow: hidden;
 	transition:
 		background-color var(--motion-base) var(--ease-soft),
 		border-color var(--motion-base) var(--ease-soft),
-		box-shadow var(--motion-base) var(--ease-soft),
-		transform var(--motion-fast) var(--ease-out);
+		box-shadow var(--motion-base) var(--ease-soft);
 }
 
 body .care-list__item:hover {
-	transform: translateY(-1px);
 	box-shadow: var(--shadow-sm);
-}
-
-body .care-list__item:active {
-	transform: scale(0.995);
 }
 
 body .care-list__item--cat-sleep {
@@ -448,17 +603,9 @@ body .care-list__item--done {
 	border-inline-start-color: var(--success);
 }
 
-/* ================= پنل ماما و متخصص — حرفه‌ای و بدون تزئین ================= */
-body .table thead th {
-	background: var(--neutral-soft);
-	color: var(--text-soft);
-}
-
-body .table tbody tr {
-	transition: background-color var(--motion-fast) var(--ease-soft);
-}
-
-/* ================= احترام به کاهش حرکت ================= */
+/* =====================================================================
+   دسترسی‌پذیری حرکت
+   ===================================================================== */
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,
@@ -470,20 +617,44 @@ body .table tbody tr {
 	}
 }
 
-/* ================= موبایل ================= */
+/* =====================================================================
+   واکنشگرایی
+   ===================================================================== */
+@media (max-width: 1024px) {
+	body .user-chip {
+		max-width: 210px;
+	}
+}
+
 @media (max-width: 760px) {
 	:root {
-		--fs-page-title: 23px;
+		--fs-page-title: 22px;
 		--fs-section-title: 18px;
 		--fs-card-title: 16px;
 		--fs-body: 14.5px;
 		--topbar-h: 60px;
 	}
 
-	/* صرفه‌جویی در باتری: انیمیشن شناور در موبایل خاموش است. */
-	body .bgc__image,
-	body .bgc__placeholder {
-		animation: none;
-		will-change: auto;
+	body .card,
+	body .stat {
+		padding: var(--space-4);
+		border-radius: var(--radius-md);
+	}
+
+	body .user-chip {
+		border: none;
+		background: transparent;
+		padding: 0;
+		max-width: none;
+	}
+
+	body .icon-btn {
+		width: 40px;
+		height: 40px;
+	}
+
+	*::-webkit-scrollbar {
+		width: 6px;
+		height: 6px;
 	}
 }
