@@ -86,16 +86,17 @@
 	transform: rotate(180deg);
 }
 
-/* ---------------------------- منوی باز ---------------------------- */
+/* ---------------------------- منوی باز ----------------------------
+ * منو با Portal مستقیماً زیر <body> قرار می‌گیرد و موقعیتش fixed است؛
+ * پس هیچ کارت، هدر چسبان، مودال یا المان دارای transform نمی‌تواند روی آن بیفتد.
+ * مختصات (left/top/width/max-height) از طریق style درجای تعیین می‌شود.
+ */
 .cselect__menu {
-	position: absolute;
-	inset-inline: 0;
-	top: calc(100% + 8px);
-	z-index: 70;
+	position: fixed;
+	z-index: 2147483000;
 	margin: 0;
 	padding: 6px;
 	list-style: none;
-	max-height: 288px;
 	overflow-y: auto;
 	overscroll-behavior: contain;
 	border-radius: 20px;
@@ -106,11 +107,12 @@
 		0 6px 18px -16px rgba(15, 12, 30, 0.45);
 	animation: cselect-in 170ms var(--ease-out, ease-out) both;
 	scrollbar-width: thin;
+	/* لایه مستقل ترسیم؛ مانع قرار گرفتن زیر لایه‌های دیگر می‌شود. */
+	isolation: isolate;
+	font-family: inherit;
 }
 
 .cselect__menu--up {
-	top: auto;
-	bottom: calc(100% + 8px);
 	animation-name: cselect-in-up;
 }
 
