@@ -39,6 +39,9 @@ export type IconName =
 	| "leaf"
 	| "message"
 	| "image"
+	| "chevron"
+	| "head"
+	| "chart"
 
 const PATHS: Record<IconName, ReactNode> = {
 	home: <path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z" />,
@@ -192,6 +195,19 @@ const PATHS: Record<IconName, ReactNode> = {
 			<rect x="3.5" y="5" width="17" height="14" rx="2.5" />
 			<circle cx="9" cy="10" r="1.6" />
 			<path d="m4.5 17 4.5-4 3.5 3 3-2.5 4 3.5" />
+		</>
+	),
+	chevron: <path d="m6 9.5 6 6 6-6" />,
+	head: (
+		<>
+			<path d="M12 4.5a6.5 6.5 0 0 1 6.5 6.5c0 2.2-1 3.6-2 4.6-.7.7-1 1.3-1 2.2V19a1.5 1.5 0 0 1-1.5 1.5h-4A1.5 1.5 0 0 1 8.5 19v-1.2c0-.9-.3-1.5-1-2.2-1-1-2-2.4-2-4.6A6.5 6.5 0 0 1 12 4.5z" />
+			<path d="M9.5 20.5h5" />
+		</>
+	),
+	chart: (
+		<>
+			<path d="M4 19h16" />
+			<path d="M5 15c3-.5 4.5-4 7-5.5S17 7.5 19 6" />
 		</>
 	),
 }
