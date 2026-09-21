@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom"
 import { Badge, Card, EmptyState, Grid, PageHeader, Stat } from "../../shared/components/ui"
 import { BabyGrowthCard } from "../../components/BabyGrowthCard/BabyGrowthCard"
+import { PregnancyGrowthChart } from "../../components/GrowthChart/PregnancyGrowthChart"
 import { CareSummary } from "../care/CareSummary"
 import { useMotherContext } from "./useMotherContext"
 import {
@@ -68,6 +69,8 @@ export function MotherDashboard() {
 			</Grid>
 
 			{gest && <BabyGrowthCard week={gest.weeks} />}
+
+			{gest && <PregnancyGrowthChart week={gest.weeks} />}
 
 			<CareSummary />
 
