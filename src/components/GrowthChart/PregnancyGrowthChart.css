@@ -1,0 +1,161 @@
+/* کارت «نمودار رشد کوچولو» — ملایم، بنفش/صورتی، بدون حس داشبورد فنی. */
+
+.pgc {
+	display: flex;
+	flex-direction: column;
+	gap: var(--space-4, 18px);
+	padding: clamp(18px, 3vw, 26px);
+	border-radius: var(--radius-xl, 26px);
+	border: 1px solid var(--primary-border);
+	background:
+		radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 55%),
+		var(--surface);
+	box-shadow: 0 26px 48px -40px color-mix(in srgb, var(--primary) 70%, transparent);
+	min-width: 0;
+}
+
+.pgc__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: var(--space-3, 14px);
+	flex-wrap: wrap;
+}
+
+.pgc__titles {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
+
+.pgc__title {
+	margin: 0;
+	font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+	font-weight: 800;
+	color: var(--text);
+}
+
+.pgc__subtitle {
+	margin: 0;
+	font-size: var(--fs-secondary, 0.9rem);
+	color: var(--text-soft);
+}
+
+.pgc__cards {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 12px;
+}
+
+.pgc__card {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	text-align: right;
+	padding: 14px;
+	border-radius: 20px;
+	border: 1px solid color-mix(in srgb, var(--primary-border) 70%, transparent);
+	background: color-mix(in srgb, var(--accent) 16%, var(--surface));
+	cursor: pointer;
+	font: inherit;
+	color: var(--text);
+	transition:
+		border-color 180ms var(--ease-soft, ease),
+		background-color 180ms var(--ease-soft, ease),
+		transform 180ms var(--ease-out, ease-out);
+	min-width: 0;
+}
+
+.pgc__card:hover {
+	transform: translateY(-2px);
+	border-color: var(--primary-border);
+}
+
+.pgc__card:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 26%, transparent);
+}
+
+.pgc__card.is-active {
+	border-color: color-mix(in srgb, var(--primary) 55%, transparent);
+	background: color-mix(in srgb, var(--primary) 12%, var(--surface));
+}
+
+.pgc__card-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	flex: 0 0 auto;
+	border-radius: 14px;
+	background: var(--gradient-primary);
+	color: #fff;
+}
+
+.pgc__card-body {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.pgc__card-label {
+	font-size: var(--fs-meta, 0.78rem);
+	color: var(--muted);
+}
+
+.pgc__card-value {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 5px;
+	font-size: 1.15rem;
+	font-weight: 800;
+	color: var(--primary-strong);
+}
+
+.pgc__card-unit {
+	font-size: var(--fs-meta, 0.78rem);
+	font-weight: 600;
+	color: var(--text-soft);
+}
+
+.pgc__card-desc {
+	font-size: var(--fs-meta, 0.78rem);
+	color: var(--text-soft);
+	line-height: var(--lh-body, 1.7);
+}
+
+.pgc__notice,
+.pgc__disclaimer {
+	margin: 0;
+	font-size: var(--fs-meta, 0.78rem);
+	color: var(--muted);
+	line-height: var(--lh-body, 1.7);
+}
+
+.pgc__notice {
+	padding: 22px;
+	text-align: center;
+	border-radius: 20px;
+	border: 1px dashed var(--primary-border);
+	background: color-mix(in srgb, var(--surface-2) 60%, transparent);
+}
+
+@media (max-width: 760px) {
+	.pgc__cards {
+		grid-template-columns: 1fr;
+	}
+
+	.pgc__head {
+		align-items: stretch;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pgc__card {
+		transition: none;
+		transform: none;
+	}
+}
