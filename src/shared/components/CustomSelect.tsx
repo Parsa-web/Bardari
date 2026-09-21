@@ -1,4 +1,5 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react"
+import { createPortal } from "react-dom"
 import { Icon } from "./icons"
 import "./CustomSelect.css"
 
@@ -6,6 +7,10 @@ import "./CustomSelect.css"
  * دراپ‌داون سفارشی و قابل استفاده دوباره.
  * جایگزین کامل منوی پیش‌فرض مرورگر است: راست‌به‌چپ، تم روشن/تاریک،
  * پیمایش کامل با صفحه‌کلید و الگوی دسترسی‌پذیر combobox/listbox.
+ *
+ * مهم: منو با Portal مستقیماً زیر <body> رندر می‌شود و موقعیتش fixed است؛
+ * بنابراین هیچ کارت، هدر چسبان، overflow:hidden یا transform والدی
+ * نمی‌تواند آن را ببرد زیر لایه‌های دیگر یا ببردد.
  */
 export type SelectOption = {
 	value: string
@@ -26,6 +31,18 @@ export type CustomSelectProps = {
 	emptyText?: string
 }
 
+type MenuPosition = {
+	left: number
+	width: number
+	top: number
+	maxHeight: number
+	up: boolean
+}
+
+const GAP = 8
+const MIN_SPACE = 180
+const MAX_MENU_HEIGHT = 288
+
 export function CustomSelect({
 	value,
 	onChange,
@@ -39,11 +56,10 @@ export function CustomSelect({
 }: CustomSelectProps) {
 	const [open, setOpen] = useState(false)
 	const [activeIndex, setActiveIndex] = useState(-1)
-	const [dropUp, setDropUp] = useState(false)
-	const rootRef = useRef<HTMLDivElement | null>(null)
+	const [position, setPosition] = useState<MenuPosition | null>(null)
 	const buttonRef = useRef<HTMLButtonElement | null>(null)
 	const listRef = useRef<HTMLUListElement | null>(null)
-	const listId = useId()
+	const listId = useId().replace(/:/g, "")
 
 	const selectedIndex = useMemo(
 		() => options.findIndex((option) => option.value === value),
@@ -51,22 +67,55 @@ export function CustomSelect({
 	)
 	const selected = selectedIndex >= 0 ? options[selectedIndex] : undefined
 
-	/* بستن منو با کلیک بیرون، اسکرول صفحه یا تغییر اندازه */
+	/** محاسبه محل قرارگیری منو نسبت به دکمه (مختصات viewport). */
+	const measure = useCallback(() => {
+		const rect = buttonRef.current?.getBoundingClientRect()
+		if (!rect) return
+		const spaceBelow = window.innerHeight - rect.bottom - GAP
+		const spaceAbove = rect.top - GAP
+		const up = spaceBelow < MIN_SPACE && spaceAbove > spaceBelow
+		const available = Math.max(140, Math.min(MAX_MENU_HEIGHT, up ? spaceAbove : spaceBelow))
+		setPosition({
+			left: Math.round(rect.left),
+			width: Math.round(rect.width),
+			top: Math.round(up ? rect.top - GAP : rect.bottom + GAP),
+			maxHeight: Math.round(available),
+			up,
+		})
+	}, [])
+
+	useLayoutEffect(() => {
+		if (!open) return
+		measure()
+	}, [open, measure, options.length])
+
+	/* همگام‌سازی موقعیت با اسکرول/تغییر اندازه و بستن با کلیک بیرون */
 	useEffect(() => {
 		if (!open) return
-		const close = () => setOpen(false)
 		const onPointerDown = (event: PointerEvent) => {
-			if (!rootRef.current?.contains(event.target as Node)) setOpen(false)
+			const target = event.target as Node
+			if (buttonRef.current?.contains(target)) return
+			if (listRef.current?.contains(target)) return
+			setOpen(false)
 		}
-		document.addEventListener("pointerdown", onPointerDown)
-		window.addEventListener("resize", close)
-		window.addEventListener("scroll", close, true)
+		const onScrollOrResize = () => {
+			const rect = buttonRef.current?.getBoundingClientRect()
+			/* اگر دکمه از صفحه خارج شد، منو بسته می‌شود؛ وگرنه دنبالش می‌آید. */
+			if (!rect || rect.bottom < 0 || rect.top > window.innerHeight) {
+				setOpen(false)
+				return
+			}
+			measure()
+		}
+		document.addEventListener("pointerdown", onPointerDown, true)
+		window.addEventListener("resize", onScrollOrResize)
+		window.addEventListener("scroll", onScrollOrResize, true)
 		return () => {
-			document.removeEventListener("pointerdown", onPointerDown)
-			window.removeEventListener("resize", close)
-			window.removeEventListener("scroll", close, true)
+			document.removeEventListener("pointerdown", onPointerDown, true)
+			window.removeEventListener("resize", onScrollOrResize)
+			window.removeEventListener("scroll", onScrollOrResize, true)
 		}
-	}, [open])
+	}, [open, measure])
 
 	/* نگه‌داشتن گزینه فعال در محدوده دید */
 	useEffect(() => {
@@ -90,11 +139,7 @@ export function CustomSelect({
 
 	const openMenu = (startIndex?: number) => {
 		if (disabled) return
-		const rect = buttonRef.current?.getBoundingClientRect()
-		if (rect) {
-			const spaceBelow = window.innerHeight - rect.bottom
-			setDropUp(spaceBelow < 260 && rect.top > spaceBelow)
-		}
+		measure()
 		setActiveIndex(startIndex ?? (selectedIndex >= 0 ? selectedIndex : firstEnabled()))
 		setOpen(true)
 	}
@@ -165,8 +210,65 @@ export function CustomSelect({
 		.filter(Boolean)
 		.join(" ")
 
+	const menu =
+		open && position && typeof document !== "undefined"
+			? createPortal(
+					<ul
+						ref={listRef}
+						id={listId}
+						className={`cselect__menu${position.up ? " cselect__menu--up" : ""}`}
+						role="listbox"
+						dir="rtl"
+						aria-label={label}
+						style={{
+							left: position.left,
+							width: position.width,
+							top: position.up ? undefined : position.top,
+							bottom: position.up ? window.innerHeight - position.top : undefined,
+							maxHeight: position.maxHeight,
+						}}
+					>
+						{options.length === 0 && <li className="cselect__empty">{emptyText}</li>}
+						{options.map((option, index) => {
+							const isSelected = option.value === value
+							const itemClasses = [
+								"cselect__option",
+								isSelected ? "is-selected" : "",
+								index === activeIndex ? "is-active" : "",
+								option.disabled ? "is-disabled" : "",
+							]
+								.filter(Boolean)
+								.join(" ")
+							return (
+								<li
+									key={option.value}
+									id={`${listId}-${index}`}
+									className={itemClasses}
+									role="option"
+									aria-selected={isSelected}
+									aria-disabled={option.disabled || undefined}
+									onMouseEnter={() => !option.disabled && setActiveIndex(index)}
+									onClick={() => commit(index)}
+								>
+									<span className="cselect__option-text">
+										<span className="cselect__option-label">{option.label}</span>
+										{option.hint && <span className="cselect__option-hint">{option.hint}</span>}
+									</span>
+									{isSelected && (
+										<span className="cselect__check" aria-hidden="true">
+											<Icon name="check" size={16} />
+										</span>
+									)}
+								</li>
+							)
+						})}
+					</ul>,
+					document.body,
+				)
+			: null
+
 	return (
-		<div className={classes} ref={rootRef}>
+		<div className={classes}>
 			<button
 				ref={buttonRef}
 				type="button"
@@ -174,7 +276,7 @@ export function CustomSelect({
 				role="combobox"
 				aria-haspopup="listbox"
 				aria-expanded={open}
-				aria-controls={listId}
+				aria-controls={open ? listId : undefined}
 				aria-label={label}
 				aria-invalid={invalid || undefined}
 				aria-activedescendant={open && activeIndex >= 0 ? `${listId}-${activeIndex}` : undefined}
@@ -189,51 +291,7 @@ export function CustomSelect({
 					<Icon name="chevron" size={18} />
 				</span>
 			</button>
-
-			{open && (
-				<ul
-					ref={listRef}
-					id={listId}
-					className={`cselect__menu${dropUp ? " cselect__menu--up" : ""}`}
-					role="listbox"
-					aria-label={label}
-				>
-					{options.length === 0 && <li className="cselect__empty">{emptyText}</li>}
-					{options.map((option, index) => {
-						const isSelected = option.value === value
-						const itemClasses = [
-							"cselect__option",
-							isSelected ? "is-selected" : "",
-							index === activeIndex ? "is-active" : "",
-							option.disabled ? "is-disabled" : "",
-						]
-							.filter(Boolean)
-							.join(" ")
-						return (
-							<li
-								key={option.value}
-								id={`${listId}-${index}`}
-								className={itemClasses}
-								role="option"
-								aria-selected={isSelected}
-								aria-disabled={option.disabled || undefined}
-								onMouseEnter={() => !option.disabled && setActiveIndex(index)}
-								onClick={() => commit(index)}
-							>
-								<span className="cselect__option-text">
-									<span className="cselect__option-label">{option.label}</span>
-									{option.hint && <span className="cselect__option-hint">{option.hint}</span>}
-								</span>
-								{isSelected && (
-									<span className="cselect__check" aria-hidden="true">
-										<Icon name="check" size={16} />
-									</span>
-								)}
-							</li>
-						)
-					})}
-				</ul>
-			)}
+			{menu}
 		</div>
 	)
 }
