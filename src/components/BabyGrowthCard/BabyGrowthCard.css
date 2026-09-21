@@ -136,6 +136,7 @@
 	grid-column: 1 / -1;
 }
 
+/* جایگاه آیکن خطی (SVG)، نه ایموجی */
 .bgc__fact-icon {
 	display: inline-flex;
 	align-items: center;
@@ -144,8 +145,7 @@
 	height: 38px;
 	flex: 0 0 38px;
 	border-radius: 50%;
-	font-size: 1.05rem;
-	line-height: 1;
+	color: var(--primary-strong);
 	background: color-mix(in srgb, var(--accent) 22%, transparent);
 }
 
@@ -242,7 +242,10 @@
 	animation: bgc-soft-in 480ms var(--ease-out, ease-out) both;
 }
 
+/* تصویر همیشه روی اسکلت بارگذاری قرار می‌گیرد تا هیچ‌وقت پشت آن گم نشود. */
 .bgc__image {
+	position: relative;
+	z-index: 1;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
@@ -251,8 +254,8 @@
 	opacity: 0;
 	transform: scale(0.985);
 	transition:
-		opacity 420ms var(--ease-out, ease-out),
-		transform 420ms var(--ease-out, ease-out);
+		opacity 320ms var(--ease-out, ease-out),
+		transform 320ms var(--ease-out, ease-out);
 }
 
 .bgc__image.is-ready {
@@ -263,6 +266,7 @@
 .bgc__orb-skeleton {
 	position: absolute;
 	inset: 14px;
+	z-index: 0;
 	border-radius: 50%;
 	background: color-mix(in srgb, var(--surface) 70%, transparent);
 	animation: bgc-pulse 1.4s ease-in-out infinite;
@@ -270,6 +274,7 @@
 
 .bgc__orb-badge {
 	position: absolute;
+	z-index: 2;
 	inset-block-end: 10px;
 	inset-inline-start: 50%;
 	transform: translateX(50%);
@@ -285,6 +290,8 @@
 
 /* حالت نبود تصویر */
 .bgc__placeholder {
+	position: relative;
+	z-index: 1;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -300,8 +307,10 @@
 }
 
 .bgc__placeholder-icon {
-	font-size: 1.8rem;
-	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--primary-strong);
 }
 
 .bgc__placeholder-text {
@@ -325,8 +334,11 @@
 }
 
 .bgc__message-icon {
-	font-size: 1.3rem;
-	line-height: 1.4;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-top: 2px;
+	color: var(--primary-strong);
 }
 
 .bgc__message-body {
