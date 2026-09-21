@@ -11,6 +11,14 @@ import { toFa } from "../../shared/utils/date"
 import "./BabyGrowthCard.css"
 
 /**
+ * مسیر تصویر هر هفته.
+ * فایل‌های 1..40 از ریشه مخزن در زمان بیلد به public path «weeks/<week>.jpg» کپی می‌شوند.
+ */
+function weekImageUrl(week: number) {
+	return `${import.meta.env.BASE_URL}weeks/${week}.jpg`
+}
+
+/**
  * کارت «سفر بارداری».
  * داده‌ها از src/data/pregnancyWeeks.ts و منطق تایم‌لاین از src/services/pregnancyJourney.ts خوانده می‌شود.
  *
@@ -19,10 +27,12 @@ import "./BabyGrowthCard.css"
 export function BabyGrowthCard({ week }: { week?: number | null }) {
 	const currentWeek = typeof week === "number" ? clampPregnancyWeek(week) : null
 	const [selectedWeek, setSelectedWeek] = useState<number | null>(null)
+	const [brokenImages, setBrokenImages] = useState<Record<number, boolean>>({})
 	const activeWeek = selectedWeek ?? currentWeek ?? MIN_PREGNANCY_WEEK
 	const info = getPregnancyWeek(activeWeek)
 	const progress = pregnancyProgress(activeWeek)
 	const timeline = buildPregnancyTimeline(activeWeek, currentWeek)
+	const imageSrc = brokenImages[activeWeek] ? info?.image : weekImageUrl(activeWeek)
 
 	const goTo = (value: number) => setSelectedWeek(clampPregnancyWeek(value))
 
@@ -107,13 +117,19 @@ export function BabyGrowthCard({ week }: { week?: number | null }) {
 					/>
 				) : (
 					<>
-						{info.image ? (
-							<img
-								className="bgc__image"
-								src={info.image}
-								alt={`تصویر رشد نوزاد در هفته ${toFa(info.week)} بارداری`}
-								loading="lazy"
-							/>
+						{imageSrc ? (
+							<figure className="bgc__figure">
+								<img
+									key={activeWeek}
+									className="bgc__image"
+									src={imageSrc}
+									alt={`تصویر رشد نوزاد در هفته ${toFa(info.week)} بارداری`}
+									loading="lazy"
+									decoding="async"
+									onError={() => setBrokenImages((prev) => ({ ...prev, [activeWeek]: true }))}
+								/>
+								<figcaption className="bgc__figure-caption">{`کوچولوی شما در هفته ${toFa(info.week)}`}</figcaption>
+							</figure>
 						) : (
 							<div className="bgc__placeholder" role="img" aria-label="تصویر این هفته هنوز اضافه نشده است">
 								<span className="bgc__placeholder-icon" aria-hidden="true">

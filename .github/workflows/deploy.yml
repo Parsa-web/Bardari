@@ -26,6 +26,31 @@ jobs:
         run: npm install
       - name: Build
         run: npx vite build
+      # تصاویر هفتگی جنین (1.jfif تا 40.jfif در ریشه مخزن) به dist/weeks/<week>.jpg کپی می‌شوند.
+      # در صورت وجود ImageMagick فشرده و کوچک می‌شوند تا سایت سریع بماند.
+      - name: Prepare weekly baby images
+        shell: bash
+        run: |
+          set -e
+          shopt -s nullglob
+          mkdir -p dist/weeks
+          count=0
+          for f in ./*.jfif ./*.jpg ./*.jpeg ./*.png ./*.webp; do
+            base="$(basename "$f")"
+            name="${base%.*}"
+            case "$name" in
+              ''|*[!0-9]*) continue ;;
+            esac
+            if [ "$name" -lt 1 ] || [ "$name" -gt 40 ]; then continue; fi
+            if command -v convert >/dev/null 2>&1; then
+              convert "$f" -auto-orient -resize '900x900>' -quality 80 "dist/weeks/$name.jpg" || cp "$f" "dist/weeks/$name.jpg"
+            else
+              cp "$f" "dist/weeks/$name.jpg"
+            fi
+            count=$((count+1))
+          done
+          echo "copied $count weekly images"
+          ls -la dist/weeks | head -n 20
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
