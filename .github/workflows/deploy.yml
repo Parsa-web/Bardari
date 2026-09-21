@@ -26,22 +26,27 @@ jobs:
         run: npm install
       - name: Build
         run: npx vite build
-      # تصاویر هفتگی جنین (1.jfif تا 40.jfif در ریشه مخزن) به dist/weeks/<week>.jpg کپی می‌شوند.
-      # در صورت وجود ImageMagick فشرده و کوچک می‌شوند تا سایت سریع بماند.
+      # تصاویر هفتگی جنین (فایل‌های عددی ۱ تا ۴۰).
+      # منبع مجاز: public/weeks/ (ترجیح) یا ریشه مخزن (سازگاری عقب).
+      # خروجی همیشه dist/weeks/<week>.jpg است تا مرورگر با jfif مشکل نداشته باشد.
       - name: Prepare weekly baby images
         shell: bash
         run: |
           set -e
           shopt -s nullglob
           mkdir -p dist/weeks
+          # حذف نسخه‌های jfif که Vite ممکن است از public کپی کرده باشد
+          rm -f dist/weeks/*.jfif
           count=0
-          for f in ./*.jfif ./*.jpg ./*.jpeg ./*.png ./*.webp; do
+          for f in public/weeks/* ./*.jfif ./*.jpg ./*.jpeg ./*.png ./*.webp; do
+            [ -f "$f" ] || continue
             base="$(basename "$f")"
             name="${base%.*}"
             case "$name" in
               ''|*[!0-9]*) continue ;;
             esac
             if [ "$name" -lt 1 ] || [ "$name" -gt 40 ]; then continue; fi
+            [ -f "dist/weeks/$name.jpg" ] && continue
             if command -v convert >/dev/null 2>&1; then
               convert "$f" -auto-orient -resize '900x900>' -quality 80 "dist/weeks/$name.jpg" || cp "$f" "dist/weeks/$name.jpg"
             else
@@ -49,7 +54,7 @@ jobs:
             fi
             count=$((count+1))
           done
-          echo "copied $count weekly images"
+          echo "prepared $count weekly images"
           ls -la dist/weeks | head -n 20
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
