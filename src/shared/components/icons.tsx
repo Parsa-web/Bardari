@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 
 /**
  * مجموعه آیکن خطی هماهنگ (ضخامت ۱٫۶، اندازه ۲۰) برای تمام رابط کاربری.
+ * در سراسر برنامه فقط از این آیکن‌ها استفاده می‌شود و هیچ ایموجی‌ای به‌عنوان آیکن به کار نمی‌رود.
  * در RTL هم درست دیده می‌شوند؛ آیکن‌های جهت‌دار با پرچم dir معکوس می‌شوند.
  */
 export type IconName =
@@ -33,6 +34,11 @@ export type IconName =
 	| "heart"
 	| "inbox"
 	| "back"
+	| "ruler"
+	| "weight"
+	| "leaf"
+	| "message"
+	| "image"
 
 const PATHS: Record<IconName, ReactNode> = {
 	home: <path d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4v-6H9v6H5a1 1 0 0 1-1-1z" />,
@@ -157,6 +163,37 @@ const PATHS: Record<IconName, ReactNode> = {
 		</>
 	),
 	back: <path d="M9.5 5 16 12l-6.5 7" />,
+	ruler: (
+		<>
+			<rect x="2.8" y="8.5" width="18.4" height="7" rx="1.8" />
+			<path d="M7 8.5v3M11 8.5v4M15 8.5v3M19 8.5v4" />
+		</>
+	),
+	weight: (
+		<>
+			<path d="M5.6 8h12.8l1.6 11a1.5 1.5 0 0 1-1.5 1.7H5.5A1.5 1.5 0 0 1 4 19z" />
+			<circle cx="12" cy="6" r="2.4" />
+		</>
+	),
+	leaf: (
+		<>
+			<path d="M5 19c-1.5-6 2.5-11 14-11 0 8-4.5 12-10.5 11.4" />
+			<path d="M5 19c3-3.5 6-5.6 9.5-7" />
+		</>
+	),
+	message: (
+		<>
+			<rect x="3.5" y="5.5" width="17" height="13" rx="2.5" />
+			<path d="m4.5 8 7.5 5 7.5-5" />
+		</>
+	),
+	image: (
+		<>
+			<rect x="3.5" y="5" width="17" height="14" rx="2.5" />
+			<circle cx="9" cy="10" r="1.6" />
+			<path d="m4.5 17 4.5-4 3.5 3 3-2.5 4 3.5" />
+		</>
+	),
 }
 
 /** آیکن‌های جهت‌دار باید در چیدمان راست‌به‌چپ قرینه شوند. */
