@@ -1,0 +1,223 @@
+/* استایل دراپ‌داون سفارشی. فقط از توکن‌های تم استفاده می‌کند تا در روشن/تاریک هماهنگ بماند. */
+
+.cselect {
+	position: relative;
+	width: 100%;
+	min-width: 0;
+}
+
+.cselect--inline {
+	width: auto;
+	min-width: 190px;
+}
+
+/* --------------------------- حالت بسته --------------------------- */
+.cselect__control {
+	width: 100%;
+	min-height: 52px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 0 18px;
+	border-radius: 18px;
+	border: 1px solid var(--border);
+	background: var(--surface);
+	color: var(--text);
+	font: inherit;
+	font-size: 1rem;
+	line-height: 1.6;
+	text-align: start;
+	cursor: pointer;
+	transition:
+		border-color 180ms var(--ease-soft, ease),
+		box-shadow 180ms var(--ease-soft, ease),
+		background-color 180ms var(--ease-soft, ease);
+}
+
+.cselect__control:hover:not(:disabled) {
+	border-color: var(--primary-border);
+	background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+}
+
+.cselect__control:focus-visible {
+	outline: none;
+	border-color: var(--primary);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.cselect.is-open .cselect__control {
+	border-color: var(--primary);
+	box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+
+.cselect.is-invalid .cselect__control {
+	border-color: var(--danger, #e11d48);
+}
+
+.cselect.is-disabled .cselect__control,
+.cselect__control:disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.cselect__value {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.cselect__value--placeholder {
+	color: var(--muted);
+}
+
+.cselect__arrow {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+	color: var(--primary-strong);
+	transition: transform 200ms var(--ease-out, ease-out);
+}
+
+.cselect.is-open .cselect__arrow {
+	transform: rotate(180deg);
+}
+
+/* ---------------------------- منوی باز ---------------------------- */
+.cselect__menu {
+	position: absolute;
+	inset-inline: 0;
+	top: calc(100% + 8px);
+	z-index: 70;
+	margin: 0;
+	padding: 6px;
+	list-style: none;
+	max-height: 288px;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	border-radius: 20px;
+	border: 1px solid var(--primary-border);
+	background: var(--surface);
+	box-shadow:
+		0 26px 50px -28px color-mix(in srgb, var(--primary) 70%, transparent),
+		0 6px 18px -16px rgba(15, 12, 30, 0.45);
+	animation: cselect-in 170ms var(--ease-out, ease-out) both;
+	scrollbar-width: thin;
+}
+
+.cselect__menu--up {
+	top: auto;
+	bottom: calc(100% + 8px);
+	animation-name: cselect-in-up;
+}
+
+.cselect__option {
+	min-height: 46px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding: 8px 14px;
+	border-radius: 14px;
+	cursor: pointer;
+	color: var(--text);
+	font-size: 0.97rem;
+	transition:
+		background-color 140ms var(--ease-soft, ease),
+		color 140ms var(--ease-soft, ease);
+}
+
+.cselect__option + .cselect__option {
+	margin-top: 2px;
+}
+
+.cselect__option.is-active {
+	background: color-mix(in srgb, var(--accent) 26%, transparent);
+	color: var(--text);
+}
+
+.cselect__option.is-selected {
+	background: var(--gradient-primary);
+	color: #fff;
+	font-weight: 700;
+}
+
+.cselect__option.is-selected.is-active {
+	filter: brightness(1.04);
+}
+
+.cselect__option.is-disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.cselect__option-text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.cselect__option-label {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.cselect__option-hint {
+	font-size: var(--fs-meta, 0.8rem);
+	color: var(--muted);
+}
+
+.cselect__option.is-selected .cselect__option-hint {
+	color: color-mix(in srgb, #fff 80%, transparent);
+}
+
+.cselect__check {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: 0 0 auto;
+}
+
+.cselect__empty {
+	padding: 14px;
+	text-align: center;
+	color: var(--muted);
+	font-size: var(--fs-meta, 0.8rem);
+}
+
+@keyframes cselect-in {
+	from {
+		opacity: 0;
+		transform: translateY(-6px) scale(0.985);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@keyframes cselect-in-up {
+	from {
+		opacity: 0;
+		transform: translateY(6px) scale(0.985);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.cselect__menu {
+		animation: none;
+	}
+
+	.cselect__arrow {
+		transition: none;
+	}
+}
