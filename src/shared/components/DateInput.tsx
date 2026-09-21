@@ -7,10 +7,13 @@ import {
 	todayJalali,
 } from "../utils/jalali"
 import { formatDateLong, toFa } from "../utils/date"
+import { CustomSelect } from "./CustomSelect"
+import type { SelectOption } from "./CustomSelect"
 
 /**
  * ورودی تاریخ شمسی.
  * مقدار بیرونی همیشه ISO میلادی (YYYY-MM-DD) است؛ کاربر فقط شمسی می‌بیند و شمسی وارد می‌کند.
+ * هر سه انتخابگر از دراپ‌داون سفارشی (Portal + fixed) استفاده می‌کنند؛ پس هیچ‌گاه زیر لایه‌های دیگر نمی‌روند.
  */
 type Draft = { y: string; m: string; d: string }
 
@@ -49,13 +52,22 @@ export function JalaliDateInput({
 		})
 	}, [value])
 
-	const years: number[] = []
-	for (let year = today.jy + yearsAhead; year >= today.jy - yearsBack; year -= 1) years.push(year)
+	const yearOptions: SelectOption[] = []
+	for (let year = today.jy + yearsAhead; year >= today.jy - yearsBack; year -= 1) {
+		yearOptions.push({ value: String(year), label: toFa(year) })
+	}
 
 	const monthLength =
 		draft.y && draft.m ? jalaliMonthLength(Number(draft.y), Number(draft.m)) : 31
-	const days: number[] = []
-	for (let day = 1; day <= monthLength; day += 1) days.push(day)
+	const dayOptions: SelectOption[] = []
+	for (let day = 1; day <= monthLength; day += 1) {
+		dayOptions.push({ value: String(day), label: toFa(day) })
+	}
+
+	const monthOptions: SelectOption[] = JALALI_MONTHS.map((name, index) => ({
+		value: String(index + 1),
+		label: name,
+	}))
 
 	const apply = (next: Draft) => {
 		let fixed = next
@@ -72,53 +84,36 @@ export function JalaliDateInput({
 		}
 	}
 
-	const selectClass = `input input--select${invalid ? " input--invalid" : ""}`
-
 	return (
 		<span className="datefield">
 			<span className="datefield__row">
-				<select
-					className={selectClass}
-					aria-label="روز"
+				<CustomSelect
+					label="روز"
+					placeholder="روز"
 					disabled={disabled}
+					invalid={invalid}
 					value={draft.d}
-					onChange={(event) => apply({ ...draft, d: event.target.value })}
-				>
-					<option value="">روز</option>
-					{days.map((day) => (
-						<option key={day} value={String(day)}>
-							{toFa(day)}
-						</option>
-					))}
-				</select>
-				<select
-					className={selectClass}
-					aria-label="ماه"
+					options={dayOptions}
+					onChange={(next) => apply({ ...draft, d: next })}
+				/>
+				<CustomSelect
+					label="ماه"
+					placeholder="ماه"
 					disabled={disabled}
+					invalid={invalid}
 					value={draft.m}
-					onChange={(event) => apply({ ...draft, m: event.target.value })}
-				>
-					<option value="">ماه</option>
-					{JALALI_MONTHS.map((name, index) => (
-						<option key={name} value={String(index + 1)}>
-							{name}
-						</option>
-					))}
-				</select>
-				<select
-					className={selectClass}
-					aria-label="سال"
+					options={monthOptions}
+					onChange={(next) => apply({ ...draft, m: next })}
+				/>
+				<CustomSelect
+					label="سال"
+					placeholder="سال"
 					disabled={disabled}
+					invalid={invalid}
 					value={draft.y}
-					onChange={(event) => apply({ ...draft, y: event.target.value })}
-				>
-					<option value="">سال</option>
-					{years.map((year) => (
-						<option key={year} value={String(year)}>
-							{toFa(year)}
-						</option>
-					))}
-				</select>
+					options={yearOptions}
+					onChange={(next) => apply({ ...draft, y: next })}
+				/>
 			</span>
 			{showPreview && value && (
 				<span className="datefield__preview">{formatDateLong(value)}</span>
