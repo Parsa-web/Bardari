@@ -1,16 +1,32 @@
 /**
- * فهرست نمایشی ماماها و پزشکان سامانه و ماما مسئول هر مادر.
- * این فایل فقط داده است و هیچ منطق UI ندارد.
+ * دفترچه واحد کادر درمان (ماما و متخصص).
+ *
+ * منبع یکتا: db.providers در AppDatabase.
+ * هیچ فهرست موازی ماما/پزشک در این فایل نگهداری نمی‌شود و ماما مسئول هر مادر
+ * فقط از mother.careTeam.midwifeId خوانده می‌شود.
  */
 
-export type CareProviderRole = "midwife" | "doctor"
+import type { AppDatabase, CareProvider } from "../shared/types/domain"
+
+export type CareProviderRole = CareProvider["role"]
 
 export const CARE_PROVIDER_ROLE_LABELS: Record<CareProviderRole, string> = {
 	midwife: "ماما",
-	doctor: "پزشک",
+	specialist: "پزشک متخصص",
 }
 
-export type CareProvider = {
+/**
+ * شماره تماس نمایشی تا زمان اتصال به بک‌اند.
+ * کلید آن شناسه پایدار ارائه‌دهنده است، نه نام او.
+ */
+const PROVIDER_PHONES: Record<string, string> = {
+	mw_1: "۰۹۱۳۰۰۰۰۰۰۱",
+	sp_1: "۰۹۱۳۰۰۰۰۰۰۲",
+	sp_2: "۰۹۱۳۰۰۰۰۰۰۳",
+}
+
+/** نمای نمایشی ارائه‌دهنده؛ رکوردها همیشه با شناسه به او وصل می‌شوند. */
+export type ProviderView = {
 	id: string
 	name: string
 	role: CareProviderRole
@@ -19,81 +35,48 @@ export type CareProvider = {
 	phone: string
 }
 
-export const CARE_PROVIDERS: ReadonlyArray<CareProvider> = [
-	{
-		id: "prv-midwife-1",
-		name: "مریم رضایی",
-		role: "midwife",
-		specialty: "مراقبت دوران بارداری",
-		clinic: "مرکز بهداشت شماره ۲",
-		phone: "۰۹۱۳۰۰۰۰۰۰۱",
-	},
-	{
-		id: "prv-midwife-2",
-		name: "سمیه کریمی",
-		role: "midwife",
-		specialty: "آموزش زایمان و شیردهی",
-		clinic: "درمانگاه مهر",
-		phone: "۰۹۱۳۰۰۰۰۰۰۴",
-	},
-	{
-		id: "prv-midwife-3",
-		name: "زهرا موسوی",
-		role: "midwife",
-		specialty: "مراقبت پس از زایمان",
-		clinic: "مرکز بهداشت شماره ۵",
-		phone: "۰۹۱۳۰۰۰۰۰۰۵",
-	},
-	{
-		id: "prv-doctor-1",
-		name: "دکتر نازنین حسینی",
-		role: "doctor",
-		specialty: "زنان و زایمان",
-		clinic: "کلینیک تخصصی امید",
-		phone: "۰۹۱۳۰۰۰۰۰۰۲",
-	},
-	{
-		id: "prv-doctor-2",
-		name: "دکتر امیر صادقی",
-		role: "doctor",
-		specialty: "پریناتولوژی (بارداری پرخطر)",
-		clinic: "بیمارستان مادر و کودک",
-		phone: "۰۹۱۳۰۰۰۰۰۰۳",
-	},
-	{
-		id: "prv-doctor-3",
-		name: "دکتر شیما بهرامی",
-		role: "doctor",
-		specialty: "کودکان و نوزادان",
-		clinic: "کلینیک کودکان بهار",
-		phone: "۰۹۱۳۰۰۰۰۰۰۶",
-	},
-]
-
-/** ماما مسئول پیش‌فرض برای مادرانی که تخصیص اختصاصی ندارند. */
-export const DEFAULT_ASSIGNED_MIDWIFE_ID = "prv-midwife-1"
-
-/** تخصیص ماما بر اساس شناسه مادر (Mother: { id, assignedMidwifeId }). */
-export const ASSIGNED_MIDWIFE_BY_MOTHER: Record<string, string> = {
-	"mother-2": "prv-midwife-2",
-	"mother-3": "prv-midwife-3",
+function toView(provider: CareProvider): ProviderView {
+	return {
+		id: provider.id,
+		name: provider.name,
+		role: provider.role,
+		specialty: provider.specialty ?? CARE_PROVIDER_ROLE_LABELS[provider.role],
+		clinic: provider.center ?? "ثبت نشده",
+		phone: PROVIDER_PHONES[provider.id] ?? "ثبت نشده",
+	}
 }
 
-export function getCareProvider(id: string): CareProvider | null {
-	return CARE_PROVIDERS.find((provider) => provider.id === id) ?? null
+export function listProviders(db: AppDatabase, role?: CareProviderRole): ProviderView[] {
+	return db.providers.filter((provider) => (role ? provider.role === role : true)).map(toView)
 }
 
-export function getCareProviderName(id: string): string {
-	return getCareProvider(id)?.name ?? "—"
+export function getProviderView(db: AppDatabase, providerId?: string | null): ProviderView | null {
+	if (!providerId) return null
+	const found = db.providers.find((provider) => provider.id === providerId)
+	return found ? toView(found) : null
 }
 
-/** شناسه ماما مسئول یک مادر. */
-export function getAssignedMidwifeId(motherId: string): string {
-	return ASSIGNED_MIDWIFE_BY_MOTHER[motherId] ?? DEFAULT_ASSIGNED_MIDWIFE_ID
+export function providerDisplayName(db: AppDatabase, providerId?: string | null): string {
+	return getProviderView(db, providerId)?.name ?? "ثبت نشده"
 }
 
-export function careProviderOptions(role?: CareProviderRole): Array<{ value: string; label: string }> {
-	return CARE_PROVIDERS.filter((provider) => (role ? provider.role === role : true)).map((provider) => ({
+/** ماما مسئول مادر؛ تنها منبع آن careTeam.midwifeId است. */
+export function getAssignedMidwifeId(db: AppDatabase, motherId: string): string | null {
+	return db.mothers.find((mother) => mother.id === motherId)?.careTeam.midwifeId ?? null
+}
+
+/** متخصص مرتبط با مادر (اولین متخصص تیم مراقبت). */
+export function getPrimarySpecialistId(db: AppDatabase, motherId: string): string | null {
+	const mother = db.mothers.find((item) => item.id === motherId)
+	if (mother && mother.careTeam.specialistIds.length > 0) return mother.careTeam.specialistIds[0]
+	return db.providers.find((provider) => provider.role === "specialist")?.id ?? null
+}
+
+export function providerOptions(
+	db: AppDatabase,
+	role?: CareProviderRole,
+): Array<{ value: string; label: string }> {
+	return listProviders(db, role).map((provider) => ({
 		value: provider.id,
 		label: `${provider.name} — ${CARE_PROVIDER_ROLE_LABELS[provider.role]} · ${provider.specialty}`,
 	}))
