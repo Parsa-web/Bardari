@@ -11,8 +11,8 @@ import {
 	TextArea,
 } from "../../shared/components/ui"
 import { JalaliDateInput } from "../../shared/components/DateInput"
-import { useMotherContext } from "../mother/useMotherContext"
-import { careActions, ownedBy, useCareState } from "./careStore"
+import { careActions, ownedBy } from "./careStore"
+import { useCare } from "./useCare"
 import type { HealthCategory, HealthSeverity } from "../../data/healthRecords"
 import {
 	HEALTH_CATEGORY_LABELS,
@@ -24,10 +24,12 @@ import {
 import { formatDateLong, todayIso } from "../../shared/utils/date"
 import "./care.css"
 
-/** ثبت وضعیت سلامت روزانه مادر به همراه خط زمانی سابقه. */
+/**
+ * ثبت وضعیت سلامت روزانه مادر.
+ * همین رکوردها (بدون کپی) در پنل مامای مسئول هم خوانده می‌شوند.
+ */
 export function HealthStatusPage() {
-	const { motherId } = useMotherContext()
-	const care = useCareState()
+	const { care, motherId, pregnancyId, assignedMidwife } = useCare()
 	const [form, setForm] = useState({
 		date: todayIso(),
 		category: "nausea" as HealthCategory,
@@ -46,6 +48,7 @@ export function HealthStatusPage() {
 		if (!form.description.trim()) return setError("توضیح وضعیت را بنویسید.")
 		careActions.addHealthRecord({
 			motherId,
+			pregnancyId,
 			date: form.date,
 			category: form.category,
 			severity: form.severity,
@@ -53,7 +56,7 @@ export function HealthStatusPage() {
 		})
 		setForm({ ...form, description: "" })
 		setError(null)
-		setNotice("وضعیت سلامت ثبت شد.")
+		setNotice("وضعیت سلامت ثبت شد و برای مامای مسئول قابل مشاهده است.")
 		return undefined
 	}
 
@@ -63,6 +66,12 @@ export function HealthStatusPage() {
 
 			{error && <Alert tone="danger">{error}</Alert>}
 			{notice && <Alert tone="success">{notice}</Alert>}
+
+			{assignedMidwife && (
+				<Alert tone="info">
+					مامای مسئول شما {assignedMidwife.name} است و همین رکوردها را در پرونده شما می‌بیند.
+				</Alert>
+			)}
 
 			<Card title="وضعیت امروز">
 				{todayRecords.length === 0 ? (
@@ -142,7 +151,11 @@ export function HealthStatusPage() {
 										<Badge tone={HEALTH_SEVERITY_TONES[item.severity]}>
 											شدت: {HEALTH_SEVERITY_LABELS[item.severity]}
 										</Badge>
-										<Button variant="ghost" size="sm" onClick={() => careActions.deleteHealthRecord(item.id)}>
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={() => careActions.deleteHealthRecord(item.id, motherId)}
+										>
 											حذف
 										</Button>
 									</span>
