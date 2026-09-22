@@ -1,30 +1,29 @@
 /**
- * داده و انواع «فعالیت روزانه» (خواب، ورزش، تغذیه، سایر).
- * دسته‌ها فقط همین چهار مورد هستند.
+ * فعالیت‌های روزانه مادر و روتین‌های تکرارشونده.
+ * فقط چهار دسته رسمی: خواب، تغذیه، ورزش، سایر.
+ * روتین فقط یک‌بار ذخیره می‌شود و نمونه روزانه از خود روتین مشتق می‌شود.
  */
 
-import { todayIso, addDays } from "../shared/utils/date"
-
-export type ActivityCategory = "sleep" | "exercise" | "nutrition" | "other"
+export type ActivityCategory = "sleep" | "nutrition" | "exercise" | "other"
 
 export const ACTIVITY_CATEGORY_LABELS: Record<ActivityCategory, string> = {
 	sleep: "خواب",
-	exercise: "ورزش",
 	nutrition: "تغذیه",
+	exercise: "ورزش",
 	other: "سایر",
 }
 
 export const ACTIVITY_CATEGORY_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
 	{ value: "sleep", label: "خواب" },
-	{ value: "exercise", label: "ورزش" },
 	{ value: "nutrition", label: "تغذیه" },
+	{ value: "exercise", label: "ورزش" },
 	{ value: "other", label: "سایر" },
 ]
 
-/** فعالیت ثبت‌شده برای یک روز مشخص. */
 export type CareActivity = {
 	id: string
 	motherId: string
+	pregnancyId: string | null
 	category: ActivityCategory
 	title: string
 	date: string
@@ -32,12 +31,15 @@ export type CareActivity = {
 	endTime: string
 	description: string
 	done: boolean
+	/** اگر از یک روتین ساخته شده باشد */
+	recurringId: string | null
+	createdAt: string
 }
 
-/** فعالیت ثابت و تکرارشونده (فعلاً تکرار روزانه). */
 export type RecurringActivity = {
 	id: string
 	motherId: string
+	pregnancyId: string | null
 	category: ActivityCategory
 	title: string
 	startTime: string
@@ -45,67 +47,61 @@ export type RecurringActivity = {
 	repeat: "daily"
 	active: boolean
 	description: string
+	createdAt: string
 }
 
-const TODAY = todayIso()
+export type ActivitySeedTemplate = {
+	key: string
+	category: ActivityCategory
+	title: string
+	dayOffset: number
+	startTime: string
+	endTime: string
+	description: string
+	done: boolean
+}
 
-export const SEED_ACTIVITIES: ReadonlyArray<CareActivity> = [
+export const ACTIVITY_SEED_TEMPLATES: ReadonlyArray<ActivitySeedTemplate> = [
 	{
-		id: "act-seed-1",
-		motherId: "*",
-		category: "exercise",
-		title: "پیاده‌روی سبک",
-		date: TODAY,
+		key: "act-1",
+		category: "nutrition",
+		title: "صبحانه کامل با لبنیات",
+		dayOffset: 0,
 		startTime: "08:00",
 		endTime: "08:30",
-		description: "پیاده‌روی بیرون از خانه",
+		description: "نان سبوس‌دار، پنیر و گردو",
 		done: true,
 	},
 	{
-		id: "act-seed-2",
-		motherId: "*",
-		category: "nutrition",
-		title: "میان‌وعده سالم",
-		date: TODAY,
-		startTime: "11:00",
-		endTime: "11:15",
-		description: "میوه و لبنیات کم‌چرب",
-		done: false,
-	},
-	{
-		id: "act-seed-3",
-		motherId: "*",
+		key: "act-2",
 		category: "sleep",
-		title: "خواب بعدازظهر",
-		date: addDays(TODAY, -1),
+		title: "خواب کوتاه بعدازظهر",
+		dayOffset: 0,
 		startTime: "14:00",
-		endTime: "15:00",
-		description: "استراحت کوتاه روزانه",
-		done: true,
+		endTime: "14:45",
+		description: "استراحت کوتاه برای کاهش خستگی",
+		done: false,
 	},
 ]
 
-export const SEED_RECURRING_ACTIVITIES: ReadonlyArray<RecurringActivity> = [
+export type RecurringSeedTemplate = {
+	key: string
+	category: ActivityCategory
+	title: string
+	startTime: string
+	endTime: string
+	description: string
+	active: boolean
+}
+
+export const RECURRING_SEED_TEMPLATES: ReadonlyArray<RecurringSeedTemplate> = [
 	{
-		id: "rec-seed-1",
-		motherId: "*",
+		key: "rec-1",
 		category: "exercise",
 		title: "پیاده‌روی روزانه",
 		startTime: "08:00",
 		endTime: "08:30",
-		repeat: "daily",
+		description: "پیاده‌روی آرام بیرون از خانه",
 		active: true,
-		description: "هر روز از ۸:۰۰ تا ۸:۳۰ پیاده‌روی بیرون از خانه",
-	},
-	{
-		id: "rec-seed-2",
-		motherId: "*",
-		category: "nutrition",
-		title: "مصرف مکمل طبق تجویز",
-		startTime: "21:00",
-		endTime: "21:05",
-		repeat: "daily",
-		active: true,
-		description: "یادآوری مصرف مکمل تجویزشده توسط ماما",
 	},
 ]
