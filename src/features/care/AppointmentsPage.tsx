@@ -8,47 +8,47 @@ import {
 	PageHeader,
 	Select,
 	TextArea,
-	TextInput,
 } from "../../shared/components/ui"
 import { JalaliDateInput } from "../../shared/components/DateInput"
+import { TimeInput } from "../../shared/components/TimeInput"
 import { CareRecordList } from "./components/CareRecordList"
 import type { CareRecordItem } from "./components/CareRecordList"
-import { useMotherContext } from "../mother/useMotherContext"
-import { careActions, ownedBy, useCareState } from "./careStore"
+import { careActions, ownedBy } from "./careStore"
+import { useCare } from "./useCare"
 import type { AppointmentType } from "../../data/appointments"
 import {
 	APPOINTMENT_STATUS_LABELS,
 	APPOINTMENT_STATUS_TONES,
 	APPOINTMENT_TYPE_LABELS,
 	APPOINTMENT_TYPE_OPTIONS,
+	isOpenAppointment,
+	motherCanCancel,
 } from "../../data/appointments"
 import {
-	CARE_PROVIDERS,
 	CARE_PROVIDER_ROLE_LABELS,
-	careProviderOptions,
-	getAssignedMidwifeId,
-	getCareProvider,
-	getCareProviderName,
+	getProviderView,
+	listProviders,
+	providerOptions,
 } from "../../data/doctors"
 import { formatDate, formatTime, todayIso } from "../../shared/utils/date"
 import "./care.css"
 
 type AppointmentForm = {
-	doctorId: string
+	providerId: string
 	date: string
 	time: string
 	type: AppointmentType
 	notes: string
 }
 
-/** نوبت‌دهی مادر با ماما و پزشک. */
+/**
+ * نوبت‌دهی مادر.
+ * مادر فقط درخواست ثبت می‌کند و می‌تواند لغو کند؛ تأیید، رد و ثبت انجام فقط از پنل کادر درمان انجام می‌شود.
+ */
 export function AppointmentsPage() {
-	const { motherId } = useMotherContext()
-	const care = useCareState()
-	const assignedMidwifeId = getAssignedMidwifeId(motherId)
-	const assignedMidwife = getCareProvider(assignedMidwifeId)
+	const { db, care, motherId, pregnancyId, assignedMidwifeId, assignedMidwife } = useCare()
 	const [form, setForm] = useState<AppointmentForm>({
-		doctorId: assignedMidwifeId,
+		providerId: "",
 		date: todayIso(),
 		time: "10:00",
 		type: "midwifery",
@@ -57,73 +57,86 @@ export function AppointmentsPage() {
 	const [error, setError] = useState<string | null>(null)
 	const [notice, setNotice] = useState<string | null>(null)
 
+	const providers = listProviders(db)
+	const selectedProviderId = form.providerId || assignedMidwifeId || providers[0]?.id || ""
 	const appointments = ownedBy(care.appointments, motherId)
 	const today = todayIso()
 	const upcoming = appointments
-		.filter((item) => item.date >= today && item.status !== "canceled" && item.status !== "done")
+		.filter((item) => isOpenAppointment(item.status) && item.date >= today)
 		.sort((a, b) => (a.date === b.date ? a.time.localeCompare(b.time) : a.date.localeCompare(b.date)))
+	const upcomingIds = new Set(upcoming.map((item) => item.id))
 	const archive = appointments
-		.filter((item) => !upcoming.includes(item))
+		.filter((item) => !upcomingIds.has(item.id))
 		.sort((a, b) => b.date.localeCompare(a.date))
 
 	const toItem = (id: string): CareRecordItem | null => {
 		const item = appointments.find((entry) => entry.id === id)
 		if (!item) return null
+		const provider = getProviderView(db, item.providerId)
 		return {
 			id: item.id,
-			title: `${APPOINTMENT_TYPE_LABELS[item.type]} · ${getCareProviderName(item.doctorId)}`,
-			badge: <Badge tone={APPOINTMENT_STATUS_TONES[item.status]}>{APPOINTMENT_STATUS_LABELS[item.status]}</Badge>,
-			meta: `${formatDate(item.date)} — ساعت ${formatTime(item.time)}`,
+			title: `${APPOINTMENT_TYPE_LABELS[item.type]} · ${provider?.name ?? "کادر درمان"}`,
+			badge: (
+				<Badge tone={APPOINTMENT_STATUS_TONES[item.status]}>{APPOINTMENT_STATUS_LABELS[item.status]}</Badge>
+			),
+			meta: `${formatDate(item.date)} — ساعت ${formatTime(item.time)}${provider ? ` · ${provider.clinic}` : ""}`,
 			body: item.notes || undefined,
-			accent: item.status === "canceled" ? "alert" : item.status === "done" ? "done" : "due",
+			accent:
+				item.status === "canceled" || item.status === "rejected"
+					? "alert"
+					: item.status === "done"
+						? "done"
+						: "due",
 			actions: (
 				<>
-					{item.status !== "done" && item.status !== "canceled" && (
-						<>
-							<Button
-								variant="outline"
-								size="sm"
-								onClick={() => careActions.setAppointmentStatus(item.id, "done")}
-							>
-								انجام شد
-							</Button>
-							<Button
-								variant="ghost"
-								size="sm"
-								onClick={() => careActions.setAppointmentStatus(item.id, "canceled")}
-							>
-								لغو نوبت
-							</Button>
-						</>
+					{motherCanCancel(item.status) && (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => careActions.cancelAppointmentByMother(item.id, motherId)}
+						>
+							لغو درخواست
+						</Button>
 					)}
-					<Button variant="ghost" size="sm" onClick={() => careActions.deleteAppointment(item.id)}>
-						حذف
-					</Button>
+					{!isOpenAppointment(item.status) && (
+						<Button
+							variant="ghost"
+							size="sm"
+							onClick={() => careActions.deleteAppointment(item.id, motherId)}
+						>
+							حذف از بایگانی
+						</Button>
+					)}
 				</>
 			),
 		}
 	}
 
-	const upcomingItems = upcoming.map((item) => toItem(item.id)).filter((item): item is CareRecordItem => item !== null)
-	const archiveItems = archive.map((item) => toItem(item.id)).filter((item): item is CareRecordItem => item !== null)
+	const upcomingItems = upcoming
+		.map((item) => toItem(item.id))
+		.filter((item): item is CareRecordItem => item !== null)
+	const archiveItems = archive
+		.map((item) => toItem(item.id))
+		.filter((item): item is CareRecordItem => item !== null)
 
 	const submit = () => {
 		setNotice(null)
-		if (!form.doctorId) return setError("ماما یا پزشک موردنظر را انتخاب کنید.")
+		if (!selectedProviderId) return setError("ماما یا پزشک موردنظر را انتخاب کنید.")
 		if (!form.date) return setError("تاریخ نوبت را انتخاب کنید.")
 		if (!form.time) return setError("ساعت نوبت را وارد کنید.")
-		careActions.addAppointment({
+		if (form.date < today) return setError("تاریخ نوبت نمی‌تواند در گذشته باشد.")
+		careActions.requestAppointment({
 			motherId,
-			doctorId: form.doctorId,
+			pregnancyId,
+			providerId: selectedProviderId,
 			date: form.date,
 			time: form.time,
 			type: form.type,
-			status: "requested",
 			notes: form.notes.trim(),
 		})
 		setForm({ ...form, notes: "" })
 		setError(null)
-		setNotice("درخواست نوبت ثبت شد و در وضعیت «درخواست شده» قرار گرفت.")
+		setNotice("درخواست نوبت ثبت شد و در انتظار تأیید کادر درمان است.")
 		return undefined
 	}
 
@@ -146,7 +159,7 @@ export function AppointmentsPage() {
 						<Button
 							variant="secondary"
 							size="sm"
-							onClick={() => setForm({ ...form, doctorId: assignedMidwife.id, type: "midwifery" })}
+							onClick={() => setForm({ ...form, providerId: assignedMidwife.id, type: "midwifery" })}
 						>
 							درخواست نوبت از مامای خودم
 						</Button>
@@ -159,7 +172,7 @@ export function AppointmentsPage() {
 			<Card title="کادر درمان در دسترس" subtitle="ماماها و پزشکان قابل انتخاب برای نوبت">
 				<CareRecordList
 					emptyTitle="کادر درمانی برای نمایش نیست."
-					items={CARE_PROVIDERS.map((provider) => ({
+					items={providers.map((provider) => ({
 						id: provider.id,
 						title: provider.name,
 						badge: (
@@ -169,7 +182,8 @@ export function AppointmentsPage() {
 									: CARE_PROVIDER_ROLE_LABELS[provider.role]}
 							</Badge>
 						),
-						meta: `${provider.specialty} · ${provider.clinic}`,
+						meta: `${provider.specialty} · ${provider.clinic} · ${provider.phone}`,
+						accent: provider.id === selectedProviderId ? "due" : "none",
 						actions: (
 							<Button
 								variant="outline"
@@ -177,7 +191,7 @@ export function AppointmentsPage() {
 								onClick={() =>
 									setForm({
 										...form,
-										doctorId: provider.id,
+										providerId: provider.id,
 										type: provider.role === "midwife" ? "midwifery" : "doctor",
 									})
 								}
@@ -193,9 +207,13 @@ export function AppointmentsPage() {
 				<div className="care-form">
 					<Field label="ماما / پزشک">
 						<Select
-							value={form.doctorId}
-							onChange={(value) => setForm({ ...form, doctorId: value })}
-							options={careProviderOptions()}
+							value={selectedProviderId}
+							onChange={(value) => setForm({ ...form, providerId: value })}
+							options={providerOptions(db).map((option) => ({
+								value: option.value,
+								label:
+									option.value === assignedMidwifeId ? `${option.label} (مامای مسئول)` : option.label,
+							}))}
 						/>
 					</Field>
 					<Field label="نوع نوبت">
@@ -209,12 +227,12 @@ export function AppointmentsPage() {
 						<JalaliDateInput
 							value={form.date}
 							onChange={(value) => setForm({ ...form, date: value })}
-							yearsBack={1}
+							yearsBack={0}
 							yearsAhead={2}
 						/>
 					</Field>
 					<Field label="ساعت">
-						<TextInput value={form.time} onChange={(value) => setForm({ ...form, time: value })} type="time" />
+						<TimeInput value={form.time} onChange={(value) => setForm({ ...form, time: value })} />
 					</Field>
 					<div className="care-form__wide">
 						<Field label="یادداشت">
@@ -231,7 +249,7 @@ export function AppointmentsPage() {
 						</Button>
 					</div>
 					<p className="care-note care-form__wide">
-						نوبت جدید با وضعیت «درخواست شده» ثبت می‌شود. تایید نهایی توسط کادر درمان انجام می‌شود.
+						نوبت جدید با وضعیت «درخواست شده» ثبت می‌شود. تأیید، رد یا ثبت انجام فقط توسط کادر درمان انجام می‌شود.
 					</p>
 				</div>
 			</Card>
