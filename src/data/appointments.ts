@@ -1,7 +1,9 @@
-/** داده و انواع «نوبت‌دهی» بین مادر و کادر درمان. */
+/**
+ * انواع و ماشین وضعیت «نوبت‌دهی» بین مادر و کادر درمان.
+ * هر نوبت با شناسه به ارائه‌دهنده (providerId) و پرونده بارداری (pregnancyId) وصل می‌شود.
+ */
 
 import type { Tone } from "../shared/constants/labels"
-import { todayIso, addDays } from "../shared/utils/date"
 
 export type AppointmentType = "midwifery" | "doctor" | "other"
 
@@ -17,68 +19,113 @@ export const APPOINTMENT_TYPE_OPTIONS: ReadonlyArray<{ value: string; label: str
 	{ value: "other", label: "سایر" },
 ]
 
-export type AppointmentStatus = "requested" | "confirmed" | "canceled" | "done"
+/**
+ * ماشین وضعیت نوبت:
+ * requested ← درخواست مادر
+ * requested → confirmed | rejected (فقط کادر درمان)
+ * confirmed → done | canceled (فقط کادر درمان)
+ * مادر فقط می‌تواند نوبت باز را لغو کند.
+ */
+export type AppointmentStatus = "requested" | "confirmed" | "rejected" | "done" | "canceled"
 
 export const APPOINTMENT_STATUS_LABELS: Record<AppointmentStatus, string> = {
 	requested: "درخواست شده",
-	confirmed: "تایید شده",
-	canceled: "لغو شده",
+	confirmed: "تأیید شده",
+	rejected: "رد شده",
 	done: "انجام شده",
+	canceled: "لغو شده",
 }
 
 export const APPOINTMENT_STATUS_TONES: Record<AppointmentStatus, Tone> = {
 	requested: "warn",
 	confirmed: "info",
-	canceled: "danger",
+	rejected: "danger",
 	done: "success",
+	canceled: "neutral",
 }
 
-export const APPOINTMENT_STATUS_OPTIONS: ReadonlyArray<{ value: string; label: string }> = [
-	{ value: "requested", label: "درخواست شده" },
-	{ value: "confirmed", label: "تایید شده" },
-	{ value: "canceled", label: "لغو شده" },
-	{ value: "done", label: "انجام شده" },
-]
+export const APPOINTMENT_STATUS_OPTIONS: ReadonlyArray<{ value: string; label: string }> = (
+	["requested", "confirmed", "rejected", "done", "canceled"] as AppointmentStatus[]
+).map((status) => ({ value: status, label: APPOINTMENT_STATUS_LABELS[status] }))
 
 export type Appointment = {
 	id: string
 	motherId: string
-	doctorId: string
+	/** پرونده بارداری مرتبط، اگر نوبت مربوط به بارداری فعال باشد */
+	pregnancyId: string | null
+	/** شناسه پایدار ماما/پزشک از دفترچه واحد کادر درمان */
+	providerId: string
 	date: string
+	time: string
+	type: AppointmentType
+	status: AppointmentStatus
+	notes: string
+	createdAt: string
+	updatedAt: string
+}
+
+/** نوبت باز = هنوز به نتیجه نهایی نرسیده است. */
+export function isOpenAppointment(status: AppointmentStatus): boolean {
+	return status === "requested" || status === "confirmed"
+}
+
+/** مادر فقط می‌تواند نوبت باز را لغو کند؛ «انجام شد» کار کادر درمان است. */
+export function motherCanCancel(status: AppointmentStatus): boolean {
+	return isOpenAppointment(status)
+}
+
+/** اقدام‌های مجاز کادر درمان روی هر وضعیت. */
+export function providerTransitions(status: AppointmentStatus): AppointmentStatus[] {
+	if (status === "requested") return ["confirmed", "rejected"]
+	if (status === "confirmed") return ["done", "canceled"]
+	return []
+}
+
+export const APPOINTMENT_TRANSITION_LABELS: Record<AppointmentStatus, string> = {
+	requested: "بازگرداندن به درخواست",
+	confirmed: "تأیید نوبت",
+	rejected: "رد درخواست",
+	done: "ثبت انجام ویزیت",
+	canceled: "لغو نوبت",
+}
+
+/**
+ * الگوی داده نمایشی نوبت.
+ * الگوها هنگام اولین ورود هر مادر با شناسه واقعی همان مادر و ارائه‌دهنده واقعی ساخته می‌شوند.
+ */
+export type AppointmentSeedTemplate = {
+	key: string
+	providerRole: "midwife" | "specialist"
+	dayOffset: number
 	time: string
 	type: AppointmentType
 	status: AppointmentStatus
 	notes: string
 }
 
-const TODAY = todayIso()
-
-export const SEED_APPOINTMENTS: ReadonlyArray<Appointment> = [
+export const APPOINTMENT_SEED_TEMPLATES: ReadonlyArray<AppointmentSeedTemplate> = [
 	{
-		id: "apt-seed-1",
-		motherId: "*",
-		doctorId: "prv-midwife-1",
-		date: addDays(TODAY, 3),
+		key: "apt-1",
+		providerRole: "midwife",
+		dayOffset: 3,
 		time: "10:30",
 		type: "midwifery",
 		status: "confirmed",
 		notes: "ویزیت دوره‌ای مراقبت بارداری",
 	},
 	{
-		id: "apt-seed-2",
-		motherId: "*",
-		doctorId: "prv-doctor-1",
-		date: addDays(TODAY, 12),
+		key: "apt-2",
+		providerRole: "specialist",
+		dayOffset: 12,
 		time: "17:00",
 		type: "doctor",
 		status: "requested",
 		notes: "بررسی نتیجه سونوگرافی",
 	},
 	{
-		id: "apt-seed-3",
-		motherId: "*",
-		doctorId: "prv-midwife-1",
-		date: addDays(TODAY, -10),
+		key: "apt-3",
+		providerRole: "midwife",
+		dayOffset: -10,
 		time: "09:00",
 		type: "midwifery",
 		status: "done",
