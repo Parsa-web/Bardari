@@ -20,6 +20,7 @@ import { MidwifeDashboard } from "../../features/midwife/MidwifeDashboard"
 import { MidwifeMothersPage } from "../../features/midwife/MidwifeMothersPage"
 import { MidwifeQuestionsPage } from "../../features/midwife/MidwifeQuestionsPage"
 import { MidwifeCheckupsPage } from "../../features/midwife/MidwifeCheckupsPage"
+import { MidwifeAppointmentsPage } from "../../features/midwife/MidwifeAppointmentsPage"
 import { MidwifeReferralsPage } from "../../features/midwife/MidwifeReferralsPage"
 import { SpecialistDashboard } from "../../features/specialist/SpecialistDashboard"
 import { SpecialistReferralsPage } from "../../features/specialist/SpecialistReferralsPage"
@@ -64,6 +65,7 @@ export function AppRoutes() {
 			>
 				<Route index element={<MidwifeDashboard />} />
 				<Route path="mothers" element={<MidwifeMothersPage />} />
+				<Route path="appointments" element={<MidwifeAppointmentsPage />} />
 				<Route path="questions" element={<MidwifeQuestionsPage />} />
 				<Route path="checkups" element={<MidwifeCheckupsPage />} />
 				<Route path="referrals" element={<MidwifeReferralsPage />} />
