@@ -1,0 +1,64 @@
+.time-input {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 8px;
+	border: 1px solid var(--border, #d8dce5);
+	border-radius: 10px;
+	background: var(--surface, #fff);
+	min-height: 44px;
+}
+
+.time-input__cell {
+	width: 42px;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	text-align: center;
+	padding: 6px 0;
+	border-radius: 8px;
+}
+
+.time-input__cell:focus {
+	outline: 2px solid var(--accent, #7c5cff);
+	outline-offset: 1px;
+}
+
+.time-input__cell:disabled {
+	opacity: 0.6;
+}
+
+.time-input__sep {
+	opacity: 0.7;
+}
+
+.time-input__period {
+	display: inline-flex;
+	gap: 2px;
+	margin-inline-start: 6px;
+	padding: 2px;
+	border-radius: 8px;
+	background: var(--surface-muted, rgba(127, 127, 127, 0.12));
+}
+
+.time-input__period-btn {
+	border: 0;
+	background: transparent;
+	color: inherit;
+	font: inherit;
+	font-size: 13px;
+	padding: 5px 10px;
+	border-radius: 6px;
+	cursor: pointer;
+}
+
+.time-input__period-btn.is-active {
+	background: var(--accent, #7c5cff);
+	color: #fff;
+}
+
+.time-input__period-btn:disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
