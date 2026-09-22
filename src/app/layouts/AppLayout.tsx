@@ -42,6 +42,7 @@ const NAV: Record<string, NavItem[]> = {
 	midwife: [
 		{ to: "/midwife", label: "خانه", icon: "home", group: "مرور کلی" },
 		{ to: "/midwife/mothers", label: "مادران تحت مراقبت", icon: "users", group: "پرونده‌ها" },
+		{ to: "/midwife/appointments", label: "نوبت‌ها", icon: "calendar", group: "پرونده‌ها" },
 		{ to: "/midwife/questions", label: "سؤال‌ها", icon: "question", group: "پرونده‌ها" },
 		{ to: "/midwife/checkups", label: "چکاپ‌ها", icon: "calendar", group: "پرونده‌ها" },
 		{ to: "/midwife/referrals", label: "ارجاع‌ها", icon: "referral", group: "پیگیری" },
