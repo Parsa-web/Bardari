@@ -1,16 +1,10 @@
 /**
- * داده و انواع «پرونده سلامت کودک» پس از تولد.
+ * «سابقه بیماری و درمان کودک».
+ *
+ * توجه: موجودیت کودک در این فایل نگهداری نمی‌شود.
+ * منبع یکتای کودک db.children است و هر سابقه فقط با childId به همان پرونده وصل می‌شود.
  * این بخش فقط ثبت سابقه است؛ سامانه هیچ دارویی توصیه نمی‌کند.
  */
-
-import { todayIso, addDays } from "../shared/utils/date"
-
-export type CareChild = {
-	id: string
-	motherId: string
-	name: string
-	birthDate: string
-}
 
 export type ChildMedicalRecord = {
 	id: string
@@ -22,29 +16,32 @@ export type ChildMedicalRecord = {
 	doctorNotes: string
 	startDate: string
 	endDate: string
+	createdAt: string
 }
 
-const TODAY = todayIso()
+export type ChildRecordSeedTemplate = {
+	key: string
+	/** کودک نمایشی از داده اصلی (db.children) */
+	childId: string
+	illness: string
+	diagnosis: string
+	treatment: string
+	medicationList: string[]
+	doctorNotes: string
+	startDayOffset: number
+	endDayOffset: number | null
+}
 
-export const SEED_CARE_CHILDREN: ReadonlyArray<CareChild> = [
+export const CHILD_RECORD_SEED_TEMPLATES: ReadonlyArray<ChildRecordSeedTemplate> = [
 	{
-		id: "cld-seed-1",
-		motherId: "*",
-		name: "آوا",
-		birthDate: addDays(TODAY, -420),
-	},
-]
-
-export const SEED_CHILD_RECORDS: ReadonlyArray<ChildMedicalRecord> = [
-	{
-		id: "cmr-seed-1",
-		childId: "cld-seed-1",
+		key: "cmr-1",
+		childId: "ch_1",
 		illness: "سرماخوردگی",
 		diagnosis: "عفونت ویروسی خفیف دستگاه تنفسی فوقانی",
 		treatment: "استراحت، مایعات کافی و شست‌وشوی بینی با سالین",
 		medicationList: ["قطره سالین بینی (طبق دستور پزشک)"],
 		doctorNotes: "در صورت تب بالای ۳۸.۵ درجه یا تنگی نفس مراجعه فوری شود.",
-		startDate: addDays(TODAY, -30),
-		endDate: addDays(TODAY, -24),
+		startDayOffset: -30,
+		endDayOffset: -24,
 	},
 ]
