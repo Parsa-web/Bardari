@@ -17,6 +17,7 @@ import { JalaliDateInput } from "../../shared/components/DateInput"
 import { GrowthChart } from "../../shared/components/GrowthChart"
 import type { ChartPoint } from "../../shared/components/GrowthChart"
 import { useMotherContext } from "./useMotherContext"
+import { useSelectedChild } from "../../shared/hooks/useSelectedChild"
 import {
 	getChildren,
 	getGrowth,
@@ -40,11 +41,11 @@ export function ChildrenPage() {
 	const { db, motherId } = useMotherContext()
 	const { mutate } = useData()
 	const children = getChildren(db, motherId)
-	const [selectedId, setSelectedId] = useState<string>(children[0]?.id ?? "")
+	const { child, selectChild, options } = useSelectedChild(children)
 	const [metric, setMetric] = useState<Metric>("weight")
 	const [growthForm, setGrowthForm] = useState({ date: todayIso(), weight: "", height: "", head: "" })
+	const [growthError, setGrowthError] = useState<string | null>(null)
 
-	const child = children.find((item) => item.id === selectedId) ?? children[0] ?? null
 	const growth = useMemo(() => (child ? getGrowth(db, child.id) : []), [db, child])
 
 	const chartPoints = useMemo<ChartPoint[]>(() => {
@@ -79,16 +80,25 @@ export function ChildrenPage() {
 	const activeMetric = METRICS.find((item) => item.value === metric) ?? METRICS[0]
 
 	const submitGrowth = () => {
-		if (!growthForm.date) return
+		if (!growthForm.date) return setGrowthError("تاریخ اندازه‌گیری الزامی است.")
+		const numbers = [growthForm.weight, growthForm.height, growthForm.head]
+		if (numbers.every((value) => value.trim() === ""))
+			return setGrowthError("دست‌کم یکی از مقادیر وزن، قد یا دور سر را وارد کنید.")
+		if (numbers.some((value) => value.trim() !== "" && !Number.isFinite(Number(value))))
+			return setGrowthError("مقادیر اندازه‌گیری باید عدد باشند.")
+		if (numbers.some((value) => value.trim() !== "" && Number(value) < 0))
+			return setGrowthError("مقادیر اندازه‌گیری نمی‌توانند منفی باشند.")
+		setGrowthError(null)
 		void mutate((current) =>
 			addGrowthMeasurement(current, {
 				childId: child.id,
 				date: growthForm.date,
-				weightKg: growthForm.weight ? Number(growthForm.weight) : null,
-				heightCm: growthForm.height ? Number(growthForm.height) : null,
-				headCm: growthForm.head ? Number(growthForm.head) : null,
+				weightKg: growthForm.weight.trim() ? Number(growthForm.weight) : null,
+				heightCm: growthForm.height.trim() ? Number(growthForm.height) : null,
+				headCm: growthForm.head.trim() ? Number(growthForm.head) : null,
 			}),
 		).then(() => setGrowthForm({ date: todayIso(), weight: "", height: "", head: "" }))
+		return undefined
 	}
 
 	return (
@@ -96,14 +106,7 @@ export function ChildrenPage() {
 			<PageHeader
 				title="پرونده کودکان"
 				subtitle="واکسیناسیون، رشد، مراحل تحول و سابقه سلامت"
-				actions={
-					<Select
-						inline
-						value={child.id}
-						onChange={(value) => setSelectedId(value)}
-						options={children.map((item) => ({ value: item.id, label: item.name }))}
-					/>
-				}
+				actions={<Select inline value={child.id} onChange={selectChild} options={options} />}
 			/>
 
 			<Grid cols={4}>
@@ -113,6 +116,11 @@ export function ChildrenPage() {
 				<Stat
 					label="واکسن انجام‌نشده"
 					value={toFa(vaccinations.filter((item) => !item.doneDate).length)}
+					hint={
+						vaccinations.some((item) => !item.doneDate && item.dueDate < todayIso())
+							? `${toFa(vaccinations.filter((item) => !item.doneDate && item.dueDate < todayIso()).length)} مورد عقب‌افتاده`
+							: undefined
+					}
 					tone={vaccinations.some((item) => !item.doneDate) ? "warn" : "success"}
 				/>
 			</Grid>
@@ -130,8 +138,16 @@ export function ChildrenPage() {
 										<p className="muted">موعد: {formatDate(item.dueDate)}</p>
 									</div>
 									<div className="row-actions">
-										<Badge tone={item.doneDate ? "success" : "warn"}>
-											{item.doneDate ? `انجام شد: ${formatDate(item.doneDate)}` : "انجام نشده"}
+										<Badge
+											tone={
+												item.doneDate ? "success" : item.dueDate < todayIso() ? "danger" : "warn"
+											}
+										>
+											{item.doneDate
+												? `انجام شد: ${formatDate(item.doneDate)}`
+												: item.dueDate < todayIso()
+													? "عقب‌افتاده"
+													: "انجام نشده"}
 										</Badge>
 										<Button
 											variant="ghost"
@@ -245,6 +261,7 @@ export function ChildrenPage() {
 						/>
 					</Field>
 				</FormRow>
+				{growthError && <p className="muted">{growthError}</p>}
 				<Button variant="primary" icon="plus" onClick={submitGrowth}>
 					ثبت اندازه‌گیری
 				</Button>
@@ -266,9 +283,9 @@ export function ChildrenPage() {
 								{growth.map((item) => (
 									<tr key={item.id}>
 										<td>{formatDate(item.date)}</td>
-										<td>{item.weightKg ? toFa(item.weightKg) : "—"}</td>
-										<td>{item.heightCm ? toFa(item.heightCm) : "—"}</td>
-										<td>{item.headCm ? toFa(item.headCm) : "—"}</td>
+										<td>{typeof item.weightKg === "number" ? toFa(item.weightKg) : NOT_RECORDED}</td>
+										<td>{typeof item.heightCm === "number" ? toFa(item.heightCm) : NOT_RECORDED}</td>
+										<td>{typeof item.headCm === "number" ? toFa(item.headCm) : NOT_RECORDED}</td>
 									</tr>
 								))}
 							</tbody>
