@@ -1,10 +1,9 @@
 /**
- * داده و انواع «چکاپ بارداری».
- * دسته‌ها فقط دو مورد است: عمومی و سایر.
+ * انواع «چکاپ بارداری» (فقط دو دسته: عمومی و سایر).
+ * چکاپ بارداری مادر با واکسیناسیون کودک یکی نیست؛ واکسن کودک در پرونده کودک نگهداری می‌شود.
  */
 
 import type { Tone } from "../shared/constants/labels"
-import { todayIso, addDays } from "../shared/utils/date"
 
 export type CareCheckupType = "general" | "other"
 
@@ -24,12 +23,16 @@ export const CARE_CHECKUP_TYPE_OPTIONS: ReadonlyArray<{ value: string; label: st
 ]
 
 /**
- * چکاپ عمومی: { type: "general", date, title, notes } به همراه تاریخ چکاپ بعدی.
- * چکاپ سایر: { type: "other", date, reason, notes } برای ویزیت فوری یا بررسی اضافه.
+ * چکاپ عمومی: عنوان + تاریخ + تاریخ چکاپ بعدی (اختیاری).
+ * چکاپ سایر: دلیل مراجعه + تاریخ.
+ * اگر چکاپ از دل یک نوبت ساخته شود، فقط appointmentId ذخیره می‌شود (بدون تکرار اطلاعات).
  */
 export type CareCheckup = {
 	id: string
 	motherId: string
+	pregnancyId: string | null
+	providerId: string | null
+	appointmentId: string | null
 	type: CareCheckupType
 	date: string
 	title: string
@@ -37,42 +40,54 @@ export type CareCheckup = {
 	notes: string
 	nextDate: string
 	done: boolean
+	createdAt: string
 }
 
-const TODAY = todayIso()
+export type CareCheckupSeedTemplate = {
+	key: string
+	type: CareCheckupType
+	dayOffset: number
+	title: string
+	reason: string
+	notes: string
+	nextDayOffset: number | null
+	done: boolean
+	/** آیا این چکاپ توسط ماما مسئول انجام می‌شود */
+	byAssignedMidwife: boolean
+}
 
-export const SEED_CARE_CHECKUPS: ReadonlyArray<CareCheckup> = [
+export const CHECKUP_SEED_TEMPLATES: ReadonlyArray<CareCheckupSeedTemplate> = [
 	{
-		id: "chk-seed-1",
-		motherId: "*",
+		key: "chk-1",
 		type: "general",
-		date: addDays(TODAY, 5),
+		dayOffset: 5,
 		title: "چکاپ دوره‌ای بارداری",
 		reason: "",
 		notes: "همراه داشتن دفترچه مراقبت و آخرین آزمایش",
-		nextDate: addDays(TODAY, 33),
+		nextDayOffset: 33,
 		done: false,
+		byAssignedMidwife: true,
 	},
 	{
-		id: "chk-seed-2",
-		motherId: "*",
+		key: "chk-2",
 		type: "general",
-		date: addDays(TODAY, -20),
+		dayOffset: -20,
 		title: "چکاپ دوره‌ای بارداری",
 		reason: "",
 		notes: "وزن و فشار خون در محدوده طبیعی بود",
-		nextDate: addDays(TODAY, 5),
+		nextDayOffset: 5,
 		done: true,
+		byAssignedMidwife: true,
 	},
 	{
-		id: "chk-seed-3",
-		motherId: "*",
+		key: "chk-3",
 		type: "other",
-		date: addDays(TODAY, -8),
+		dayOffset: -8,
 		title: "",
 		reason: "ویزیت فوری به دلیل سرگیجه",
 		notes: "توصیه به استراحت و مصرف مایعات بیشتر",
-		nextDate: "",
+		nextDayOffset: null,
 		done: true,
+		byAssignedMidwife: false,
 	},
 ]
