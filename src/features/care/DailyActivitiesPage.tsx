@@ -10,10 +10,11 @@ import {
 	TextInput,
 } from "../../shared/components/ui"
 import { JalaliDateInput } from "../../shared/components/DateInput"
+import { TimeInput } from "../../shared/components/TimeInput"
 import { CareRecordList } from "./components/CareRecordList"
 import type { CareRecordItem } from "./components/CareRecordList"
-import { useMotherContext } from "../mother/useMotherContext"
-import { careActions, ownedBy, useCareState } from "./careStore"
+import { careActions, ownedBy } from "./careStore"
+import { useCare } from "./useCare"
 import type { ActivityCategory } from "../../data/activities"
 import { ACTIVITY_CATEGORY_LABELS, ACTIVITY_CATEGORY_OPTIONS } from "../../data/activities"
 import { addDays, formatDate, formatTime, todayIso } from "../../shared/utils/date"
@@ -37,8 +38,7 @@ const EMPTY_RECURRING: RecurringForm = {
 
 /** برنامه روزانه مادر: فعالیت‌های همان روز + روتین‌های ثابت تکرارشونده. */
 export function DailyActivitiesPage() {
-	const { motherId } = useMotherContext()
-	const care = useCareState()
+	const { care, motherId, pregnancyId } = useCare()
 	const [selectedDate, setSelectedDate] = useState<string>(todayIso())
 	const [recForm, setRecForm] = useState<RecurringForm>(EMPTY_RECURRING)
 	const [error, setError] = useState<string | null>(null)
@@ -47,7 +47,7 @@ export function DailyActivitiesPage() {
 	const activities = ownedBy(care.activities, motherId)
 	const recurring = ownedBy(care.recurring, motherId)
 	const dayActivities = activities
-		.filter((item) => item.date === selectedDate)
+		.filter((item) => item.date === selectedDate && !item.recurringId)
 		.sort((a, b) => a.startTime.localeCompare(b.startTime))
 
 	const timeRange = (start: string, end: string) => `${formatTime(start)} تا ${formatTime(end)}`
@@ -133,6 +133,7 @@ export function DailyActivitiesPage() {
 		if (recForm.endTime <= recForm.startTime) return setError("ساعت پایان باید بعد از ساعت شروع باشد.")
 		careActions.addRecurring({
 			motherId,
+			pregnancyId,
 			category: recForm.category,
 			title: recForm.title.trim(),
 			startTime: recForm.startTime,
@@ -179,22 +180,26 @@ export function DailyActivitiesPage() {
 				<Field label="انتخاب روز (تقویم شمسی)">
 					<JalaliDateInput value={selectedDate} onChange={setSelectedDate} yearsBack={2} yearsAhead={1} />
 				</Field>
-				<CareRecordList
-					items={dayItems}
-					emptyTitle="برای این روز فعالیتی ثبت نشده است."
-					emptyHint="یک روتین ثابت بسازید یا فعالیت را در دفترچه فعالیت ثبت کنید."
-				/>
+				<div className="care-scroll">
+					<CareRecordList
+						items={dayItems}
+						emptyTitle="برای این روز فعالیتی ثبت نشده است."
+						emptyHint="یک روتین ثابت بسازید یا فعالیت را در دفترچه فعالیت ثبت کنید."
+					/>
+				</div>
 			</Card>
 
 			<Card
 				title="روتین‌های ثابت"
 				subtitle="یک‌بار بسازید — مانند «هر روز از ۸:۰۰ تا ۸:۳۰ پیاده‌روی بیرون از خانه»"
 			>
-				<CareRecordList
-					items={recurringItems}
-					emptyTitle="روتین ثابتی ثبت نشده است."
-					emptyHint="فعالیت‌های هرروزه را یک‌بار ثبت کنید تا هر روز خودکار نمایش داده شوند."
-				/>
+				<div className="care-scroll">
+					<CareRecordList
+						items={recurringItems}
+						emptyTitle="روتین ثابتی ثبت نشده است."
+						emptyHint="فعالیت‌های هرروزه را یک‌بار ثبت کنید تا هر روز خودکار نمایش داده شوند."
+					/>
+				</div>
 
 				<div className="care-form">
 					<Field label="دسته">
@@ -211,21 +216,17 @@ export function DailyActivitiesPage() {
 							placeholder="مانند پیاده‌روی روزانه"
 						/>
 					</Field>
-					<Field label="ساعت شروع و پایان">
-						<div className="care-list__actions">
-							<TextInput
-								value={recForm.startTime}
-								onChange={(value) => setRecForm({ ...recForm, startTime: value })}
-								type="time"
-								inline
-							/>
-							<TextInput
-								value={recForm.endTime}
-								onChange={(value) => setRecForm({ ...recForm, endTime: value })}
-								type="time"
-								inline
-							/>
-						</div>
+					<Field label="ساعت شروع">
+						<TimeInput
+							value={recForm.startTime}
+							onChange={(value) => setRecForm({ ...recForm, startTime: value })}
+						/>
+					</Field>
+					<Field label="ساعت پایان">
+						<TimeInput
+							value={recForm.endTime}
+							onChange={(value) => setRecForm({ ...recForm, endTime: value })}
+						/>
 					</Field>
 					<Field label="توضیح">
 						<TextInput
