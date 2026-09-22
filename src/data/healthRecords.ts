@@ -1,7 +1,6 @@
-/** داده و انواع «وضعیت سلامت روزانه» مادر. */
+/** انواع «وضعیت سلامت روزانه» مادر؛ هر رکورد به مادر و پرونده بارداری وصل است. */
 
 import type { Tone } from "../shared/constants/labels"
-import { todayIso, addDays } from "../shared/utils/date"
 
 export type HealthCategory = "pain" | "nausea" | "fatigue" | "headache" | "complaint" | "other"
 
@@ -46,37 +45,26 @@ export const HEALTH_SEVERITY_OPTIONS: ReadonlyArray<{ value: string; label: stri
 export type HealthRecord = {
 	id: string
 	motherId: string
+	/** پرونده بارداری مرتبط؛ برای رکوردهای خارج از دوره بارداری null است */
+	pregnancyId: string | null
 	date: string
 	category: HealthCategory
 	description: string
 	severity: HealthSeverity
+	createdAt: string
 }
 
-const TODAY = todayIso()
+/** الگوی داده نمایشی؛ هنگام اولین ورود هر مادر با شناسه واقعی او ساخته می‌شود. */
+export type HealthSeedTemplate = {
+	key: string
+	dayOffset: number
+	category: HealthCategory
+	severity: HealthSeverity
+	description: string
+}
 
-export const SEED_HEALTH_RECORDS: ReadonlyArray<HealthRecord> = [
-	{
-		id: "hlt-seed-1",
-		motherId: "*",
-		date: TODAY,
-		category: "nausea",
-		description: "تهوع صبحگاهی بعد از بیدار شدن",
-		severity: "medium",
-	},
-	{
-		id: "hlt-seed-2",
-		motherId: "*",
-		date: addDays(TODAY, -2),
-		category: "fatigue",
-		description: "خستگی بعد از کار روزانه",
-		severity: "low",
-	},
-	{
-		id: "hlt-seed-3",
-		motherId: "*",
-		date: addDays(TODAY, -6),
-		category: "headache",
-		description: "سردرد خفیف در بعدازظهر",
-		severity: "low",
-	},
+export const HEALTH_SEED_TEMPLATES: ReadonlyArray<HealthSeedTemplate> = [
+	{ key: "hlt-1", dayOffset: 0, category: "nausea", severity: "medium", description: "تهوع صبحگاهی بعد از بیدار شدن" },
+	{ key: "hlt-2", dayOffset: -2, category: "fatigue", severity: "low", description: "خستگی بعد از کار روزانه" },
+	{ key: "hlt-3", dayOffset: -6, category: "headache", severity: "low", description: "سردرد خفیف در بعدازظهر" },
 ]
